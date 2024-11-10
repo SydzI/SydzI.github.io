@@ -8,7 +8,7 @@
       <link href="/2024/11/10/WriteUP-for-RE/"/>
       <url>/2024/11/10/WriteUP-for-RE/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h1 id="BUUCTF-easyre"><a href="#BUUCTF-easyre" class="headerlink" title="BUUCTF_easyre"></a>BUUCTF_easyre</h1><ul><li><p>DIE打开，64位</p><p><img src="/2024/11/10/WriteUP-for-RE/image-20241107194219188.png" alt="image-20241107194219188"></p></li><li><p>IDA打开，映入眼帘的就是flag了</p><p><img src="/2024/11/10/WriteUP-for-RE/image-20241107194223826.png" alt="image-20241107194223826"></p></li><li><p>flag：flag{this_Is_a_EaSyRe}</p></li></ul><h1 id="BUUCTF-reverse1"><a href="#BUUCTF-reverse1" class="headerlink" title="BUUCTF_reverse1"></a>BUUCTF_reverse1</h1><ul><li><p>64位</p><p><img src="/2024/11/10/WriteUP-for-RE/image-20241107195640857.png" alt="image-20241107195640857"></p></li><li><p>IDA查看字符串表，定位关键字符串</p><p><img src="/2024/11/10/WriteUP-for-RE/image-20241107195646194.png" alt="image-20241107195646194"></p></li><li><p>找到主函数并反编译，分析</p><p><img src="/2024/11/10/WriteUP-for-RE/image-20241107195654665.png" alt="image-20241107195654665"></p></li><li><p>得到flag：flag{hell0_w0rld}</p></li></ul>]]></content>
       
       
       <categories>
