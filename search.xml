@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>WriteUp_for_RE</title>
-      <link href="/2024/11/10/WriteUp-for-RE/"/>
-      <url>/2024/11/10/WriteUp-for-RE/</url>
+      <title>WriteUP_for_RE</title>
+      <link href="/2024/11/10/WriteUP-for-RE/"/>
+      <url>/2024/11/10/WriteUP-for-RE/</url>
       
-        <content type="html"><![CDATA[<h1 id="BUUCTF-easyre"><a href="#BUUCTF-easyre" class="headerlink" title="BUUCTF_easyre"></a>BUUCTF_easyre</h1><ul><li><p>DIE打开，64位</p><p><img src="/2024/11/10/WriteUp-for-RE/image-20241107194219188.png" alt="image-20241107194219188"></p></li><li><p>IDA打开，映入眼帘的就是flag了</p><p><img src="/2024/11/10/WriteUp-for-RE/image-20241107194223826.png" alt="image-20241107194223826"></p></li><li><p>flag：flag{this_Is_a_EaSyRe}</p></li></ul>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
       
       <categories>
