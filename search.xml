@@ -8,7 +8,7 @@
       <link href="/2024/11/10/%E4%B8%80%E4%BA%9BRE%E7%9A%84WriteUP/"/>
       <url>/2024/11/10/%E4%B8%80%E4%BA%9BRE%E7%9A%84WriteUP/</url>
       
-        <content type="html"><![CDATA[<p>A collection for reverse writeup.</p><span id="more"></span><h1 id="BUUCTF-easyre"><a href="#BUUCTF-easyre" class="headerlink" title="BUUCTF_easyre"></a>BUUCTF_easyre</h1><ul><li><p>DIE打开，64位</p><p><img src="/image-20241107194219188-1731246796136-2.png" alt="image-20241107194219188"></p></li><li><p>IDA打开，映入眼帘的就是flag了</p><p><img src="/image-20241107194223826-1731246796135-1.png" alt="image-20241107194223826"></p></li><li><p>flag：flag{this_Is_a_EaSyRe}</p></li></ul><p><img src="/../%E4%B8%80%E4%BA%9BRE%E7%9A%84WriteUP/avatar-1731929043566-1.jpg" alt="avatar"></p><p><img src="https://s2.loli.net/2024/11/18/Uk4uRWTxB6f8Dwn.png"></p>]]></content>
+        <content type="html"><![CDATA[<p>A collection for reverse writeup.</p><span id="more"></span><h1 id="BUUCTF-easyre"><a href="#BUUCTF-easyre" class="headerlink" title="BUUCTF_easyre"></a>BUUCTF_easyre</h1><ul><li><p>DIE打开，64位</p><p><img src="/image-20241107194219188-1731246796136-2.png" alt="image-20241107194219188"></p></li><li><p>IDA打开，映入眼帘的就是flag了</p><p><img src="/image-20241107194223826-1731246796135-1.png" alt="image-20241107194223826"></p></li><li><p>flag：flag{this_Is_a_EaSyRe}</p></li></ul><p><img src="/../%E4%B8%80%E4%BA%9BRE%E7%9A%84WriteUP/avatar-1731929043566-1.jpg" alt="avatar"></p><p><img src="https://s2.loli.net/2024/11/18/Uk4uRWTxB6f8Dwn.png"></p><p><img src="https://s2.loli.net/2024/11/18/JtfvRqd6723mNpS.png" alt="屏幕截图 2024-11-07 193954"></p>]]></content>
       
       
       <categories>
