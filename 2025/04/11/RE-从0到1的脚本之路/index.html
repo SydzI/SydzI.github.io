@@ -20,28 +20,32 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="SydzI&#39;s blog">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="[SWPUCTF 2021 新生赛]fakebase12345678910111213141516#给的代码如下：flag &#x3D; &#x27;xxxxxxxxxxxxxxxxxxx&#x27;s_box &#x3D; &#x27;qwertyuiopasdfghjkzxcvb123456#$&#x27;tmp &#x3D; &#x27;&#x27;for i in flag:    tmp +&#x3D; str(bin(o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RE:从0到1的脚本之路">
+<meta property="og:url" content="http://example.com/2025/04/11/RE-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/index.html">
 <meta property="og:site_name" content="SydzI&#39;s blog">
+<meta property="og:description" content="[SWPUCTF 2021 新生赛]fakebase12345678910111213141516#给的代码如下：flag &#x3D; &#x27;xxxxxxxxxxxxxxxxxxx&#x27;s_box &#x3D; &#x27;qwertyuiopasdfghjkzxcvb123456#$&#x27;tmp &#x3D; &#x27;&#x27;for i in flag:    tmp +&#x3D; str(bin(o">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-11T01:55:12.000Z">
+<meta property="article:modified_time" content="2025-04-11T15:15:02.513Z">
 <meta property="article:author" content="SydzI">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2025/04/11/RE-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>SydzI's blog</title>
+  <title>RE:从0到1的脚本之路 | SydzI's blog</title>
   
 
 
@@ -183,9 +187,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -201,10 +206,9 @@
       <meta itemprop="name" content="SydzI's blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/04/11/RE-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/" class="post-title-link" itemprop="url">RE:从0到1的脚本之路</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          RE:从0到1的脚本之路
+        </h1>
     
         <div class="post-meta">
             <span class="post-meta-item">
@@ -225,6 +229,18 @@
               <span class="post-meta-item-text"></span>
               <span class="leancloud-visitors-count"></span> times
             </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2025/04/11/RE-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2025/04/11/RE-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/" itemprop="commentCount"></span>
+    </a>
+  </span>
   
   <br>
             <span class="post-meta-item" title="本文字数">
@@ -251,7 +267,7 @@
     <div class="post-body" itemprop="articleBody">
     
       
-          <span id="more"></span>
+        <span id="more"></span>
 
 <h1 id="SWPUCTF-2021-新生赛-fakebase"><a href="#SWPUCTF-2021-新生赛-fakebase" class="headerlink" title="[SWPUCTF 2021 新生赛]fakebase"></a>[SWPUCTF 2021 新生赛]fakebase</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#给的代码如下：</span></span><br><span class="line">flag = <span class="string">&#x27;xxxxxxxxxxxxxxxxxxx&#x27;</span></span><br><span class="line"></span><br><span class="line">s_box = <span class="string">&#x27;qwertyuiopasdfghjkzxcvb123456#$&#x27;</span></span><br><span class="line">tmp = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> flag:</span><br><span class="line">    tmp += <span class="built_in">str</span>(<span class="built_in">bin</span>(<span class="built_in">ord</span>(i)))[<span class="number">2</span>:].zfill(<span class="number">8</span>)</span><br><span class="line">b1 = <span class="built_in">int</span>(tmp,<span class="number">2</span>)</span><br><span class="line">s = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">while</span> b1//<span class="number">31</span> != <span class="number">0</span>:</span><br><span class="line">    s += s_box[b1%<span class="number">31</span>]</span><br><span class="line">    b1 = b1//<span class="number">31</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(s)</span><br><span class="line"></span><br><span class="line"><span class="comment"># s = u#k4ggia61egegzjuqz12jhfspfkay</span></span><br></pre></td></tr></table></figure>
 
@@ -287,217 +303,37 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">&#x27;wesyvbniazxchjko1973652048@$+-&amp;*&lt;&gt;&#x27;</span></span><br><span class="line">result = <span class="string">&#x27;v0b9n1nkajz@j0c4jjo3oi1h1i937b395i5y5e0e$i&#x27;</span></span><br><span class="line">tmp=<span class="string">&#x27;&#x27;</span></span><br><span class="line">flag=<span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="comment">#提取出result里和s1、s2相关的字符</span></span><br><span class="line">s1_list=[]</span><br><span class="line">s2_list=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="built_in">len</span>(result),<span class="number">2</span>):</span><br><span class="line">    s1_list.append(result[i])</span><br><span class="line">    s2_list.append(result[i+<span class="number">1</span>])</span><br><span class="line"><span class="comment">#开始爆破</span></span><br><span class="line"><span class="comment">#先求出加密过程两个索引值</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s1_list)):</span><br><span class="line">    index1=s.index(s1_list[i])</span><br><span class="line">    index2=s.index(s2_list[i])</span><br><span class="line">    <span class="comment">#以索引值为判断条件，在常见字符的范围内重现加密过程，加密结果和索引值一致即为flag的字符</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>,<span class="number">126</span>):</span><br><span class="line">        s1=j//<span class="number">17</span></span><br><span class="line">        s2=j%<span class="number">17</span></span><br><span class="line">        <span class="keyword">if</span> (s1 + i) % <span class="number">34</span>==index1 <span class="keyword">and</span> -(s2 + i + <span class="number">1</span>) % <span class="number">34</span>==index2:</span><br><span class="line">            flag+=<span class="built_in">chr</span>(j)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"><span class="built_in">print</span>(flag)</span><br><span class="line"><span class="comment">#NSSCTF&#123;Fake_RERE_QAQ&#125;</span></span><br></pre></td></tr></table></figure></li>
 </ul>
 
-      
     </div>
     
     
     
     
+    
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/03/12/Reverse/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://s21.ax1x.com/2024/11/09/pA6w8H0.jpg">
-      <meta itemprop="name" content="SydzI">
-      <meta itemprop="description" content="">
-    </span>
     
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SydzI's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/03/12/Reverse/" class="post-title-link" itemprop="url">Reverse</a>
-        </h2>
-    
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-    
-              <time title="创建时间：2025-03-12 20:16:25" itemprop="dateCreated datePublished" datetime="2025-03-12T20:16:25+08:00">2025-03-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-04-06 22:14:36" itemprop="dateModified" datetime="2025-04-06T22:14:36+08:00">2025-04-06</time>
-              </span>
-    
-          
-            <span id="/2025/03/12/Reverse/" class="post-meta-item leancloud_visitors" data-flag-title="Reverse" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text"></span>
-              <span class="leancloud-visitors-count"></span> times
-            </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text"></span>
-              <span>11k</span> 字
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text"></span>
-              <span>19 分钟</span>
-            </span>
-    
-        </div>
-      </header>
-    
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-    
-      
-          <p>关于reverse的 知识</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/03/12/Reverse/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
-    
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/03/04/%E5%91%A8%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://s21.ax1x.com/2024/11/09/pA6w8H0.jpg">
-      <meta itemprop="name" content="SydzI">
-      <meta itemprop="description" content="">
-    </span>
     
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SydzI's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/03/04/%E5%91%A8%E8%AE%B0/" class="post-title-link" itemprop="url">周记</a>
-        </h2>
-    
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-    
-              <time title="创建时间：2025-03-04 21:28:48" itemprop="dateCreated datePublished" datetime="2025-03-04T21:28:48+08:00">2025-03-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-04-06 22:06:59" itemprop="dateModified" datetime="2025-04-06T22:06:59+08:00">2025-04-06</time>
-              </span>
-    
-          
-            <span id="/2025/03/04/%E5%91%A8%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="周记" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text"></span>
-              <span class="leancloud-visitors-count"></span> times
-            </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text"></span>
-              <span>874</span> 字
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text"></span>
-              <span>1 分钟</span>
-            </span>
-    
-        </div>
-      </header>
-    
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-    
-      
-          <p>  简单记录每周的收获（以督促自己学习[doge]</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/03/04/%E5%91%A8%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/12/Reverse/" rel="prev" title="Reverse">
+      <i class="fa fa-chevron-left"></i> Reverse
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-    
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -544,6 +380,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SWPUCTF-2021-%E6%96%B0%E7%94%9F%E8%B5%9B-fakebase"><span class="nav-number">1.</span> <span class="nav-text">[SWPUCTF 2021 新生赛]fakebase</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SWPUCTF-2021-%E6%96%B0%E7%94%9F%E8%B5%9B-%E9%9D%9E%E5%B8%B8%E7%AE%80%E5%8D%95%E7%9A%84%E9%80%BB%E8%BE%91%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">[SWPUCTF 2021 新生赛]非常简单的逻辑题</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
