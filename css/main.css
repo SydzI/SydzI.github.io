@@ -1214,7 +1214,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #de04ff;
+  background: #d0c6ed;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -1374,10 +1374,6 @@ pre .javascript .function {
 }
 .post-toc .nav .active-current > .nav-child > .nav-item {
   display: block;
-}
-.post-toc .nav .active > a {
-  border-bottom-color: #fc6423;
-  color: #fc6423;
 }
 .post-toc .nav .active-current > a {
   color: #fc6423;
@@ -2698,10 +2694,131 @@ ul.breadcrumb li + li:last-child {
     margin: 8px 0 0;
   }
 }
+/* 分类卡片样式 - 安全追加 */
+.category-cards-container {
+  margin: 40px auto;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+.category-cards-container .category-card {
+  background: rgba(255,255,255,0.85); /* 半透明白色，与你的opacity 0.85协调 */
+  border-radius: 8px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px); /* 毛玻璃效果增强背景融合 */
+  border: 1px solid rgba(255,255,255,0.3); /* 柔和边框 */
+}
+.category-cards-container .category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+}
+.category-cards-container .category-card .category-name {
+  color: #2c3e50;
+  font-size: 1.4em;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+.category-cards-container .category-card .post-count {
+  color: #7f8c8d;
+  font-size: 0.9em;
+  display: block;
+}
+/* 保持你原有的背景设置（不要修改这部分） */
 body {
   background-image: url("/images/background.jpg");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: 100% 100%;
   opacity: 0.85;
+}
+/* ======================== */
+/* 分类卡片内的文章列表样式 */
+/* ======================== */
+.category-card {
+  position: relative; /* 为毛玻璃效果提供定位上下文 */
+}
+.category-card .category-header {
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.category-card .recent-posts-list {
+  margin-top: 10px;
+}
+.category-card .recent-posts-list .recent-post-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  transition: all 0.2s ease;
+}
+.category-card .recent-posts-list .recent-post-item:hover {
+  transform: translateX(3px);
+}
+.category-card .recent-posts-list .recent-post-item .post-title {
+  color: #34495e;
+  font-size: 0.95em;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+.category-card .recent-posts-list .recent-post-item .post-title:hover {
+  color: #3498db;
+  text-decoration: underline;
+}
+.category-card .recent-posts-list .recent-post-item .post-date {
+  color: #95a5a6;
+  font-size: 0.8em;
+  font-family: 'Arial', sans-serif;
+  flex-shrink: 0;
+}
+.category-card * {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+.category-card .category-header,
+.category-card .recent-post-item,
+.category-card .recent-posts-list {
+  border: none !important;
+  border-bottom: none !important;
+}
+/* 更多文章按钮样式 */
+.more-posts-wrapper {
+  text-align: left;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.more-posts-wrapper .more-posts-button {
+  display: inline-block;
+  color: #48a8f1;
+  font-size: 0.9em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  background: rgba(52,152,219,0.1);
+}
+.more-posts-wrapper .more-posts-button:hover {
+  background: rgba(52,152,219,0.2);
+  transform: translateX(3px);
+}
+.more-posts-wrapper .more-posts-button:hover::after {
+  margin-left: 8px;
+}
+/* 响应式调整 */
+@media (max-width: 767px) {
+  .category-card {
+    padding: 18px;
+  }
+  .category-card .recent-post-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .category-card .recent-post-item .post-date {
+    margin-top: 3px;
+    align-self: flex-end;
+  }
 }
