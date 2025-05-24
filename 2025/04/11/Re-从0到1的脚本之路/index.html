@@ -508,35 +508,9 @@
 
           </div>
           
-
-
-    <script src="//cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js"></script>
     <div class="comments" id="valine-comments"></div>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // 检测本地环境
-        const isLocal = /localhost|127\.0\.0\.1|::1/.test(location.hostname);
-        
-        // 本地访问时完全禁用Valine
-        if (isLocal) {
-          const valineContainer = document.querySelector('#vcomments');
-          if (valineContainer) {
-            valineContainer.innerHTML = '<div class="local-notice">🚫 本地预览模式已禁用评论系统</div>';
-            console.log('[Valine] 已拦截本地访问');
-          }
-          return;
-        }
-    
-        // 线上环境初始化
-    	new Valine({
-      		el: '#vcomments',
-     		appId: 'T2UWk3ujlmzua4yKz4VEQe2I-MdYXbMMI',  // 直接引用变量，不要用管道符
-      		appKey: 'fr73RF31Z7iChYTGlXKY7tfw',
-      		
-      		visitor: true
-    	});
-      });
-    </script><script>
+
+<script>
   window.addEventListener('tabs:register', () => {
     let { activeClass } = CONFIG.comments;
     if (CONFIG.comments.storage) {
