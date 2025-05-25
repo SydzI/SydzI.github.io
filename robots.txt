@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /tags/
+Allow: /
+Allow: /posts/
+Allow: /about/
+Allow: archives
+Sitemap: https://sydzi.github.io//sitemap.xml
