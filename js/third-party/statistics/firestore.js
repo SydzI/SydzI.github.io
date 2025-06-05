@@ -27,22 +27,21 @@ firebase.initializeApp({
   const articles = db.collection(CONFIG.firestore.collection);
 
   document.addEventListener('page:loaded', () => {
-
     if (CONFIG.page.isPost) {
       // Fix issue #118
       // https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
       const title = document.querySelector('.post-title').textContent.trim();
       const doc = articles.doc(title);
       let increaseCount = CONFIG.hostname === location.hostname;
-      if (localStorage.getItem(title)) {
+      if (sessionStorage.getItem(title)) {
         increaseCount = false;
       } else {
-        // Mark as visited
-        localStorage.setItem(title, true);
+        // Mark as visited in current session
+        sessionStorage.setItem(title, true);
       }
       getCount(doc, increaseCount).then(count => {
         document.querySelector('.firestore-visitors-count').innerText = count;
-      });
+      }).catch(e => console.error('Error updating count:', e));
     } else if (CONFIG.page.isHome) {
       const promises = [...document.querySelectorAll('.post-title')].map(element => {
         const title = element.textContent.trim();
@@ -54,7 +53,7 @@ firebase.initializeApp({
         counts.forEach((val, idx) => {
           metas[idx].innerText = val;
         });
-      });
+      }).catch(e => console.error('Error fetching counts:', e));
     }
   });
 })();
