@@ -6,8 +6,8 @@ https://sydzi.github.io/tags/index.html
 https://sydzi.github.io/2025/06/02/%E5%91%A8%E8%AE%B0/
 https://sydzi.github.io/about/index.html
 https://sydzi.github.io/
-https://sydzi.github.io/tags/Reverse/
 https://sydzi.github.io/tags/%E6%9D%82%E8%AE%B0/
-https://sydzi.github.io/categories/RELearning/
+https://sydzi.github.io/tags/Reverse/
 https://sydzi.github.io/categories/%E5%91%A8%E8%AE%B0/
 https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/
+https://sydzi.github.io/categories/RELearning/
