@@ -2,7 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://sydzi.github.io/2025/06/02/Re-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/</loc>
+    <loc>https://sydzi.github.io/2025/06/02/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E4%BC%98%E5%8C%96/</loc>
+    
+    <lastmod>2025-06-14</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://sydzi.github.io/2025/06/05/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E9%87%8D%E5%BB%BA/</loc>
     
     <lastmod>2025-06-14</lastmod>
     
@@ -20,16 +29,7 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/2025/06/02/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E4%BC%98%E5%8C%96/</loc>
-    
-    <lastmod>2025-06-14</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2025/06/05/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E9%87%8D%E5%BB%BA/</loc>
+    <loc>https://sydzi.github.io/2025/06/02/Re-%E4%BB%8E0%E5%88%B01%E7%9A%84%E8%84%9A%E6%9C%AC%E4%B9%8B%E8%B7%AF/</loc>
     
     <lastmod>2025-06-14</lastmod>
     
@@ -74,14 +74,14 @@
 
   
   <url>
-    <loc>https://sydzi.github.io/tags/Reverse/</loc>
+    <loc>https://sydzi.github.io/tags/%E6%9D%82%E8%AE%B0/</loc>
     <lastmod>2025-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/tags/%E6%9D%82%E8%AE%B0/</loc>
+    <loc>https://sydzi.github.io/tags/Reverse/</loc>
     <lastmod>2025-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -90,14 +90,14 @@
 
   
   <url>
-    <loc>https://sydzi.github.io/categories/RELearning/</loc>
+    <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
     <lastmod>2025-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
+    <loc>https://sydzi.github.io/categories/RELearning/</loc>
     <lastmod>2025-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
