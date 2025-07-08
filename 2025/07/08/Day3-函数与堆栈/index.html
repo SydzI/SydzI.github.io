@@ -50,7 +50,7 @@
 <meta property="og:description" content="函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-07-08T06:14:04.000Z">
-<meta property="article:modified_time" content="2025-07-08T15:24:15.665Z">
+<meta property="article:modified_time" content="2025-07-08T15:26:58.664Z">
 <meta property="article:author" content="SydzI">
 <meta name="twitter:card" content="summary">
 
@@ -184,7 +184,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E4%B8%8E%E6%A0%88%E5%B8%A7"><span class="nav-number">1.</span> <span class="nav-text">函数与栈帧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E4%B8%8E%E4%B8%B2%E6%8C%87%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">数组与串指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8F%E4%B8%8E%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">3.</span> <span class="nav-text">宏与结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x64%E6%B1%87%E7%BC%96%E6%A1%86%E6%9E%B6"><span class="nav-number">4.</span> <span class="nav-text">x64汇编框架</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E4%B8%8E%E6%A0%88%E5%B8%A7"><span class="nav-number">1.</span> <span class="nav-text">函数与栈帧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E4%B8%8E%E4%B8%B2%E6%8C%87%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">数组与串指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8F%E4%B8%8E%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">3.</span> <span class="nav-text">宏与结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x64%E6%B1%87%E7%BC%96%E6%A1%86%E6%9E%B6"><span class="nav-number">4.</span> <span class="nav-text">x64汇编框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E8%81%94%E6%B1%87%E7%BC%96%E4%B8%8E%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">内联汇编与混合编程</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -273,7 +273,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-07-08 14:14:04 / 修改时间：23:24:15" itemprop="dateCreated datePublished" datetime="2025-07-08T14:14:04+08:00">2025-07-08</time>
+      <time title="创建时间：2025-07-08 14:14:04 / 修改时间：23:26:58" itemprop="dateCreated datePublished" datetime="2025-07-08T14:14:04+08:00">2025-07-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -299,7 +299,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.6k</span>
+      <span>2.7k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -353,47 +353,11 @@
 <li><p>结构体：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">;使用关键字struct和ends，如</span><br><span class="line">Point struct</span><br><span class="line">	x word ?</span><br><span class="line">	y word ?</span><br><span class="line">Point ends</span><br><span class="line"></span><br><span class="line">;实例化结构体</span><br><span class="line">MyPoint Point&lt;?&gt;	;实例化出MyPoint</span><br><span class="line"></span><br><span class="line">;访问结构体成员</span><br><span class="line">mov MyPoint.x,123</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="x64汇编框架"><a href="#x64汇编框架" class="headerlink" title="x64汇编框架"></a>x64汇编框架</h2><ul>
-<li><pre><code class="assembly">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈
-.code
-;Add函数声明
-Add proc
-    push rbp
-    mov rbp,rsp
-    lea rax,[rdi + rsi]		;从寄存器中取参数
-    pop rbp
-    ret
-Add endp
+<h2 id="x64汇编框架"><a href="#x64汇编框架" class="headerlink" title="x64汇编框架"></a>x64汇编框架</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈</span><br><span class="line">.code</span><br><span class="line">;Add函数声明</span><br><span class="line">Add proc</span><br><span class="line">	push rbp</span><br><span class="line">	mov rbp,rsp</span><br><span class="line">	lea rax,[rdi + rsi]		;从寄存器中取参数</span><br><span class="line">	pop rbp</span><br><span class="line">	ret</span><br><span class="line">Add endp</span><br><span class="line"></span><br><span class="line">main proc			</span><br><span class="line">	mov rdi,2		;把参数传入寄存器中</span><br><span class="line">	mov rsi,3</span><br><span class="line">	call Add</span><br><span class="line">	ret</span><br><span class="line">main endp</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">;x86环境下的代码，传参使用栈</span><br><span class="line">.code</span><br><span class="line">;Add函数声明</span><br><span class="line">Add proc</span><br><span class="line">	push ebp</span><br><span class="line">	mov ebp,esp</span><br><span class="line">	mov eax,[esp+8]			;从栈上取参数</span><br><span class="line">	add eax,[esp+12]</span><br><span class="line">	pop ebp</span><br><span class="line">	ret</span><br><span class="line">Add endp</span><br><span class="line"></span><br><span class="line">main proc</span><br><span class="line">	push 3			;把参数压入栈中</span><br><span class="line">	push 2</span><br><span class="line">	call Add</span><br><span class="line">	add esp,8</span><br><span class="line">main endp</span><br></pre></td></tr></table></figure>
 
-main proc			
-    mov rdi,2		;把参数传入寄存器中
-    mov rsi,3
-    call Add
-    ret
-main endp
-end
-
-
-;x86环境下的代码，传参使用栈
-.code
-;Add函数声明
-Add proc
-    push ebp
-    mov ebp,esp
-    mov eax,[esp+8]			;从栈上取参数
-    add eax,[esp+12]
-    pop ebp
-    ret
-Add endp
-
-main proc
-    push 3			;把参数压入栈中
-    push 2
-    call Add
-    add esp,8
-main endp
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 内联汇编与混合编程</span><br><span class="line"></span><br><span class="line">- x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm&#123;&#125;直接写在C++代码中:</span><br><span class="line"></span><br><span class="line">  ```c++</span><br><span class="line">  #include&lt;iostream&gt;</span><br><span class="line">  int main()&#123;</span><br><span class="line">      _asm&#123;</span><br><span class="line">          xor eax,eax</span><br><span class="line">          mov eax,1</span><br><span class="line">          add eax,1</span><br><span class="line">      &#125;</span><br><span class="line">      return 0;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-</code></pre>
+<h2 id="内联汇编与混合编程"><a href="#内联汇编与混合编程" class="headerlink" title="内联汇编与混合编程"></a>内联汇编与混合编程</h2><ul>
+<li><p>x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm{}直接写在C++代码中:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    _asm&#123;</span><br><span class="line">        <span class="keyword">xor</span> eax,eax</span><br><span class="line">        mov eax,<span class="number">1</span></span><br><span class="line">        add eax,<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>x64下，在Microsoft Visual C++ (MSVC)程序中使用汇编，需要独立的asm文件，通过extern声明使用：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">Add</span><span class="params">(<span class="type">long</span> <span class="type">long</span> number1,<span class="type">long</span> <span class="type">long</span> number2)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> res=<span class="built_in">Add</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">    std::cout&lt;&lt;res&lt;&lt;std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//asm文件</span></span><br><span class="line">.code</span><br><span class="line">Add proc</span><br><span class="line">    push rbp</span><br><span class="line">    mov rbp,rsp</span><br><span class="line">    <span class="keyword">xor</span> rax,rax</span><br><span class="line">    add rax,rcx</span><br><span class="line">    add rax,rdx</span><br><span class="line">    pop rbp</span><br><span class="line">    ret</span><br><span class="line">Add endp</span><br><span class="line">end</span><br></pre></td></tr></table></figure></li>
