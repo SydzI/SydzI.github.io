@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs">
+  <meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sydzi.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"language":true,"language_text":{"x86asm":"assembly"}},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+<!-- 强制移除目录下划线 -->
+
+<style>
+  /* 覆盖所有可能的目录容器 */
+  [class*="toc"] .nav-item a,
+  [class*="TOC"] .nav-item a,
+  .active > a,
+  .active-current > a {
+    border-bottom: none !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+  }
+
+
+  /* 覆盖伪元素下划线 */
+  [class*="toc"] a::after,
+  [class*="TOC"] a::after {
+    display: none !important;
+  }
+</style>
+
+    <meta name="description" content="if-else语句识别、switch语句识别、循环语句识别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day6:if-else语句识别、switch语句识别、循环语句识别">
+<meta property="og:url" content="https://sydzi.github.io/2025/07/14/Day6-switch%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB/index.html">
+<meta property="og:site_name" content="SydzI&#39;s Blog">
+<meta property="og:description" content="if-else语句识别、switch语句识别、循环语句识别">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sydzi.github.io/images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-16%20000211.png">
+<meta property="og:image" content="https://sydzi.github.io/images/image-20250716001640839.png">
+<meta property="article:published_time" content="2025-07-14T07:50:16.000Z">
+<meta property="article:modified_time" content="2025-07-15T16:49:54.185Z">
+<meta property="article:author" content="SydzI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sydzi.github.io/images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-16%20000211.png">
+
+
+<link rel="canonical" href="https://sydzi.github.io/2025/07/14/Day6-switch%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://sydzi.github.io/2025/07/14/Day6-switch%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB/","path":"2025/07/14/Day6-switch语句识别/","title":"Day6:if-else语句识别、switch语句识别、循环语句识别"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day6:if-else语句识别、switch语句识别、循环语句识别 | SydzI's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-app-compat.js" integrity="sha256-k2eD8Bl04gp35v4S01cNbO+3UeLK6mVqpOyUJz4aXzY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-firestore-compat.js" integrity="sha256-r1EpenNle+MZs+KB73PFJnrmIF3k29t5XGrSqfZ9PPw=" crossorigin="anonymous" defer></script>
+  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}</script>
+  <script src="/js/third-party/statistics/firestore.js" defer></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SydzI's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮，吾将上下而求索</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#if-else%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB"><span class="nav-number">1.</span> <span class="nav-text">if-else语句识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#switch%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">switch语句识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">循环语句识别</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="SydzI"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">SydzI</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SydzI" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SydzI" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+
+<div class="post-block">
+  
+
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sydzi.github.io/2025/07/14/Day6-switch%E8%AF%AD%E5%8F%A5%E8%AF%86%E5%88%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="SydzI">
+    </span>
+    
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SydzI's Blog">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day6:if-else语句识别、switch语句识别、循环语句识别 | SydzI's Blog">
+      <meta itemprop="description" content="if-else语句识别、switch语句识别、循环语句识别">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day6:if-else语句识别、switch语句识别、循环语句识别
+        </h1>
+    
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-07-14 15:50:16" itemprop="dateCreated datePublished" datetime="2025-07-14T15:50:16+08:00">2025-07-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-07-16 00:49:54" itemprop="dateModified" datetime="2025-07-16T00:49:54+08:00">2025-07-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RELearining/" itemprop="url" rel="index"><span itemprop="name">RELearining</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="firestore-visitors-count"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>14k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>26 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>if-else语句识别、switch语句识别、循环语句识别</p>
+<span id="more"></span>
+
+<h2 id="if-else语句识别"><a href="#if-else语句识别" class="headerlink" title="if-else语句识别"></a>if-else语句识别</h2><ul>
+<li><p>第一种，数值比较作为条件（x86debug为例，其余类似，仅是比较方法（如使用sub而不是cmp）和模式特征上的差异）</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span>004702D0                 <span class="keyword">lea</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line"><span class="symbol">.text:</span>004702D3                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004702D4                 <span class="keyword">push</span>    offset unk_545E50 <span class="comment">; %d</span></span><br><span class="line"><span class="symbol">.text:</span>004702D9                 <span class="keyword">call</span>    sub_4681E0      <span class="comment">; scanf</span></span><br><span class="line"><span class="symbol">.text:</span>004702DE                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>004702E1                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_C], <span class="number">1</span></span><br><span class="line"><span class="symbol">.text:</span>004702E5                 <span class="keyword">jnz</span>     short loc_4702F6 <span class="comment">; if [ebp+var_C]!=1, jump to loc_4702f6</span></span><br><span class="line"><span class="symbol">.text:</span>004702E7                 <span class="keyword">push</span>    offset aNEquales1 <span class="comment">; &quot;n equales 1&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>004702EC                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>004702F1                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br><span class="line"><span class="symbol">.text:</span>004702F4                 <span class="keyword">jmp</span>     short loc_470303</span><br><span class="line"><span class="symbol">.text:</span>004702F6 <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>004702F6</span><br><span class="line"><span class="symbol">.text:</span>004702F6 loc_4702F6:                             <span class="comment">; CODE XREF: main+45↑j</span></span><br><span class="line"><span class="symbol">.text:</span>004702F6                 <span class="keyword">push</span>    offset aNDoesNotEqual1 <span class="comment">; &quot;n does not equal 1&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>004702FB                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470300</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line"><span class="keyword">if</span> (n == <span class="number">1</span>)</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equales 1&quot;</span>);</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n does not equal 1&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第二种，变量直接作为条件</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span><span class="number">00470303</span>                 <span class="keyword">lea</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_18]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470306</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470307</span>                 <span class="keyword">push</span>    offset unk_545E50 <span class="comment">; %d</span></span><br><span class="line"><span class="symbol">.text:</span>0047030C                 <span class="keyword">call</span>    sub_4681E0      <span class="comment">; scanf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470311</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470314</span>                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_18], <span class="number">0</span> <span class="comment">; 和&#x27;0&#x27;比较</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470318</span>                 <span class="keyword">jz</span>      short loc_470327 <span class="comment">; if [ebp+var_18]==0, jump to loc_470327, 跳过printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047031A                 <span class="keyword">push</span>    offset aJudgeIsNotZero <span class="comment">; &quot;judge is not zero&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>0047031F                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470324</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> judge;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;judge);</span><br><span class="line"><span class="keyword">if</span> (judge)</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;judge is not zero&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第三种，返回值（函数式）作为条件</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span><span class="number">00470387</span>                 <span class="keyword">lea</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span>0047038A                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0047038B                 <span class="keyword">push</span>    offset unk_545E50 <span class="comment">; %d</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470390</span>                 <span class="keyword">call</span>    sub_4681E0      <span class="comment">; scanf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470398</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span>0047039B                 <span class="keyword">push</span>    <span class="built_in">eax</span>             <span class="comment">; 输入的值入栈，即函数传参</span></span><br><span class="line"><span class="symbol">.text:</span>0047039C                 <span class="keyword">call</span>    sub_46B214      <span class="comment">; 自定义函数</span></span><br><span class="line"><span class="symbol">.text:</span>004703A1                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br><span class="line"><span class="symbol">.text:</span>004703A4                 <span class="keyword">test</span>    <span class="built_in">eax</span>, <span class="built_in">eax</span>        <span class="comment">; 1 &amp; 1 = 0； 0 &amp; 0 = 1</span></span><br><span class="line"><span class="symbol">.text:</span>004703A6                 <span class="keyword">jz</span>      short loc_4703B5</span><br><span class="line"><span class="symbol">.text:</span>004703A8                 <span class="keyword">push</span>    offset aItS0    <span class="comment">; &quot;it&#x27;s 0\n&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>004703AD                 <span class="keyword">call</span>    sub_468D1B</span><br><span class="line"><span class="symbol">.text:</span>004703B2                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;sub_46b214</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470110</span> arg_0           = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470110</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470110</span>                 <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470111</span>                 <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470113</span>                 <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470119</span>                 <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line"><span class="symbol">.text:</span>0047011A                 <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line"><span class="symbol">.text:</span>0047011B                 <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">.text:</span>0047011C                 <span class="keyword">mov</span>     <span class="built_in">edi</span>, <span class="built_in">ebp</span></span><br><span class="line"><span class="symbol">.text:</span>0047011E                 <span class="keyword">xor</span>     <span class="built_in">ecx</span>, <span class="built_in">ecx</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470120</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470125</span>                 <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470127</span>                 <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset unk_57500E</span><br><span class="line"><span class="symbol">.text:</span>0047012C                 <span class="keyword">call</span>    sub_46B660</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470131</span>                 <span class="keyword">nop</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470132</span>                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+arg_0], <span class="number">0</span>  <span class="comment">; [ebp+8], eax在栈上的位置</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470136</span>                 <span class="keyword">jnz</span>     short loc_470141 <span class="comment">; eax=0</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470138</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">1</span>          <span class="comment">; if [ebp+arg_0]==0, eax=1, return 1(eax)</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047013D</span>                 <span class="keyword">jmp</span>     short loc_470143</span><br><span class="line"><span class="symbol">.text:</span>0047013F <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>0047013F                 <span class="keyword">jmp</span>     short loc_470143</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470141</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470141</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470141</span> loc_470141:                             <span class="comment">; CODE XREF: sub_470110+26↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470141</span>                 <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span>        <span class="comment">; eax=0</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470143</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470143</span> loc_470143:                             <span class="comment">; CODE XREF: sub_470110+2D↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470143</span>                                         <span class="comment">; sub_470110+2F↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470143</span>                 <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470144</span>                 <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470145</span>                 <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470146</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span></span><br><span class="line"><span class="symbol">.text:</span>0047014C                 <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line"><span class="symbol">.text:</span>0047014E                 <span class="keyword">call</span>    sub_46A62A</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470153</span>                 <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470155</span>                 <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470156</span>                 <span class="keyword">retn</span></span><br></pre></td></tr></table></figure>
+
+<p>源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">IfZero</span><span class="params">(<span class="type">int</span> a)</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (a == <span class="number">0</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;a);</span><br><span class="line">	<span class="keyword">if</span>(IfZero(a))</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;it&#x27;s 0\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="switch语句识别"><a href="#switch语句识别" class="headerlink" title="switch语句识别"></a>switch语句识别</h2><ul>
+<li><p>比较简单的情况下：</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span><span class="number">00470327</span>                 <span class="keyword">lea</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span>0047032A                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0047032B                 <span class="keyword">push</span>    offset unk_545E50 <span class="comment">; %d</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470330</span>                 <span class="keyword">call</span>    sub_4681E0      <span class="comment">; scanf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470335</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470338</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span>0047033B                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_EC], <span class="built_in">eax</span> <span class="comment">; [ebp+var_EC]==[ebp+var_24], 用临时变量[ebp+var_EC]来检验case</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470341</span>                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_EC], <span class="number">1</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470348</span>                 <span class="keyword">jz</span>      short loc_47035E <span class="comment">; case1输出</span></span><br><span class="line"><span class="symbol">.text:</span>0047034A                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_EC], <span class="number">5</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470351</span>                 <span class="keyword">jz</span>      short loc_470371 <span class="comment">; case5输出</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span>                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_EC], <span class="number">0Ah</span></span><br><span class="line"><span class="symbol">.text:</span>0047035A                 <span class="keyword">jz</span>      short loc_470384 <span class="comment">; case10输出</span></span><br><span class="line"><span class="symbol">.text:</span>0047035C                 <span class="keyword">jmp</span>     short loc_470395 <span class="comment">; break然后system(&quot;pause&quot;)</span></span><br><span class="line"><span class="symbol">.text:</span>0047035E <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>0047035E</span><br><span class="line"><span class="symbol">.text:</span>0047035E loc_47035E:                             <span class="comment">; CODE XREF: main+A8↑j</span></span><br><span class="line"><span class="symbol">.text:</span>0047035E                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470361</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470362</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470367</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047036C                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>0047036F                 <span class="keyword">jmp</span>     short loc_470395</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470371</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470371</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470371</span> loc_470371:                             <span class="comment">; CODE XREF: main+B1↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470371</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470374</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470375</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>0047037A                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047037F                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470382</span>                 <span class="keyword">jmp</span>     short loc_470395</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470384</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470384</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470384</span> loc_470384:                             <span class="comment">; CODE XREF: main+BA↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470384</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_24]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470387</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470388</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047038D</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470392</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span> loc_470395:                             <span class="comment">; CODE XREF: main+BC↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span>                                         <span class="comment">; main+CF↑j ...</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span>                 <span class="keyword">push</span>    offset aPause   <span class="comment">; &quot;pause&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>0047039A                 <span class="keyword">call</span>    sub_46AFAD      <span class="comment">; system(&quot;pause&quot;)</span></span><br><span class="line"><span class="symbol">.text:</span>0047039F                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> number;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;number);</span><br><span class="line"><span class="keyword">switch</span> (number) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">10</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">system(<span class="string">&quot;pause&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再复杂点，会优化出跳转表，即每个case跳转的地址会被集合成一个数组，像表一样</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span>004702D3                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004702D4                 <span class="keyword">push</span>    offset unk_545E50 <span class="comment">; %d</span></span><br><span class="line"><span class="symbol">.text:</span>004702D9                 <span class="keyword">call</span>    sub_4681E0      <span class="comment">; scanf</span></span><br><span class="line"><span class="symbol">.text:</span>004702DE                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>004702E1                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line"><span class="symbol">.text:</span>004702E4                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_D4], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004702EA                 <span class="keyword">mov</span>     <span class="built_in">ecx</span>, [<span class="built_in">ebp</span>+var_D4] <span class="comment">; 把输入值传到ecx，下一步减去1，减1的原因见后面的解释</span></span><br><span class="line"><span class="symbol">.text:</span>004702F0                 <span class="keyword">sub</span>     <span class="built_in">ecx</span>, <span class="number">1</span>          <span class="comment">; switch 67 cases</span></span><br><span class="line"><span class="symbol">.text:</span>004702F3                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_D4], <span class="built_in">ecx</span></span><br><span class="line"><span class="symbol">.text:</span>004702F9                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_D4], <span class="number">42h</span> <span class="comment">; 把输入值和42h(66)比较，下一步是大于66就跳出case的判断</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470300</span>                 <span class="keyword">ja</span>      def_470313      <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470306</span>                 <span class="keyword">mov</span>     <span class="built_in">edx</span>, [<span class="built_in">ebp</span>+var_D4]</span><br><span class="line"><span class="symbol">.text:</span>0047030C                 <span class="keyword">movzx</span>   <span class="built_in">eax</span>, <span class="built_in">ds</span>:byte_470418[<span class="built_in">edx</span>] <span class="comment">; 跳转表索引值表，即预判了输入值的范围并且为每个可能的值建立了索引值表（比如说现在确定了范围是0-66，就枚举了0-66这些数值对应的索引，然后再根据索引找到应改跳转的地址</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470313</span>                 <span class="keyword">jmp</span>     <span class="built_in">ds</span>:jpt_470313[<span class="built_in">eax</span>*<span class="number">4</span>] <span class="comment">; switch jump</span></span><br><span class="line"><span class="symbol">.text:</span>0047031A <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>0047031A</span><br><span class="line"><span class="symbol">.text:</span>0047031A loc_47031A:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span>0047031A                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span>0047031A                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 1</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047031D</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0047031E                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470323</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470328</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>0047032B                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047032D</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047032D</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047032D</span> loc_47032D:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047032D</span>                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047032D</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 5</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470330</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470331</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470336</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047033B                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>0047033E                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470340</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470340</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470340</span> loc_470340:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470340</span>                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470340</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 10</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470343</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470344</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470349</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047034E                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470351</span>                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span> loc_470353:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span>                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470353</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 17</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470356</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470357</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>0047035C                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470361</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470364</span>                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470366</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470366</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470366</span> loc_470366:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470366</span>                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470366</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 11</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470369</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0047036A                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span>0047036F                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470374</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470377</span>                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470379</span> <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470379</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470379</span> loc_470379:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470379</span>                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470379</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 67</span></span><br><span class="line"><span class="symbol">.text:</span>0047037C                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047037D</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470382</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470387</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span>0047038A                 <span class="keyword">jmp</span>     short def_470313 <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span>0047038C <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>0047038C</span><br><span class="line"><span class="symbol">.text:</span>0047038C loc_47038C:                             <span class="comment">; CODE XREF: sub_4702A0+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span>0047038C                                         <span class="comment">; DATA XREF: .text:jpt_470313↓o</span></span><br><span class="line"><span class="symbol">.text:</span>0047038C                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_C] <span class="comment">; jumptable 00470313 case 3</span></span><br><span class="line"><span class="symbol">.text:</span>0047038F                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470390</span>                 <span class="keyword">push</span>    offset aNEqualsD <span class="comment">; &quot;n equals %d&quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00470395</span>                 <span class="keyword">call</span>    sub_468D1B      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0047039A                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047039D</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047039D</span> def_470313:                             <span class="comment">; CODE XREF: sub_4702A0+60↑j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047039D</span>                                         <span class="comment">; sub_4702A0+73↑j ...</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0047039D</span>                 <span class="keyword">push</span>    offset aPause   <span class="comment">; jumptable 00470313 default case, cases 2,4,6-9,12-16,18-66</span></span><br><span class="line"><span class="symbol">.text:</span>004703A2                 <span class="keyword">call</span>    sub_46AFAD      <span class="comment">; system</span></span><br><span class="line"><span class="symbol">.text:</span>004703A7                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> number;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;number);</span><br><span class="line"><span class="keyword">switch</span> (number) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">10</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">17</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">11</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">67</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;n equals %d&quot;</span>, number);</span><br><span class="line">	<span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">system(<span class="string">&quot;pause&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对跳转表和索引值表进行进一步解释：</p>
+<p>先看跳转表：</p>
+<p><img src="/../images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-16%20000211.png" alt="跳转表"></p>
+<p>可以看到跳转表只有简单的8种情况。但是编译器（反编译器？）只能根据case的最大值用笨方法枚举可能的值，这时候，就可以给这些枚举的值分成两种：一种是case里有的，一种是case里没有的。看跳转表的最后一个，叫def而不是loc，这个就是给case里没有的枚举值准备的。因为分为case里有的和没有的，因此，case里有的，会给出具体的索引值；case里没有的，统一导向跳转表的最后一个。再看索引值表：</p>
+<p><img src="/../images/image-20250716001640839.png" alt="索引值表"></p>
+<p>可以看到，里面枚举了0到66对应的索引值。看汇编代码，是将输入的值作为索引值表的索引来用的，索引出来的值再作为跳转表的索引。注意看，索引值表的最小值为0，因此，跳转表和数组一样从0开始索引，而0-7对应跳转表的八种情况。通过进一步挖掘信息，还可以知道跳转表是把case按照从小到大的顺序排列的。因此，最开始会对输入值有一个减的操作。至于为什么减1，我们就可以推测最小的case是1了，因为索引从0开始，而最小的case在索引0处。</p>
+</li>
+<li><p>这样解释下来可能还有点绕，所以我们按照机器的动作走一遍：</p>
+<p>首先，把case按顺序排出跳转表。</p>
+<p>然后，假设我们拿到输入的值。作为机器，我们知道case有：1，3，5，10，17，11，67，所以先给输入的值减1，以便这个值是1的时候我们可以索引到跳转表下标0处。同时，如果这个值大于66，我们还可以直接跳过case检查，直接导出去（刚好和在case最大最小值范围内但不是case的值一样对待）</p>
+<p>再然后，我们枚举0-66的值，并且把这些值和case里有的值一一比较，分出两种值：一种在case里，一种不再case里。</p>
+<p>ok，然后我们建立索引值表，给在case里的枚举值对应的跳转表索引值，比如说枚举值2（输入值是3），刚好case里有3，按顺序排第二，我们就给索引值1（从0开始索引）。回头看截出来的索引值表，在下标2的地方刚好是1（枚举值索引出跳转表索引）；给不在case里的值索引到7，对应跳转表最后一位（为没在case里的值专门准备的那一位）。</p>
+<p>最后，我们就准备好我们的解决方案了，对于任意输入的值我们就都有对策了。</p>
+</li>
+<li><p>请务必真正理解上述内容，因为在逆向工程中，这么绕的操作很常见。在PE文件结构部分，我们或许还有机会再接触到这么绕的操作。（其实只需要写出程序拿到ida里点开跳转表和索引值表（如果有的话）看几眼就明白了，亲身实践总比阅读文字来的有效，因为文字还取决于书写者的表达水平(●’◡’●)）</p>
+</li>
+</ul>
+<h2 id="循环语句识别"><a href="#循环语句识别" class="headerlink" title="循环语句识别"></a>循环语句识别</h2><ul>
+<li><p>第一种，for循环</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span><span class="number">00464096</span>                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="number">0</span>  <span class="comment">; 一个变量初始化为0</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">0046409D</span>                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_14], <span class="number">1</span> <span class="comment">; 另一个变量初始化为1</span></span><br><span class="line"><span class="symbol">.text:</span>004640A4                 <span class="keyword">jmp</span>     short loc_4640AF</span><br><span class="line"><span class="symbol">.text:</span>004640A6 <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>004640A6</span><br><span class="line"><span class="symbol">.text:</span>004640A6 loc_4640A6:                             <span class="comment">; CODE XREF: sub_464070+4E↓j</span></span><br><span class="line"><span class="symbol">.text:</span>004640A6                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_14]</span><br><span class="line"><span class="symbol">.text:</span>004640A9                 <span class="keyword">add</span>     <span class="built_in">eax</span>, <span class="number">1</span>          <span class="comment">; 用eax过渡，给[ebp+var_14]加1</span></span><br><span class="line"><span class="symbol">.text:</span>004640AC                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_14], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640AF</span><br><span class="line"><span class="symbol">.text:</span>004640AF loc_4640AF:                             <span class="comment">; CODE XREF: sub_464070+34↑j</span></span><br><span class="line"><span class="symbol">.text:</span>004640AF                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_14], <span class="number">0Ah</span></span><br><span class="line"><span class="symbol">.text:</span>004640B3                 <span class="keyword">jg</span>      short loc_4640C0 <span class="comment">; [ebp+var_14]大于0Ah时跳转（出循环）</span></span><br><span class="line"><span class="symbol">.text:</span>004640B5                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span>004640B8                 <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_14] <span class="comment">; 用eax过渡，把[ebp+var_14]的值加到[ebp+var_8]上</span></span><br><span class="line"><span class="symbol">.text:</span>004640BB                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640BE                 <span class="keyword">jmp</span>     short loc_4640A6 <span class="comment">; 跳回去，形成循环</span></span><br><span class="line"><span class="symbol">.text:</span>004640C0 <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>004640C0</span><br><span class="line"><span class="symbol">.text:</span>004640C0 loc_4640C0:                             <span class="comment">; CODE XREF: sub_464070+43↑j</span></span><br><span class="line"><span class="symbol">.text:</span>004640C0                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span>004640C3                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640C4                 <span class="keyword">push</span>    offset aCountD  <span class="comment">; &quot;count : %d &quot;</span></span><br><span class="line"><span class="symbol">.text:</span>004640C9                 <span class="keyword">call</span>    sub_45DB54      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>004640CE                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) &#123;</span><br><span class="line">	count += i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;count : %d &quot;</span>, count);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第二种，while循环</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span>004640D1                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="number">0</span>  <span class="comment">; 一个变量初始化为0</span></span><br><span class="line"><span class="symbol">.text:</span>004640D8                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_20], <span class="number">0Ah</span> <span class="comment">; 另一个变量初始化为10</span></span><br><span class="line"><span class="symbol">.text:</span>004640DF</span><br><span class="line"><span class="symbol">.text:</span>004640DF loc_4640DF:                             <span class="comment">; CODE XREF: sub_464070+87↓j</span></span><br><span class="line"><span class="symbol">.text:</span>004640DF                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_20], <span class="number">0</span></span><br><span class="line"><span class="symbol">.text:</span>004640E3                 <span class="keyword">jle</span>     short loc_4640F9 <span class="comment">; [ebp+var_20]小于等于0时跳转（出循环）</span></span><br><span class="line"><span class="symbol">.text:</span>004640E5                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span>004640E8                 <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_20] <span class="comment">; eax过渡，把[ebp+var_20]值加到[ebp+var_8]上</span></span><br><span class="line"><span class="symbol">.text:</span>004640EB                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640EE                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_20]</span><br><span class="line"><span class="symbol">.text:</span>004640F1                 <span class="keyword">sub</span>     <span class="built_in">eax</span>, <span class="number">1</span>          <span class="comment">; eax过渡，给[ebp+var_20]减1</span></span><br><span class="line"><span class="symbol">.text:</span>004640F4                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_20], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640F7                 <span class="keyword">jmp</span>     short loc_4640DF <span class="comment">; 回跳，形成循环</span></span><br><span class="line"><span class="symbol">.text:</span>004640F9 <span class="comment">; ---------------------------------------------------------------------------</span></span><br><span class="line"><span class="symbol">.text:</span>004640F9</span><br><span class="line"><span class="symbol">.text:</span>004640F9 loc_4640F9:                             <span class="comment">; CODE XREF: sub_464070+73↑j</span></span><br><span class="line"><span class="symbol">.text:</span>004640F9                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span>004640FC                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>004640FD                 <span class="keyword">push</span>    offset aCountD  <span class="comment">; &quot;count : %d &quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464102</span>                 <span class="keyword">call</span>    sub_45DB54      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464107</span>                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> n = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">while</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">	count += n;</span><br><span class="line">	n--;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;count : %d &quot;</span>, count);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第三种，do-while循环</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">.text:</span>0046410A                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="number">0</span>  <span class="comment">; 一个变量初始化为0</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464111</span>                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_2C], <span class="number">0Ah</span> <span class="comment">; 另一个变量初始化为10</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464118</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464118</span> loc_464118:                             <span class="comment">; CODE XREF: sub_464070+BE↓j</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464118</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span>0046411B                 <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_2C] <span class="comment">; eax过渡，把[ebp+var_2C]值加到[ebp+var_8]上</span></span><br><span class="line"><span class="symbol">.text:</span>0046411E                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_8], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464121</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_2C]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464124</span>                 <span class="keyword">sub</span>     <span class="built_in">eax</span>, <span class="number">1</span>          <span class="comment">; eax过渡，给[ebp+var_2C]减1</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464127</span>                 <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+var_2C], <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span>0046412A                 <span class="keyword">cmp</span>     [<span class="built_in">ebp</span>+var_2C], <span class="number">0</span></span><br><span class="line"><span class="symbol">.text:</span>0046412E                 <span class="keyword">jg</span>      short loc_464118 <span class="comment">; [ebp+var_2C]大于0时回跳</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464130</span>                 <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+var_8]</span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464133</span>                 <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464134</span>                 <span class="keyword">push</span>    offset aCountD  <span class="comment">; &quot;count : %d &quot;</span></span><br><span class="line"><span class="symbol">.text:</span><span class="number">00464139</span>                 <span class="keyword">call</span>    sub_45DB54      <span class="comment">; printf</span></span><br><span class="line"><span class="symbol">.text:</span>0046413E                 <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">	count += i;</span><br><span class="line">	i--;</span><br><span class="line">&#125; <span class="keyword">while</span> (i &gt; <span class="number">0</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;count : %d &quot;</span>, count);</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+    
+    
+    
+    
+    
+    <footer class="post-footer">
+    
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/07/12/Day5-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/" rel="prev" title="Day5:函数调用约定">
+                  <i class="fa fa-angle-left"></i> Day5:函数调用约定
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">SydzI</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">61k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:51</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"sydzi/sydzi.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body>
+</html>
