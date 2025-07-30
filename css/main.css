@@ -1295,7 +1295,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #f6f;
+    background: #77a6aa;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -1671,7 +1671,7 @@ pre code {
 }
 @media (min-width: 1200px) {
   .footer-inner {
-    width: 1160px;
+    width: 1300px;
   }
 }
 @media (min-width: 1600px) {
@@ -2569,7 +2569,7 @@ header.header {
 }
 @media (min-width: 1200px) {
   .main {
-    width: 1160px;
+    width: 1300px;
   }
 }
 @media (min-width: 1600px) {
