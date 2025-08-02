@@ -126,88 +126,6 @@
       </categories>
   </entry>
   <entry>
-    <title>Day11:花指令</title>
-    <url>/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/</url>
-    <content><![CDATA[<p>花指令</p>
-<span id="more"></span>
-
-<h2 id="花指令"><a href="#花指令" class="headerlink" title="花指令"></a>花指令</h2><ul>
-<li><p>又叫垃圾指令，不影响程序原始逻辑，但会干扰IDA反编译或者反汇编。</p>
-</li>
-<li><p>原理：</p>
-<p>因为反编译器多是静态分析的，不会通过执行来分析逻辑，只会根据反汇编出来的指令分析，因此有空可乘：例如可以通过内联汇编不完整指令但是跳过不完整指令来模糊指令边界、内联汇编永跳永不跳分支来误导运行逻辑分析、内联汇编无意义指令误导主要逻辑</p>
-</li>
-<li><p>显著特征是出现红色行，而应对方法是选中花指令所在的区域改为“nop”（空指令）</p>
-</li>
-</ul>
-<h3 id="恒跳型"><a href="#恒跳型" class="headerlink" title="恒跳型"></a>恒跳型</h3><ul>
-<li><p>实测IDA9.0.241217不会报红，也就是混淆失效，所以就看看源码吧</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	_asm&#123;</span><br><span class="line">		xor eax, eax;</span><br><span class="line">		jz s;</span><br><span class="line">		add esp, <span class="number">0x11</span>;</span><br><span class="line">	s:</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;hello\n&quot;</span>);</span><br><span class="line">	system(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="call-ret相消型"><a href="#call-ret相消型" class="headerlink" title="call-ret相消型"></a>call-ret相消型</h3><ul>
-<li><p>来看效果</p>
-<p><img src="/../images/image-20250731203000820.png" alt="报红"></p>
-</li>
-<li><p>可以看到，在函数中间出现了sp-analysis failed，而上面一条就是retn，明显不对。</p>
-<p>往前看，rep stosd初始化后，call了$+5，即当前位置+5&#x3D;0046308C，也就是下一条的add</p>
-<p>然后给esp的值+7（call的时候push eip即push 0046308c了）</p>
-<p>此时esp存放值为0046308c+7&#x3D;00463093，所以retn时会pop 00463093，程序跳到00463093</p>
-<p>往下看，00463093正是没识别出来的三个数的最后一个，下面还有一个offset没有指令。</p>
-<p>第三个数68h和offset结合刚好是push offset，对应上了下面的call（函数传参）</p>
-</li>
-<li><p>选中没识别的三个数，按“U”（undefine)，可以看到三个数分开了</p>
-<p><img src="/../images/image-20250731203817109.png" alt="按U"></p>
-</li>
-<li><p>选中db 68h和dd offset aHello，按C转化为汇编指令，可以看到push offset恢复了</p>
-<p><img src="/../images/image-20250731204815374.png" alt="恢复push"></p>
-</li>
-<li><p>选中call $+5到db 34h，右键选择”Fill with NOPs“（实测db 34h会nop不干净，要选中到db 34h下一行）</p>
-<p><img src="/../images/image-20250731204858702.png" alt="NOP"></p>
-</li>
-<li><p>可以看到函数变成这样，这是因为插入了retn导致函数范围分析错误，需要纠正</p>
-<p><img src="/../images/image-20250731205500606.png" alt="NOP完"></p>
-</li>
-<li><p>点击函数名，然后右键edit fuction，把end address改成末尾那个真正的retn的地址就OK了</p>
-<p><img src="/../images/image-20250731205807130.png" alt="纠正函数范围"></p>
-</li>
-</ul>
-<h3 id="jz-操作数不全型"><a href="#jz-操作数不全型" class="headerlink" title="jz-操作数不全型"></a>jz-操作数不全型</h3><ul>
-<li><p>这种情况下会出现和上一种一样的指令识别错误的问题，且看图：</p>
-<p><img src="/../images/image-20250801002342967.png" alt="图"></p>
-</li>
-<li><p>这是按照MSVS C++初始化规则跳转后，在本来main函数的地方的截图。但是跳转过程中会发现，跳转到main函数的代码是jmp loc_xxxxxx而不是jmp sub_xxxxxx。但是目前还不影响，先分析报错的地方。</p>
-</li>
-<li><p>可以看到 xor ebp,[eax+50h] 处报红了，并且下面是一段没分析出来的数和字符串”pause”，下面进行分析</p>
-</li>
-<li><p>首先，rep stosd初始化后，进行了一个恒跳，跳转的地方是0046308E，在 xor ebp,[eax+50h] 这条指令里，所以这里红了</p>
-</li>
-<li><p>把 xor ebp,[eax+50h] 这条指令undefine一下</p>
-<p><img src="/../images/image-20250801002409823.png" alt="undefine一下"></p>
-</li>
-<li><p>根据逻辑，程序是肯定会跳到0046308E的，所以前面的代码冗余，直接nop掉。选中 xor eax,eax 到0046308E（根据上一种类型的经验，要多覆盖一位才能刚好nop掉目标代码）</p>
-<p><img src="/../images/image-20250801002510740.png" alt="NOP"></p>
-</li>
-<li><p>nop完成后（如果有db 90h就按”C“转成code）就会发现下面没分析的数立刻分析出指令了</p>
-<p><img src="/../images/image-20250801002536258.png" alt="去混淆成功"></p>
-</li>
-<li><p>但是还没完，此时按F5是无法反编译的，因为报错的地方是loc_xxxxxx范围里的，不是一个函数，也就是前面说的jmp loc_xxxxxx而不是jmp sub_xxxxxx的问题了。这里可以看出，IDA这类混淆会导致IDA把函数识别成一个引用而不是函数。</p>
-</li>
-<li><p>到最开始push ebp开辟栈帧的引用loc_463070处，把它undefine一下，再按“P”重新分析一下，就可以得到main函数了</p>
-<p><img src="/../images/image-20250801002703125.png" alt="修复的main函数"></p>
-</li>
-<li><p>这类有一个特征就是jz loc_xxxxxx+1，据此可以快速找到加了混淆的地方</p>
-</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>上述三种（实际上有混淆效果的只有两种）是比较基础的花指令。识别花指令的要点主要是看红色错误，也可以结合一些特征来识别。解决方法就是nop掉混淆代码。</li>
-<li>在实际设计题目时，笔者意外发现了一些更强力的混淆，单单是在上述三种类型的基础上加一点其他指令，就会导致一个函数完全无法被识别（被放在rdata段而不是text段的那种），但是程序还能正常执行，而报错的地方在无法识别的函数的上级函数里（跳转到这个函数的那个函数），可能要结合AI才能实现快捷的分析。因此，花指令还是一个具有挑战性的混淆方式（当然也可能是笔者太菜了没石粒）</li>
-</ul>
-]]></content>
-      <categories>
-        <category>RELearning</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Day10:壳与脱壳（二）</title>
     <url>/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
     <content><![CDATA[<p>二次断点法、一次断点法、特征查找法（均基于Xdbg）、Dll手动脱壳</p>
@@ -422,6 +340,151 @@
 </li>
 <li><p>scyllahide一般绕过不了，可以在主函数涉及判断结果的逻辑中进行改动绕过。</p>
 </li>
+</ul>
+]]></content>
+      <categories>
+        <category>RELearning</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Day3:函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</title>
+    <url>/2025/07/08/Day3-%E5%87%BD%E6%95%B0%E4%B8%8E%E5%A0%86%E6%A0%88/</url>
+    <content><![CDATA[<p>函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</p>
+<span id="more"></span>
+
+<h2 id="函数与栈帧"><a href="#函数与栈帧" class="headerlink" title="函数与栈帧"></a>函数与栈帧</h2><ul>
+<li><p>“栈“是内存中的一部分，可以理解为连续的一块内存，它为程序运行提供了一个暂时的存放数据的地方，地址、数据等可以通过push指令从寄存器中被复制到栈中，进而寄存器可以进行其他操作，等到这些数据再次被需要时再从栈中被pop出来。栈遵循先进后出的规则，先push的在高地址，后push的在低地址</p>
+</li>
+<li><p>在程序运行时，每个函数都会拥有独立的栈帧，即独立的栈上的一部分空间。有两个寄存器，esp，ebp（x86即32位环境下）负责维护函数的栈空间。ebp存放的是函数栈空间的栈基址，esp存放的是函数栈空间的栈顶。可以理解为ebp是指向函数栈空间最高位的一个指针（因为栈空间从高地址开始分配，因此指向的是最高位，但是是栈空间的起始地址），而esp是指向函数栈空间最低位的一个指针（指向的是最低位，但是会随着后续栈空间的扩充而变化）。</p>
+</li>
+<li><p>CALL指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;call一个函数的时候，会发生以下内容</span></span><br><span class="line"><span class="keyword">push</span> 返回地址（<span class="keyword">call</span>所在指令的下一条）</span><br><span class="line"><span class="keyword">jmp</span> 目标函数地址</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>RET指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;函数结束时，RET指令会发生以下内容</span></span><br><span class="line"><span class="keyword">pop</span> <span class="built_in">eip</span> <span class="comment">;从栈上弹出返回地址到eip（保存下一步指令地址的寄存器）</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>栈帧：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;跳转到每一个函数，会发生以下内容以开辟栈帧</span></span><br><span class="line"><span class="keyword">push</span> <span class="built_in">ebp</span>			<span class="comment">;把上一个函数的ebp值放到栈上</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebp</span>,<span class="built_in">esp</span>			<span class="comment">;把esp值给ebp，开辟新函数的栈帧</span></span><br><span class="line"><span class="comment">;函数执行完毕后，会发生以下内容清理栈帧</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">esp</span>,<span class="built_in">ebp</span>			<span class="comment">;把ebp值给esp，清理函数栈帧</span></span><br><span class="line"><span class="keyword">pop</span> <span class="built_in">ebp</span>				<span class="comment">;恢复ebp原来的值，即上一个函数的ebp</span></span><br><span class="line"><span class="keyword">ret</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="数组与串指令"><a href="#数组与串指令" class="headerlink" title="数组与串指令"></a>数组与串指令</h2><ul>
+<li><p>声明数组：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">.data</span>			<span class="comment">;在数据段声明</span></span><br><span class="line"> szHello <span class="built_in">db</span> <span class="string">&#x27;HelloWorld&#x27;</span>,<span class="number">0</span>			<span class="comment">;声明一个字符串</span></span><br><span class="line"> nNumber <span class="built_in">dd</span> <span class="number">20</span> dup(<span class="number">0</span>)				<span class="comment">;声明一个DWORD数组，20位，使用dup()初始化数组内容为0</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用数组基址的几种方式：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">lea</span> <span class="built_in">eax</span>,szHello</span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebx</span>,offset Nnumber</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>访问数组成员：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;[数组起始地址+索引寄存器*比例因子+偏移量]（索引寄存器用来存放索引值，比例因子对应类型的字节大小，偏移量可用于结构体数组等场景）</span></span><br><span class="line"><span class="comment">;如：</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebx</span>,offset Array	<span class="comment">;把数组基址给ebx</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">esi</span>,<span class="number">0</span>				<span class="comment">;esi用来当索引寄存器</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ecx</span>,<span class="number">10</span>				<span class="comment">;ecx用来放索引上限（ecx常用作计数器）</span></span><br><span class="line"><span class="symbol"></span></span><br><span class="line"><span class="symbol">loop_start:</span>				<span class="comment">;创建一个循环</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,[<span class="built_in">ebx</span>+<span class="built_in">esi</span>*<span class="number">4</span>]	<span class="comment">;取出数组内容放到eax中</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">esi</span>,<span class="number">1</span>			<span class="comment">;索引递增</span></span><br><span class="line">	<span class="keyword">cmp</span> <span class="built_in">esi</span>,<span class="built_in">ecx</span>			<span class="comment">;与索引上限比较，判断是否遍历完数组</span></span><br><span class="line">	<span class="keyword">jl</span> loop_start		<span class="comment">;还没遍历完数组就循环操作，jump到loop_start再走一遍</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>串指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;stos系列:stosb,stosw,stosd,stosq（分别对应byte,word,dword,qword,功能是把al/ax/eax/rax中的内容存到edi/rdi）</span></span><br><span class="line"><span class="comment">;lods系列:lodsb,lodsw,lodsd,lodsq（同样分别对应四个类型，功能是把esi/rsi的内容加载到al/ax/eax/rax中）</span></span><br><span class="line"><span class="comment">;movs系列:movsb,movsw,movsd,movsq（同样分别对应四个类型，功能是把esi的内容复制到edi中）</span></span><br><span class="line"><span class="comment">;cmps系列:cmpsb,cmpsw,cmpsd,cmpsq（同样分别对应四个类型，功能是比较esi和edi的内容并设置标志位）</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="宏与结构体"><a href="#宏与结构体" class="headerlink" title="宏与结构体"></a>宏与结构体</h2><ul>
+<li><p>宏：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;无参宏使用关键字EQU，如</span></span><br><span class="line">PI <span class="built_in">EQU</span> <span class="number">3</span>		<span class="comment">;定义PI=3</span></span><br><span class="line"><span class="comment">;含参宏使用关键字MACRO，用endm结尾，如</span></span><br><span class="line">Myadd MACRO Number</span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">eax</span>,Number</span><br><span class="line">endm			<span class="comment">;定义Myadd函数实现eax加上参数</span></span><br><span class="line"><span class="comment">;含参宏的调用：</span></span><br><span class="line">Myadd&lt;参数&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结构体：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;使用关键字struct和ends，如</span></span><br><span class="line">Point struct</span><br><span class="line">	x <span class="built_in">word</span> ?</span><br><span class="line">	y <span class="built_in">word</span> ?</span><br><span class="line">Point ends</span><br><span class="line"></span><br><span class="line"><span class="comment">;实例化结构体</span></span><br><span class="line">MyPoint Point&lt;?&gt;	<span class="comment">;实例化出MyPoint</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;访问结构体成员</span></span><br><span class="line"><span class="keyword">mov</span> MyPoint<span class="number">.</span>x,<span class="number">123</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="x64汇编框架-MASM"><a href="#x64汇编框架-MASM" class="headerlink" title="x64汇编框架(MASM)"></a>x64汇编框架(MASM)</h2><figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈</span></span><br><span class="line"><span class="meta">.code</span></span><br><span class="line"><span class="comment">;Add函数声明</span></span><br><span class="line"><span class="keyword">Add</span> proc</span><br><span class="line">	<span class="keyword">push</span> <span class="built_in">rbp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rbp</span>,<span class="built_in">rsp</span></span><br><span class="line">	<span class="keyword">lea</span> <span class="built_in">rax</span>,[<span class="built_in">rdi</span> + <span class="built_in">rsi</span>]		<span class="comment">;从寄存器中取参数</span></span><br><span class="line">	<span class="keyword">pop</span> <span class="built_in">rbp</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line"><span class="keyword">Add</span> endp</span><br><span class="line"></span><br><span class="line">main proc			</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdi</span>,<span class="number">2</span>		<span class="comment">;把参数传入寄存器中</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rsi</span>,<span class="number">3</span></span><br><span class="line">	<span class="keyword">call</span> <span class="keyword">Add</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line">main endp</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">;x86环境下的代码，传参使用栈</span></span><br><span class="line"><span class="meta">.code</span></span><br><span class="line"><span class="comment">;Add函数声明</span></span><br><span class="line"><span class="keyword">Add</span> proc</span><br><span class="line">	<span class="keyword">push</span> <span class="built_in">ebp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebp</span>,<span class="built_in">esp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,[<span class="built_in">esp</span>+<span class="number">8</span>]			<span class="comment">;从栈上取参数</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">eax</span>,[<span class="built_in">esp</span>+<span class="number">12</span>]</span><br><span class="line">	<span class="keyword">pop</span> <span class="built_in">ebp</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line"><span class="keyword">Add</span> endp</span><br><span class="line"></span><br><span class="line">main proc</span><br><span class="line">	<span class="keyword">push</span> <span class="number">3</span>			<span class="comment">;把参数压入栈中</span></span><br><span class="line">	<span class="keyword">push</span> <span class="number">2</span></span><br><span class="line">	<span class="keyword">call</span> <span class="keyword">Add</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">esp</span>,<span class="number">8</span></span><br><span class="line">main endp</span><br></pre></td></tr></table></figure>
+
+<h2 id="内联汇编与混合编程"><a href="#内联汇编与混合编程" class="headerlink" title="内联汇编与混合编程"></a>内联汇编与混合编程</h2><ul>
+<li><p>x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm{}直接写在C++代码中:</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    _asm&#123;</span><br><span class="line">        <span class="keyword">xor</span> eax,eax</span><br><span class="line">        mov eax,<span class="number">1</span></span><br><span class="line">        add eax,<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>x64下，在Microsoft Visual C++ (MSVC)程序中使用汇编，需要独立的asm文件，通过extern声明使用：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">Add</span><span class="params">(<span class="type">long</span> <span class="type">long</span> number1,<span class="type">long</span> <span class="type">long</span> number2)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> res=<span class="built_in">Add</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">    std::cout&lt;&lt;res&lt;&lt;std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//asm文件</span></span><br><span class="line">.code</span><br><span class="line">Add proc</span><br><span class="line">    push rbp</span><br><span class="line">    mov rbp,rsp</span><br><span class="line">    <span class="keyword">xor</span> rax,rax</span><br><span class="line">    add rax,rcx</span><br><span class="line">    add rax,rdx</span><br><span class="line">    pop rbp</span><br><span class="line">    ret</span><br><span class="line">Add endp</span><br><span class="line">end</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>RELearning</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Day4:Linux汇编框架、操作系统与汇编器、主函数跳转流程</title>
+    <url>/2025/07/11/Day4-Linux%E6%B1%87%E7%BC%96%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[<p>Linux汇编框架、操作系统与汇编器、主函数跳转流程</p>
+<span id="more"></span>
+
+<h2 id="Linux-NASM-汇编框架"><a href="#Linux-NASM-汇编框架" class="headerlink" title="Linux(NASM)汇编框架"></a>Linux(NASM)汇编框架</h2><ul>
+<li><p>Linux和Windows的不同主要有：</p>
+<ul>
+<li><p>系统调用方式不同：</p>
+<ul>
+<li><p>Windows提供API，可以直接利用系统函数</p>
+</li>
+<li><p>Linux需要用系统调用号触发系统调用。系统调用号存入特定寄存器后使用触发指令，触发系统调用</p>
+<p>触发指令：</p>
+<p>​	32位(x86)：int 0x80</p>
+<p>​	64位(x64)：syscall</p>
+<p>参数传递：</p>
+<p>​	32位：eax（系统调用号），ebx、ecx、edx、esi、edi、ebp（参数）。</p>
+<p>​	64位：rax（系统调用号），rdi、rsi、rdx、r10、r8、r9（参数）。</p>
+<p>32位下exit示例：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">1</span>		<span class="comment">;32位下，exit的系统调用号为1</span></span><br><span class="line"><span class="keyword">int</span> <span class="number">0x80</span>		<span class="comment">;系统调用号存入寄存器后，触发系统调用</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>可执行文件格式不同：</p>
+<ul>
+<li>Windows使用PE文件格式</li>
+<li>Linux使用ELF文件格式</li>
+</ul>
+</li>
+<li><p>其他细节：</p>
+<ul>
+<li>Linux在段名前必须添加section，只有.text段没有.code段（实际上由汇编器决定，详见下一部分）</li>
+<li>Linux使用0xA作为字符串结束符</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>32位汇编框架</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">section</span> .data</span><br><span class="line">	msg <span class="built_in">db</span> <span class="string">&quot;HelloWorld&quot;</span>,<span class="number">0xA</span></span><br><span class="line">	len <span class="built_in">equ</span> $ - msg				<span class="comment">;用变量len记录msg的长度（$表示当前变量的地址，减去msg的地址就是msg的长度）</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">section</span> .text</span><br><span class="line">	<span class="meta">global</span> _start</span><br><span class="line"><span class="symbol">_start:</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">4</span>					<span class="comment">;eax存放系统调用号4：sys_write</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebx</span>,<span class="number">1</span>					<span class="comment">;参数1：文件描述符，1表示标准输出stdout</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ecx</span>,msg					<span class="comment">;参数2：要打印的数据地址</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">edx</span>,len					<span class="comment">;参数3：打印的字节数</span></span><br><span class="line">	<span class="keyword">int</span> <span class="number">0x80</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">1</span>					<span class="comment">;eax存放系统调用号1：sys_exit</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebx</span>,<span class="number">0</span>					<span class="comment">;参数1：退出状态码（0表示成功）</span></span><br><span class="line">	<span class="keyword">int</span> <span class="number">0x80</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>64位汇编框架</p>
+</li>
+</ul>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">section</span> .data</span><br><span class="line">	msg <span class="built_in">db</span> <span class="string">&quot;HelloWorld&quot;</span>,<span class="number">0xA</span></span><br><span class="line">	len <span class="built_in">equ</span> $ - msg				</span><br><span class="line">	</span><br><span class="line"><span class="meta">section</span> .text</span><br><span class="line">	<span class="meta">global</span> _start</span><br><span class="line"><span class="symbol">_start:</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rax</span>,<span class="number">1</span>					<span class="comment">;rax存放系统调用号1：sys_write</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdi</span>,<span class="number">1</span>					<span class="comment">;参数1：文件描述符，1表示标准输出stdout</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rsi</span>,msg					<span class="comment">;参数2：要打印的数据地址</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdx</span>,len					<span class="comment">;参数3：打印的字节数</span></span><br><span class="line">	<span class="keyword">syscall</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rax</span>,<span class="number">60</span>					<span class="comment">;rax存放系统调用号60：sys_exit</span></span><br><span class="line">	<span class="keyword">xor</span> <span class="built_in">rdi</span>,<span class="built_in">rdi</span>					<span class="comment">;参数1：退出状态码（0表示成功）</span></span><br><span class="line">	<span class="keyword">syscall</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="操作系统与汇编器"><a href="#操作系统与汇编器" class="headerlink" title="操作系统与汇编器"></a>操作系统与汇编器</h2><ul>
+<li>Windows：主要有MASM和NASM两种汇编器<ul>
+<li>MASM（Microsoft Macro Assembler），主要集成在visual studio中<ul>
+<li>段名前不要求加section，可以直接用 <strong>.段名</strong> 声明</li>
+<li>指令存放在.code段</li>
+<li>.code段，函数以 <strong>func_name proc</strong> 开始，以 <strong>func_name endp</strong> 结束</li>
+<li>使用Intel风格，即 <strong>指令   目标操作数，源操作数</strong></li>
+</ul>
+</li>
+<li>NASM（Netwide Assembler），跨平台汇编器，支持Windows、Linux、macOS<ul>
+<li>段名前要求加section，用 <strong>sectino .段名</strong> 声明</li>
+<li>指令存放在.text段</li>
+<li>.text段，函数用 <strong>global func_name</strong> 声明后再定义 </li>
+<li>使用Intel风格</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Linux：主要有NASM和GAS两种汇编器<ul>
+<li>NASM同上 </li>
+<li>GAS（GNU Assembler），Linux默认汇编器<ul>
+<li>段名前要求加.section，用 <strong>.section .段名</strong> 声明</li>
+<li>指令存放在.text段</li>
+<li>.text段，函数用 <strong>.global func_name</strong> 声明后再定义</li>
+<li>使用AT&amp;T风格，即 <strong>指令   源操作数，目标操作数</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="主函数跳转流程"><a href="#主函数跳转流程" class="headerlink" title="主函数跳转流程"></a>主函数跳转流程</h2><ul>
+<li><p>环境：vs2022，Debug  x86&#x2F;x64，Release x86&#x2F;x64</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x86 debug 跳转特征</span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;第一个call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step3</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">call</span> &lt;--	<span class="comment">;连续两个call，进第二个</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step4</span></span><br><span class="line"><span class="number">2</span>*<span class="keyword">jz</span>--&gt;<span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;两个jz指向的同一个call且此call后紧跟mov和call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step5</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续push3个参数入栈后的call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step6</span></span><br><span class="line"><span class="keyword">jmp</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x86 Release 跳转特征</span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;call后的jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续push3个参数入栈后的call</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64 Debug 跳转特征 </span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;第一个call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step3</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">call</span> &lt;--	<span class="comment">;连续两个call进第二个</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step4</span></span><br><span class="line"><span class="number">2</span>*<span class="keyword">jz</span>--&gt;<span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;两个jz指向的同一个call且此call后紧跟mov和call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step5</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续5个mov后的call（传参）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step6</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64 Release 跳转特征 </span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;call后的jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;三个mov后的call（传参）且此call后紧跟mov和call</span></span><br></pre></td></tr></table></figure></li>
 </ul>
 ]]></content>
       <categories>
@@ -654,53 +717,81 @@
       </categories>
   </entry>
   <entry>
-    <title>Day3:函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</title>
-    <url>/2025/07/08/Day3-%E5%87%BD%E6%95%B0%E4%B8%8E%E5%A0%86%E6%A0%88/</url>
-    <content><![CDATA[<p>函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</p>
+    <title>Day11:花指令</title>
+    <url>/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/</url>
+    <content><![CDATA[<p>花指令</p>
 <span id="more"></span>
 
-<h2 id="函数与栈帧"><a href="#函数与栈帧" class="headerlink" title="函数与栈帧"></a>函数与栈帧</h2><ul>
-<li><p>“栈“是内存中的一部分，可以理解为连续的一块内存，它为程序运行提供了一个暂时的存放数据的地方，地址、数据等可以通过push指令从寄存器中被复制到栈中，进而寄存器可以进行其他操作，等到这些数据再次被需要时再从栈中被pop出来。栈遵循先进后出的规则，先push的在高地址，后push的在低地址</p>
+<h2 id="花指令"><a href="#花指令" class="headerlink" title="花指令"></a>花指令</h2><ul>
+<li><p>又叫垃圾指令，不影响程序原始逻辑，但会干扰IDA反编译或者反汇编。</p>
 </li>
-<li><p>在程序运行时，每个函数都会拥有独立的栈帧，即独立的栈上的一部分空间。有两个寄存器，esp，ebp（x86即32位环境下）负责维护函数的栈空间。ebp存放的是函数栈空间的栈基址，esp存放的是函数栈空间的栈顶。可以理解为ebp是指向函数栈空间最高位的一个指针（因为栈空间从高地址开始分配，因此指向的是最高位，但是是栈空间的起始地址），而esp是指向函数栈空间最低位的一个指针（指向的是最低位，但是会随着后续栈空间的扩充而变化）。</p>
+<li><p>原理：</p>
+<p>因为反编译器多是静态分析的，不会通过执行来分析逻辑，只会根据反汇编出来的指令分析，因此有空可乘：例如可以通过内联汇编不完整指令但是跳过不完整指令来模糊指令边界、内联汇编永跳永不跳分支来误导运行逻辑分析、内联汇编无意义指令误导主要逻辑</p>
 </li>
-<li><p>CALL指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;call一个函数的时候，会发生以下内容</span></span><br><span class="line"><span class="keyword">push</span> 返回地址（<span class="keyword">call</span>所在指令的下一条）</span><br><span class="line"><span class="keyword">jmp</span> 目标函数地址</span><br></pre></td></tr></table></figure>
+<li><p>显著特征是出现红色行，而应对方法是选中花指令所在的区域改为“nop”（空指令）</p>
 </li>
-<li><p>RET指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;函数结束时，RET指令会发生以下内容</span></span><br><span class="line"><span class="keyword">pop</span> <span class="built_in">eip</span> <span class="comment">;从栈上弹出返回地址到eip（保存下一步指令地址的寄存器）</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>栈帧：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;跳转到每一个函数，会发生以下内容以开辟栈帧</span></span><br><span class="line"><span class="keyword">push</span> <span class="built_in">ebp</span>			<span class="comment">;把上一个函数的ebp值放到栈上</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebp</span>,<span class="built_in">esp</span>			<span class="comment">;把esp值给ebp，开辟新函数的栈帧</span></span><br><span class="line"><span class="comment">;函数执行完毕后，会发生以下内容清理栈帧</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">esp</span>,<span class="built_in">ebp</span>			<span class="comment">;把ebp值给esp，清理函数栈帧</span></span><br><span class="line"><span class="keyword">pop</span> <span class="built_in">ebp</span>				<span class="comment">;恢复ebp原来的值，即上一个函数的ebp</span></span><br><span class="line"><span class="keyword">ret</span></span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="数组与串指令"><a href="#数组与串指令" class="headerlink" title="数组与串指令"></a>数组与串指令</h2><ul>
-<li><p>声明数组：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">.data</span>			<span class="comment">;在数据段声明</span></span><br><span class="line"> szHello <span class="built_in">db</span> <span class="string">&#x27;HelloWorld&#x27;</span>,<span class="number">0</span>			<span class="comment">;声明一个字符串</span></span><br><span class="line"> nNumber <span class="built_in">dd</span> <span class="number">20</span> dup(<span class="number">0</span>)				<span class="comment">;声明一个DWORD数组，20位，使用dup()初始化数组内容为0</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用数组基址的几种方式：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">lea</span> <span class="built_in">eax</span>,szHello</span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebx</span>,offset Nnumber</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>访问数组成员：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;[数组起始地址+索引寄存器*比例因子+偏移量]（索引寄存器用来存放索引值，比例因子对应类型的字节大小，偏移量可用于结构体数组等场景）</span></span><br><span class="line"><span class="comment">;如：</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ebx</span>,offset Array	<span class="comment">;把数组基址给ebx</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">esi</span>,<span class="number">0</span>				<span class="comment">;esi用来当索引寄存器</span></span><br><span class="line"><span class="keyword">mov</span> <span class="built_in">ecx</span>,<span class="number">10</span>				<span class="comment">;ecx用来放索引上限（ecx常用作计数器）</span></span><br><span class="line"><span class="symbol"></span></span><br><span class="line"><span class="symbol">loop_start:</span>				<span class="comment">;创建一个循环</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,[<span class="built_in">ebx</span>+<span class="built_in">esi</span>*<span class="number">4</span>]	<span class="comment">;取出数组内容放到eax中</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">esi</span>,<span class="number">1</span>			<span class="comment">;索引递增</span></span><br><span class="line">	<span class="keyword">cmp</span> <span class="built_in">esi</span>,<span class="built_in">ecx</span>			<span class="comment">;与索引上限比较，判断是否遍历完数组</span></span><br><span class="line">	<span class="keyword">jl</span> loop_start		<span class="comment">;还没遍历完数组就循环操作，jump到loop_start再走一遍</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>串指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;stos系列:stosb,stosw,stosd,stosq（分别对应byte,word,dword,qword,功能是把al/ax/eax/rax中的内容存到edi/rdi）</span></span><br><span class="line"><span class="comment">;lods系列:lodsb,lodsw,lodsd,lodsq（同样分别对应四个类型，功能是把esi/rsi的内容加载到al/ax/eax/rax中）</span></span><br><span class="line"><span class="comment">;movs系列:movsb,movsw,movsd,movsq（同样分别对应四个类型，功能是把esi的内容复制到edi中）</span></span><br><span class="line"><span class="comment">;cmps系列:cmpsb,cmpsw,cmpsd,cmpsq（同样分别对应四个类型，功能是比较esi和edi的内容并设置标志位）</span></span><br></pre></td></tr></table></figure></li>
+<h3 id="恒跳型"><a href="#恒跳型" class="headerlink" title="恒跳型"></a>恒跳型</h3><ul>
+<li><p>实测IDA9.0.241217不会报红，也就是混淆失效，所以就看看源码吧</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	_asm&#123;</span><br><span class="line">		xor eax, eax;</span><br><span class="line">		jz s;</span><br><span class="line">		add esp, <span class="number">0x11</span>;</span><br><span class="line">	s:</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;hello\n&quot;</span>);</span><br><span class="line">	system(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="宏与结构体"><a href="#宏与结构体" class="headerlink" title="宏与结构体"></a>宏与结构体</h2><ul>
-<li><p>宏：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;无参宏使用关键字EQU，如</span></span><br><span class="line">PI <span class="built_in">EQU</span> <span class="number">3</span>		<span class="comment">;定义PI=3</span></span><br><span class="line"><span class="comment">;含参宏使用关键字MACRO，用endm结尾，如</span></span><br><span class="line">Myadd MACRO Number</span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">eax</span>,Number</span><br><span class="line">endm			<span class="comment">;定义Myadd函数实现eax加上参数</span></span><br><span class="line"><span class="comment">;含参宏的调用：</span></span><br><span class="line">Myadd&lt;参数&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="call-ret相消型"><a href="#call-ret相消型" class="headerlink" title="call-ret相消型"></a>call-ret相消型</h3><ul>
+<li><p>来看效果</p>
+<p><img src="/../images/image-20250731203000820.png" alt="报红"></p>
 </li>
-<li><p>结构体：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;使用关键字struct和ends，如</span></span><br><span class="line">Point struct</span><br><span class="line">	x <span class="built_in">word</span> ?</span><br><span class="line">	y <span class="built_in">word</span> ?</span><br><span class="line">Point ends</span><br><span class="line"></span><br><span class="line"><span class="comment">;实例化结构体</span></span><br><span class="line">MyPoint Point&lt;?&gt;	<span class="comment">;实例化出MyPoint</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;访问结构体成员</span></span><br><span class="line"><span class="keyword">mov</span> MyPoint<span class="number">.</span>x,<span class="number">123</span></span><br></pre></td></tr></table></figure></li>
+<li><p>可以看到，在函数中间出现了sp-analysis failed，而上面一条就是retn，明显不对。</p>
+<p>往前看，rep stosd初始化后，call了$+5，即当前位置+5&#x3D;0046308C，也就是下一条的add</p>
+<p>然后给esp的值+7（call的时候push eip即push 0046308c了）</p>
+<p>此时esp存放值为0046308c+7&#x3D;00463093，所以retn时会pop 00463093，程序跳到00463093</p>
+<p>往下看，00463093正是没识别出来的三个数的最后一个，下面还有一个offset没有指令。</p>
+<p>第三个数68h和offset结合刚好是push offset，对应上了下面的call（函数传参）</p>
+</li>
+<li><p>选中没识别的三个数，按“U”（undefine)，可以看到三个数分开了</p>
+<p><img src="/../images/image-20250731203817109.png" alt="按U"></p>
+</li>
+<li><p>选中db 68h和dd offset aHello，按C转化为汇编指令，可以看到push offset恢复了</p>
+<p><img src="/../images/image-20250731204815374.png" alt="恢复push"></p>
+</li>
+<li><p>选中call $+5到db 34h，右键选择”Fill with NOPs“（实测db 34h会nop不干净，要选中到db 34h下一行）</p>
+<p><img src="/../images/image-20250731204858702.png" alt="NOP"></p>
+</li>
+<li><p>可以看到函数变成这样，这是因为插入了retn导致函数范围分析错误，需要纠正</p>
+<p><img src="/../images/image-20250731205500606.png" alt="NOP完"></p>
+</li>
+<li><p>点击函数名，然后右键edit fuction，把end address改成末尾那个真正的retn的地址就OK了</p>
+<p><img src="/../images/image-20250731205807130.png" alt="纠正函数范围"></p>
+</li>
 </ul>
-<h2 id="x64汇编框架-MASM"><a href="#x64汇编框架-MASM" class="headerlink" title="x64汇编框架(MASM)"></a>x64汇编框架(MASM)</h2><figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈</span></span><br><span class="line"><span class="meta">.code</span></span><br><span class="line"><span class="comment">;Add函数声明</span></span><br><span class="line"><span class="keyword">Add</span> proc</span><br><span class="line">	<span class="keyword">push</span> <span class="built_in">rbp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rbp</span>,<span class="built_in">rsp</span></span><br><span class="line">	<span class="keyword">lea</span> <span class="built_in">rax</span>,[<span class="built_in">rdi</span> + <span class="built_in">rsi</span>]		<span class="comment">;从寄存器中取参数</span></span><br><span class="line">	<span class="keyword">pop</span> <span class="built_in">rbp</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line"><span class="keyword">Add</span> endp</span><br><span class="line"></span><br><span class="line">main proc			</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdi</span>,<span class="number">2</span>		<span class="comment">;把参数传入寄存器中</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rsi</span>,<span class="number">3</span></span><br><span class="line">	<span class="keyword">call</span> <span class="keyword">Add</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line">main endp</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">;x86环境下的代码，传参使用栈</span></span><br><span class="line"><span class="meta">.code</span></span><br><span class="line"><span class="comment">;Add函数声明</span></span><br><span class="line"><span class="keyword">Add</span> proc</span><br><span class="line">	<span class="keyword">push</span> <span class="built_in">ebp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebp</span>,<span class="built_in">esp</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,[<span class="built_in">esp</span>+<span class="number">8</span>]			<span class="comment">;从栈上取参数</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">eax</span>,[<span class="built_in">esp</span>+<span class="number">12</span>]</span><br><span class="line">	<span class="keyword">pop</span> <span class="built_in">ebp</span></span><br><span class="line">	<span class="keyword">ret</span></span><br><span class="line"><span class="keyword">Add</span> endp</span><br><span class="line"></span><br><span class="line">main proc</span><br><span class="line">	<span class="keyword">push</span> <span class="number">3</span>			<span class="comment">;把参数压入栈中</span></span><br><span class="line">	<span class="keyword">push</span> <span class="number">2</span></span><br><span class="line">	<span class="keyword">call</span> <span class="keyword">Add</span></span><br><span class="line">	<span class="keyword">add</span> <span class="built_in">esp</span>,<span class="number">8</span></span><br><span class="line">main endp</span><br></pre></td></tr></table></figure>
-
-<h2 id="内联汇编与混合编程"><a href="#内联汇编与混合编程" class="headerlink" title="内联汇编与混合编程"></a>内联汇编与混合编程</h2><ul>
-<li><p>x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm{}直接写在C++代码中:</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    _asm&#123;</span><br><span class="line">        <span class="keyword">xor</span> eax,eax</span><br><span class="line">        mov eax,<span class="number">1</span></span><br><span class="line">        add eax,<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="jz-操作数不全型"><a href="#jz-操作数不全型" class="headerlink" title="jz-操作数不全型"></a>jz-操作数不全型</h3><ul>
+<li><p>这种情况下会出现和上一种一样的指令识别错误的问题，且看图：</p>
+<p><img src="/../images/image-20250801002342967.png" alt="图"></p>
 </li>
-<li><p>x64下，在Microsoft Visual C++ (MSVC)程序中使用汇编，需要独立的asm文件，通过extern声明使用：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">Add</span><span class="params">(<span class="type">long</span> <span class="type">long</span> number1,<span class="type">long</span> <span class="type">long</span> number2)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> res=<span class="built_in">Add</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">    std::cout&lt;&lt;res&lt;&lt;std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//asm文件</span></span><br><span class="line">.code</span><br><span class="line">Add proc</span><br><span class="line">    push rbp</span><br><span class="line">    mov rbp,rsp</span><br><span class="line">    <span class="keyword">xor</span> rax,rax</span><br><span class="line">    add rax,rcx</span><br><span class="line">    add rax,rdx</span><br><span class="line">    pop rbp</span><br><span class="line">    ret</span><br><span class="line">Add endp</span><br><span class="line">end</span><br></pre></td></tr></table></figure></li>
+<li><p>这是按照MSVS C++初始化规则跳转后，在本来main函数的地方的截图。但是跳转过程中会发现，跳转到main函数的代码是jmp loc_xxxxxx而不是jmp sub_xxxxxx。但是目前还不影响，先分析报错的地方。</p>
+</li>
+<li><p>可以看到 xor ebp,[eax+50h] 处报红了，并且下面是一段没分析出来的数和字符串”pause”，下面进行分析</p>
+</li>
+<li><p>首先，rep stosd初始化后，进行了一个恒跳，跳转的地方是0046308E，在 xor ebp,[eax+50h] 这条指令里，所以这里红了</p>
+</li>
+<li><p>把 xor ebp,[eax+50h] 这条指令undefine一下</p>
+<p><img src="/../images/image-20250801002409823.png" alt="undefine一下"></p>
+</li>
+<li><p>根据逻辑，程序是肯定会跳到0046308E的，所以前面的代码冗余，直接nop掉。选中 xor eax,eax 到0046308E（根据上一种类型的经验，要多覆盖一位才能刚好nop掉目标代码）</p>
+<p><img src="/../images/image-20250801002510740.png" alt="NOP"></p>
+</li>
+<li><p>nop完成后（如果有db 90h就按”C“转成code）就会发现下面没分析的数立刻分析出指令了</p>
+<p><img src="/../images/image-20250801002536258.png" alt="去混淆成功"></p>
+</li>
+<li><p>但是还没完，此时按F5是无法反编译的，因为报错的地方是loc_xxxxxx范围里的，不是一个函数，也就是前面说的jmp loc_xxxxxx而不是jmp sub_xxxxxx的问题了。这里可以看出，IDA这类混淆会导致IDA把函数识别成一个引用而不是函数。</p>
+</li>
+<li><p>到最开始push ebp开辟栈帧的引用loc_463070处，把它undefine一下，再按“P”重新分析一下，就可以得到main函数了</p>
+<p><img src="/../images/image-20250801002703125.png" alt="修复的main函数"></p>
+</li>
+<li><p>这类有一个特征就是jz loc_xxxxxx+1，据此可以快速找到加了混淆的地方</p>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>上述三种（实际上有混淆效果的只有两种）是比较基础的花指令。识别花指令的要点主要是看红色错误，也可以结合一些特征来识别。解决方法就是nop掉混淆代码。</li>
+<li>在实际设计题目时，笔者意外发现了一些更强力的混淆，单单是在上述三种类型的基础上加一点其他指令，就会导致一个函数完全无法被识别（被放在rdata段而不是text段的那种），但是程序还能正常执行，而报错的地方在无法识别的函数的上级函数里（跳转到这个函数的那个函数），可能要结合AI才能实现快捷的分析。因此，花指令还是一个具有挑战性的混淆方式（当然也可能是笔者太菜了没石粒）</li>
 </ul>
 ]]></content>
       <categories>
@@ -708,90 +799,26 @@
       </categories>
   </entry>
   <entry>
-    <title>Day4:Linux汇编框架、操作系统与汇编器、主函数跳转流程</title>
-    <url>/2025/07/11/Day4-Linux%E6%B1%87%E7%BC%96%E6%A1%86%E6%9E%B6/</url>
-    <content><![CDATA[<p>Linux汇编框架、操作系统与汇编器、主函数跳转流程</p>
+    <title>Day5:函数调用约定</title>
+    <url>/2025/07/12/Day5-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/</url>
+    <content><![CDATA[<p>函数调用约定</p>
 <span id="more"></span>
 
-<h2 id="Linux-NASM-汇编框架"><a href="#Linux-NASM-汇编框架" class="headerlink" title="Linux(NASM)汇编框架"></a>Linux(NASM)汇编框架</h2><ul>
-<li><p>Linux和Windows的不同主要有：</p>
-<ul>
-<li><p>系统调用方式不同：</p>
-<ul>
-<li><p>Windows提供API，可以直接利用系统函数</p>
+<h2 id="函数调用约定"><a href="#函数调用约定" class="headerlink" title="函数调用约定"></a>函数调用约定</h2><ul>
+<li><p>主要有三种：cdecl、stdcall、fastcall。以求和函数为例</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//求和</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a+b+c;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> res=sum(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,res);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>Linux需要用系统调用号触发系统调用。系统调用号存入特定寄存器后使用触发指令，触发系统调用</p>
-<p>触发指令：</p>
-<p>​	32位(x86)：int 0x80</p>
-<p>​	64位(x64)：syscall</p>
-<p>参数传递：</p>
-<p>​	32位：eax（系统调用号），ebx、ecx、edx、esi、edi、ebp（参数）。</p>
-<p>​	64位：rax（系统调用号），rdi、rsi、rdx、r10、r8、r9（参数）。</p>
-<p>32位下exit示例：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">1</span>		<span class="comment">;32位下，exit的系统调用号为1</span></span><br><span class="line"><span class="keyword">int</span> <span class="number">0x80</span>		<span class="comment">;系统调用号存入寄存器后，触发系统调用</span></span><br></pre></td></tr></table></figure></li>
-</ul>
+<li><p>cdecl：完全栈传参，参数从右往左入栈，由调用者清理参数占用的栈空间</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">2</span>               <span class="comment">; 参数b入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">1</span>               <span class="comment">; 参数a入栈</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YAHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0Ch</span>			<span class="comment">;这里调用者进行了清理参数占用的栈空间的操作(3个参数×4字节)，被调用者不负责</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line"></span><br><span class="line"><span class="comment">; int __cdecl sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YAHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">0Ch</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">10h</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;sum函数自身的栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">edi</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">ecx</span>, <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span>                     <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;清理自身栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">?sum@@YAHHHH@Z  endp</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>可执行文件格式不同：</p>
-<ul>
-<li>Windows使用PE文件格式</li>
-<li>Linux使用ELF文件格式</li>
-</ul>
+<li><p>stdcall：完全栈传参，参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">2</span>               <span class="comment">; 参数b入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">1</span>               <span class="comment">; 参数a入栈</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YGHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span>		<span class="comment">;这里直接到把返回值给res了，调用者不负责清理参数占用的栈空间</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line">  </span><br><span class="line"><span class="comment">; int __stdcall sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YGHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">0Ch</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">10h</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;sum的栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">              	 <span class="keyword">mov</span>     <span class="built_in">edi</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">ecx</span>, <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span>                     <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;清理自身栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span>    <span class="number">0Ch</span>			<span class="comment">;被调用者通过返回指令给esp增加0Ch，清理参数占用的栈空间</span></span><br><span class="line">?sum@@YGHHHH@Z  endp</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>其他细节：</p>
-<ul>
-<li>Linux在段名前必须添加section，只有.text段没有.code段（实际上由汇编器决定，详见下一部分）</li>
-<li>Linux使用0xA作为字符串结束符</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>32位汇编框架</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">section</span> .data</span><br><span class="line">	msg <span class="built_in">db</span> <span class="string">&quot;HelloWorld&quot;</span>,<span class="number">0xA</span></span><br><span class="line">	len <span class="built_in">equ</span> $ - msg				<span class="comment">;用变量len记录msg的长度（$表示当前变量的地址，减去msg的地址就是msg的长度）</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">section</span> .text</span><br><span class="line">	<span class="meta">global</span> _start</span><br><span class="line"><span class="symbol">_start:</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">4</span>					<span class="comment">;eax存放系统调用号4：sys_write</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebx</span>,<span class="number">1</span>					<span class="comment">;参数1：文件描述符，1表示标准输出stdout</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ecx</span>,msg					<span class="comment">;参数2：要打印的数据地址</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">edx</span>,len					<span class="comment">;参数3：打印的字节数</span></span><br><span class="line">	<span class="keyword">int</span> <span class="number">0x80</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">eax</span>,<span class="number">1</span>					<span class="comment">;eax存放系统调用号1：sys_exit</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">ebx</span>,<span class="number">0</span>					<span class="comment">;参数1：退出状态码（0表示成功）</span></span><br><span class="line">	<span class="keyword">int</span> <span class="number">0x80</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>64位汇编框架</p>
-</li>
-</ul>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="meta">section</span> .data</span><br><span class="line">	msg <span class="built_in">db</span> <span class="string">&quot;HelloWorld&quot;</span>,<span class="number">0xA</span></span><br><span class="line">	len <span class="built_in">equ</span> $ - msg				</span><br><span class="line">	</span><br><span class="line"><span class="meta">section</span> .text</span><br><span class="line">	<span class="meta">global</span> _start</span><br><span class="line"><span class="symbol">_start:</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rax</span>,<span class="number">1</span>					<span class="comment">;rax存放系统调用号1：sys_write</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdi</span>,<span class="number">1</span>					<span class="comment">;参数1：文件描述符，1表示标准输出stdout</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rsi</span>,msg					<span class="comment">;参数2：要打印的数据地址</span></span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rdx</span>,len					<span class="comment">;参数3：打印的字节数</span></span><br><span class="line">	<span class="keyword">syscall</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">mov</span> <span class="built_in">rax</span>,<span class="number">60</span>					<span class="comment">;rax存放系统调用号60：sys_exit</span></span><br><span class="line">	<span class="keyword">xor</span> <span class="built_in">rdi</span>,<span class="built_in">rdi</span>					<span class="comment">;参数1：退出状态码（0表示成功）</span></span><br><span class="line">	<span class="keyword">syscall</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="操作系统与汇编器"><a href="#操作系统与汇编器" class="headerlink" title="操作系统与汇编器"></a>操作系统与汇编器</h2><ul>
-<li>Windows：主要有MASM和NASM两种汇编器<ul>
-<li>MASM（Microsoft Macro Assembler），主要集成在visual studio中<ul>
-<li>段名前不要求加section，可以直接用 <strong>.段名</strong> 声明</li>
-<li>指令存放在.code段</li>
-<li>.code段，函数以 <strong>func_name proc</strong> 开始，以 <strong>func_name endp</strong> 结束</li>
-<li>使用Intel风格，即 <strong>指令   目标操作数，源操作数</strong></li>
-</ul>
-</li>
-<li>NASM（Netwide Assembler），跨平台汇编器，支持Windows、Linux、macOS<ul>
-<li>段名前要求加section，用 <strong>sectino .段名</strong> 声明</li>
-<li>指令存放在.text段</li>
-<li>.text段，函数用 <strong>global func_name</strong> 声明后再定义 </li>
-<li>使用Intel风格</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Linux：主要有NASM和GAS两种汇编器<ul>
-<li>NASM同上 </li>
-<li>GAS（GNU Assembler），Linux默认汇编器<ul>
-<li>段名前要求加.section，用 <strong>.section .段名</strong> 声明</li>
-<li>指令存放在.text段</li>
-<li>.text段，函数用 <strong>.global func_name</strong> 声明后再定义</li>
-<li>使用AT&amp;T风格，即 <strong>指令   源操作数，目标操作数</strong></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="主函数跳转流程"><a href="#主函数跳转流程" class="headerlink" title="主函数跳转流程"></a>主函数跳转流程</h2><ul>
-<li><p>环境：vs2022，Debug  x86&#x2F;x64，Release x86&#x2F;x64</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x86 debug 跳转特征</span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;第一个call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step3</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">call</span> &lt;--	<span class="comment">;连续两个call，进第二个</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step4</span></span><br><span class="line"><span class="number">2</span>*<span class="keyword">jz</span>--&gt;<span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;两个jz指向的同一个call且此call后紧跟mov和call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step5</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续push3个参数入栈后的call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step6</span></span><br><span class="line"><span class="keyword">jmp</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x86 Release 跳转特征</span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;call后的jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">push</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续push3个参数入栈后的call</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64 Debug 跳转特征 </span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;第一个call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step3</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">call</span> &lt;--	<span class="comment">;连续两个call进第二个</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step4</span></span><br><span class="line"><span class="number">2</span>*<span class="keyword">jz</span>--&gt;<span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;两个jz指向的同一个call且此call后紧跟mov和call</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step5</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;连续5个mov后的call（传参）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step6</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;直接jmp</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">;x64 Release 跳转特征 </span></span><br><span class="line"><span class="comment">;step1</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">jmp</span>			<span class="comment">;call后的jmp</span></span><br><span class="line"></span><br><span class="line"><span class="comment">;step2</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span></span><br><span class="line"><span class="keyword">mov</span></span><br><span class="line"><span class="keyword">call</span>		<span class="comment">;三个mov后的call（传参）且此call后紧跟mov和call</span></span><br></pre></td></tr></table></figure></li>
+<li><p>fastcall：寄存器+栈传参，优先使用寄存器，剩余参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
+<p>寄存器传参优先级：</p>
+<p>x86：ecx  edx  栈</p>
+<p>x64：rcx  rdx  r8  r9  栈</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">edx</span>, <span class="number">2</span>          <span class="comment">; 参数b存入寄存器</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">1</span>          <span class="comment">; 参数a存入寄存器</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YIHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span>		<span class="comment">;这里也是没有调用者对参数占用的栈空间的清理</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line"></span><br><span class="line"><span class="comment">; int __fastcall sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YIHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">var_18          = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">18h</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">14h</span></span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0D8h</span>		<span class="comment">;sum开辟栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ecx</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_18]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">6</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+b], <span class="built_in">edx</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+a], <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0D8h</span>		<span class="comment">;sum清理栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span>    <span class="number">4</span>				<span class="comment">;由于只有一个参数被push到栈上，所以被调用者返回4，清理参数占用的栈空间</span></span><br><span class="line">?sum@@YIHHHH@Z  endp</span><br></pre></td></tr></table></figure></li>
 </ul>
 ]]></content>
       <categories>
@@ -930,6 +957,133 @@
 
 <p>源码</p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">int</span> ID;</span><br><span class="line">	<span class="type">char</span> name[<span class="number">20</span>];</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Student</span>(<span class="type">int</span> n = <span class="number">0</span>, <span class="type">const</span> <span class="type">char</span>* na = <span class="string">&quot;NONE&quot;</span>) :<span class="built_in">ID</span>(n) &#123;</span><br><span class="line">		<span class="built_in">memcpy</span>(name, na, <span class="built_in">sizeof</span>(na));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>;</span><br><span class="line">	~<span class="built_in">Student</span>();</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Student::show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d %s\n&quot;</span>, ID, name);</span><br><span class="line">&#125;</span><br><span class="line">Student::~<span class="built_in">Student</span>() &#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;destructing......&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span>  <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="function">Student <span class="title">stu</span><span class="params">(<span class="number">001</span>, <span class="string">&quot;xiaoming&quot;</span>)</span></span>;</span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>RELearning</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Day9:壳与脱壳（一）</title>
+    <url>/2025/07/29/Day9-%E5%A3%B3/</url>
+    <content><![CDATA[<p>壳、壳的加载过程、工具脱壳、手动脱壳流程、esp定律（基于Xdbg）</p>
+<span id="more"></span>
+
+<h2 id="壳"><a href="#壳" class="headerlink" title="壳"></a>壳</h2><ul>
+<li><p>先看ctf-wiki对壳的介绍：</p>
+<p><strong>壳</strong> 是在一些计算机软件里一段专门负责保护软件不被非法修改或反编译的程序。</p>
+<p>它们一般都是先于程序运行，拿到控制权，然后完成它们保护软件的任务。</p>
+</li>
+<li><p>因此，加壳程序包含壳程序和原程序两个部分，且原程序在壳程序运行后才恢复到独立可执行的状态。因此，可以借助动态调试器在壳程序运行完后进行dump，从而获得独立可执行的原程序</p>
+</li>
+<li><p>常见的壳有压缩壳和加密壳两种：</p>
+<p>压缩壳：upx、ASpack、PECompat等</p>
+<p>加密壳：VMProtect、Themida、ASProtector等</p>
+</li>
+</ul>
+<h2 id="壳的加载过程"><a href="#壳的加载过程" class="headerlink" title="壳的加载过程"></a>壳的加载过程</h2><ul>
+<li>壳和原程序在逻辑上基本没有关联，因此，壳程序在解析加壳后的二进制文件前，会先保存各寄存器的值，通常用pushad&#x2F;puahfd实现</li>
+<li>解析完成后，是原程序的逻辑部分，此时，壳程序给出控制权，寄存器恢复到解析前的状态，通常用popad&#x2F;popfd实现</li>
+<li>最后，程序跳到原程序入口点开始执行</li>
+</ul>
+<h2 id="工具脱壳"><a href="#工具脱壳" class="headerlink" title="工具脱壳"></a>工具脱壳</h2><ul>
+<li><p>直接使用工具脱壳的情况主要有两种：一种是无修改的、只使用加壳程序加壳；另一种是使用加壳程序加壳后修改了区块名的。前者可以直接使用加壳程序脱壳（如果具备脱壳功能的话），后者先修改区块名再使用加壳程序脱壳。</p>
+</li>
+<li><p>upx无修改加壳示例：</p>
+<p>拿到可执行文件，先到DIE查看，发现有壳。对壳的信息描述没有出现“modified”字眼，因此判断是无修改加壳，直接使用工具脱壳</p>
+<p><img src="/../images/image-20250729103439484.png" alt="查看壳信息"></p>
+<p>直接使用upx -d脱壳</p>
+<p><img src="/../images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-29%20103724.png" alt="upx-d脱壳"></p>
+<p>再次用DIE打开，发现没有识别出壳了</p>
+<p><img src="/../images/image-20250729104311684.png" alt="脱壳后查看壳信息"></p>
+</li>
+<li><p>upx修改区块名加壳示例：</p>
+<p>先到DIE查看壳信息，发现是upx modified</p>
+<p><img src="/../images/image-20250729110711262.png" alt="查看壳信息"></p>
+<p>点击“区块“下方的”&gt;“查看区块信息，发现区块名有改动</p>
+<p><img src="/../images/image-20250729110752177.png" alt="区块名改动"></p>
+<p>010editor修改区块名</p>
+<p><img src="/../images/image-20250729111002665.png" alt="修改区块名"></p>
+<p>再次查看壳信息，变成无修改加壳了，直接工具脱壳</p>
+<p><img src="/../images/image-20250729111128932.png" alt="再次查看壳信息"></p>
+</li>
+</ul>
+<h2 id="手动脱壳流程"><a href="#手动脱壳流程" class="headerlink" title="手动脱壳流程"></a>手动脱壳流程</h2><ul>
+<li><p>步骤：</p>
+<ul>
+<li>查壳：使用DIE、ExeinfoPE、PEiD等工具查壳</li>
+<li>寻找程序原入口点(OEP)：通过各种方法找到壳代码结束、程序真正开始的地方</li>
+<li>dump内存：借助插件从OEP开始dump出原程序</li>
+<li>输入表(IAT)重建：借助插件重建输入表</li>
+<li>关闭程序重定位：使用DIE等工具关闭程序重定位</li>
+</ul>
+</li>
+<li><p>寻找OEP的方法有很多，而dump和IAT重建以及关闭重定位的方法基本固定。先用一个例子展示整体流程，再详细展开寻找OEP的方法。upx手动脱壳示例：</p>
+<ul>
+<li><p>查壳：显示是upx</p>
+<p><img src="/../images/image-20250729133015652.png" alt="查壳"></p>
+</li>
+<li><p>寻找OEP：</p>
+<p>采用esp定律法（详见下文）找到push ebp开头的一段代码</p>
+<p><img src="/../images/image-20250729134006853.png" alt="寻找OEP"></p>
+</li>
+<li><p>dump内存：</p>
+<p>打开插件scylla，点击“转储”栏中的“转储”，会获得一个_dump后缀的exe文件</p>
+<p><img src="/../images/image-20250729134119537.png" alt="dump"></p>
+</li>
+<li><p>IAT重建：</p>
+<p>点击“IAT自动搜索”，会有弹窗问是否使用高级搜索结果，点“是”。这时候，VA和“大小”两个框会被填充。</p>
+<p><img src="/../images/image-20250729134901607.png" alt="IAT自动搜索"></p>
+<p>接下来点“获取导入”，上方的大框中会出现dll结尾的东西，需要把带红色X的取消勾选</p>
+<p><img src="/../images/image-20250729134937163.png" alt="获取导入"></p>
+<p>然后点击修复转储，选择刚刚dump出来的文件，会得到一个再加上_SCY的exe文件。</p>
+<p>此时程序大概率运行不了，会闪退。但是对于静态分析来说，到这一步已经足够了。</p>
+</li>
+<li><p>关闭重定位：把得到的_dump_SCY.exe文件拖到DIE，点击“区块”栏的“&gt;”，会弹出文件结构界面</p>
+<p><img src="/../images/image-20250729135914719.png" alt="文件结构界面"></p>
+<p>先取消勾选右上角的“只读”</p>
+<p><img src="/../images/image-20250729140239276.png" alt="取消只读"></p>
+<p>点击IMAGE_NT_HEADERS下的IMAGE_FILE_HEADER，在“标志”选项中勾选“RELOCS_STRIPPED”（图中未勾选）</p>
+<p><img src="/../images/image-20250729140145721.png" alt="勾选RELOCS_STRIPPED"></p>
+<p>再点击IMAGE_OPTIONAL_HEADERS，找到另一个标志(DllCharacteristics)，取消勾选“DYNAMIC_BASE”（图中未取消）</p>
+<p><img src="/../images/image-20250729140545940.png" alt="取消勾选DYNAMIC_BASE"></p>
+<p>这样子，我们的程序就脱完壳并且可以正常运行了</p>
+</li>
+<li><p>PS：关于IAT重建这一步骤，为什么不能IAT自动搜索再转储一步到位？</p>
+<p>结合AI的解释，个人见解是IAT自动搜索的过程可能会运行程序，导致地址刷新，OEP失效，dump出来的程序不完整或者不对。因此，dump和IAT重建实际上是两个步骤，不过被集成到了一个界面。其实还有手动重建IAT的方法，这种情况下就确确实实需要先dump再导入重建的IAT了，因为在调试器中找到OEP后还要继续找IAT</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="寻找OEP的方法（一）"><a href="#寻找OEP的方法（一）" class="headerlink" title="寻找OEP的方法（一）"></a>寻找OEP的方法（一）</h2><h3 id="ESP定律"><a href="#ESP定律" class="headerlink" title="ESP定律"></a>ESP定律</h3><ul>
+<li><p>前文，我们知道了壳程序解析时会有pushad\popad或者pushfd\popfd的操作。pushad时，随着通用寄存器值的入栈，esp的值会发生变化，又因为栈平衡的特性，最终esp的值会回到pushad后的这个值。因此，可以借助这一点，给pushad后的esp值下硬件访问断点，popad后就会触发断点，中断调试，进而实现跳过整个壳解析过程。当然，中断处还不是OEP，一般在中断处后会有一个跨度明显的jmp，甚至jmp后还有一个跳转表jmp才会到达真正的OEP</p>
+</li>
+<li><p>具体操作如下：</p>
+<ul>
+<li><p>xdbg打开，F9到程序所在内存区域</p>
+<p><img src="/../images/image-20250729172225632.png" alt="xdbg打开"></p>
+</li>
+<li><p>可以看到EIP所在就是pushad</p>
+<p><img src="/../images/image-20250729172310628.png" alt="pushad"></p>
+</li>
+<li><p>F8步过，esp更新</p>
+<p><img src="/../images/image-20250729172402698.png" alt="esp更新"></p>
+</li>
+<li><p>在右下角栈窗口设上硬件访问断点</p>
+<p><img src="/../images/image-20250729172449826.png" alt="设置硬件访问断点"></p>
+</li>
+<li><p>点击工具栏“视图”下方的“-&gt;”，程序会执行过popad。可以看到下方不远处有个大跳</p>
+<p><img src="/../images/image-20250729172606653.png" alt="popad"></p>
+</li>
+<li><p>F8到大跳处F7步入，有跳转表继续F7步入，可以看到开辟栈帧操作，这里就是OEP了，在此处直接使用scylla dump出程序</p>
+<p><img src="/../images/image-20250729172759829.png" alt="OEP"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="单步跟踪法"><a href="#单步跟踪法" class="headerlink" title="单步跟踪法"></a>单步跟踪法</h3><ul>
+<li>如名，就是一直按F8，让程序尽量向下走，遇到循环就跳过，遇到近call就步入，重点关注大跳</li>
+<li>参考ctf-wiki <a href="https://ctf-wiki.org/reverse/platform/windows/unpack/trace/">https://ctf-wiki.org/reverse/platform/windows/unpack/trace/</a></li>
 </ul>
 ]]></content>
       <categories>
@@ -1101,160 +1255,6 @@
       <tags>
         <tag>Reverse</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Day5:函数调用约定</title>
-    <url>/2025/07/12/Day5-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/</url>
-    <content><![CDATA[<p>函数调用约定</p>
-<span id="more"></span>
-
-<h2 id="函数调用约定"><a href="#函数调用约定" class="headerlink" title="函数调用约定"></a>函数调用约定</h2><ul>
-<li><p>主要有三种：cdecl、stdcall、fastcall。以求和函数为例</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//求和</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a+b+c;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> res=sum(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,res);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>cdecl：完全栈传参，参数从右往左入栈，由调用者清理参数占用的栈空间</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">2</span>               <span class="comment">; 参数b入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">1</span>               <span class="comment">; 参数a入栈</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YAHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0Ch</span>			<span class="comment">;这里调用者进行了清理参数占用的栈空间的操作(3个参数×4字节)，被调用者不负责</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line"></span><br><span class="line"><span class="comment">; int __cdecl sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YAHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">0Ch</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">10h</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;sum函数自身的栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">edi</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">ecx</span>, <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span>                     <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;清理自身栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">?sum@@YAHHHH@Z  endp</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>stdcall：完全栈传参，参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">2</span>               <span class="comment">; 参数b入栈</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">1</span>               <span class="comment">; 参数a入栈</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YGHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span>		<span class="comment">;这里直接到把返回值给res了，调用者不负责清理参数占用的栈空间</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line">  </span><br><span class="line"><span class="comment">; int __stdcall sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YGHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">0Ch</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">10h</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;sum的栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">              	 <span class="keyword">mov</span>     <span class="built_in">edi</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">ecx</span>, <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span>                     <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0C0h</span>		<span class="comment">;清理自身栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span>    <span class="number">0Ch</span>			<span class="comment">;被调用者通过返回指令给esp增加0Ch，清理参数占用的栈空间</span></span><br><span class="line">?sum@@YGHHHH@Z  endp</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>fastcall：寄存器+栈传参，优先使用寄存器，剩余参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
-<p>寄存器传参优先级：</p>
-<p>x86：ecx  edx  栈</p>
-<p>x64：rcx  rdx  r8  r9  栈</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="comment">; int __cdecl main()</span></span><br><span class="line">_main           proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: j__main↑j</span></span><br><span class="line">  </span><br><span class="line">var_C           = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">0Ch</span></span><br><span class="line">res             = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart_2:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_C]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">3</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd_2:</span>                   <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp</span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="number">3</span>               <span class="comment">; 参数c入栈</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">edx</span>, <span class="number">2</span>          <span class="comment">; 参数b存入寄存器</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">1</span>          <span class="comment">; 参数a存入寄存器</span></span><br><span class="line">                <span class="keyword">call</span>    j_?sum@@YIHHHH@Z <span class="comment">; sum(int,int,int)</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+res], <span class="built_in">eax</span>		<span class="comment">;这里也是没有调用者对参数占用的栈空间的清理</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+res]</span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">push</span>    offset _Format  <span class="comment">; &quot;%d\n&quot;</span></span><br><span class="line">                <span class="keyword">call</span>    j__printf</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">8</span></span><br><span class="line">                <span class="keyword">xor</span>     <span class="built_in">eax</span>, <span class="built_in">eax</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0CCh</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span></span><br><span class="line">_main           endp</span><br><span class="line"></span><br><span class="line"><span class="comment">; int __fastcall sum(int a, int b, int c)</span></span><br><span class="line">?sum@@YIHHHH@Z  proc <span class="built_in">near</span>               <span class="comment">; CODE XREF: sum(int,int,int)↑j</span></span><br><span class="line">  </span><br><span class="line">var_18          = <span class="built_in">byte</span> <span class="built_in">ptr</span> -<span class="number">18h</span></span><br><span class="line">b               = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">14h</span></span><br><span class="line">a               = <span class="built_in">dword</span> <span class="built_in">ptr</span> -<span class="number">8</span></span><br><span class="line">c               = <span class="built_in">dword</span> <span class="built_in">ptr</span>  <span class="number">8</span></span><br><span class="line">  </span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">sub</span>     <span class="built_in">esp</span>, <span class="number">0D8h</span>		<span class="comment">;sum开辟栈空间</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">push</span>    <span class="built_in">ecx</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitStart:</span></span><br><span class="line">                <span class="keyword">lea</span>     <span class="built_in">edi</span>, [<span class="built_in">ebp</span>+var_18]</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, <span class="number">6</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, <span class="number">0CCCCCCCCh</span></span><br><span class="line">                <span class="keyword">rep</span> <span class="keyword">stosd</span></span><br><span class="line"><span class="symbol">  </span></span><br><span class="line"><span class="symbol">__$EncStackInitEnd:</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+b], <span class="built_in">edx</span></span><br><span class="line">                <span class="keyword">mov</span>     [<span class="built_in">ebp</span>+a], <span class="built_in">ecx</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">ecx</span>, offset _6005466B_entry@cpp <span class="comment">; JMC_flag</span></span><br><span class="line">                <span class="keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="number">4</span> <span class="comment">; __CheckForDebuggerJustMyCode(x)</span></span><br><span class="line">                <span class="keyword">nop</span></span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+a]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+b]</span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">eax</span>, [<span class="built_in">ebp</span>+c]</span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">edi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">esi</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebx</span></span><br><span class="line">                <span class="keyword">add</span>     <span class="built_in">esp</span>, <span class="number">0D8h</span>		<span class="comment">;sum清理栈空间</span></span><br><span class="line">                <span class="keyword">cmp</span>     <span class="built_in">ebp</span>, <span class="built_in">esp</span></span><br><span class="line">                <span class="keyword">call</span>    j___RTC_CheckEsp</span><br><span class="line">                <span class="keyword">mov</span>     <span class="built_in">esp</span>, <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">pop</span>     <span class="built_in">ebp</span></span><br><span class="line">                <span class="keyword">retn</span>    <span class="number">4</span>				<span class="comment">;由于只有一个参数被push到栈上，所以被调用者返回4，清理参数占用的栈空间</span></span><br><span class="line">?sum@@YIHHHH@Z  endp</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>RELearning</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Day9:壳与脱壳（一）</title>
-    <url>/2025/07/29/Day9-%E5%A3%B3/</url>
-    <content><![CDATA[<p>壳、壳的加载过程、工具脱壳、手动脱壳流程、esp定律（基于Xdbg）</p>
-<span id="more"></span>
-
-<h2 id="壳"><a href="#壳" class="headerlink" title="壳"></a>壳</h2><ul>
-<li><p>先看ctf-wiki对壳的介绍：</p>
-<p><strong>壳</strong> 是在一些计算机软件里一段专门负责保护软件不被非法修改或反编译的程序。</p>
-<p>它们一般都是先于程序运行，拿到控制权，然后完成它们保护软件的任务。</p>
-</li>
-<li><p>因此，加壳程序包含壳程序和原程序两个部分，且原程序在壳程序运行后才恢复到独立可执行的状态。因此，可以借助动态调试器在壳程序运行完后进行dump，从而获得独立可执行的原程序</p>
-</li>
-<li><p>常见的壳有压缩壳和加密壳两种：</p>
-<p>压缩壳：upx、ASpack、PECompat等</p>
-<p>加密壳：VMProtect、Themida、ASProtector等</p>
-</li>
-</ul>
-<h2 id="壳的加载过程"><a href="#壳的加载过程" class="headerlink" title="壳的加载过程"></a>壳的加载过程</h2><ul>
-<li>壳和原程序在逻辑上基本没有关联，因此，壳程序在解析加壳后的二进制文件前，会先保存各寄存器的值，通常用pushad&#x2F;puahfd实现</li>
-<li>解析完成后，是原程序的逻辑部分，此时，壳程序给出控制权，寄存器恢复到解析前的状态，通常用popad&#x2F;popfd实现</li>
-<li>最后，程序跳到原程序入口点开始执行</li>
-</ul>
-<h2 id="工具脱壳"><a href="#工具脱壳" class="headerlink" title="工具脱壳"></a>工具脱壳</h2><ul>
-<li><p>直接使用工具脱壳的情况主要有两种：一种是无修改的、只使用加壳程序加壳；另一种是使用加壳程序加壳后修改了区块名的。前者可以直接使用加壳程序脱壳（如果具备脱壳功能的话），后者先修改区块名再使用加壳程序脱壳。</p>
-</li>
-<li><p>upx无修改加壳示例：</p>
-<p>拿到可执行文件，先到DIE查看，发现有壳。对壳的信息描述没有出现“modified”字眼，因此判断是无修改加壳，直接使用工具脱壳</p>
-<p><img src="/../images/image-20250729103439484.png" alt="查看壳信息"></p>
-<p>直接使用upx -d脱壳</p>
-<p><img src="/../images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-29%20103724.png" alt="upx-d脱壳"></p>
-<p>再次用DIE打开，发现没有识别出壳了</p>
-<p><img src="/../images/image-20250729104311684.png" alt="脱壳后查看壳信息"></p>
-</li>
-<li><p>upx修改区块名加壳示例：</p>
-<p>先到DIE查看壳信息，发现是upx modified</p>
-<p><img src="/../images/image-20250729110711262.png" alt="查看壳信息"></p>
-<p>点击“区块“下方的”&gt;“查看区块信息，发现区块名有改动</p>
-<p><img src="/../images/image-20250729110752177.png" alt="区块名改动"></p>
-<p>010editor修改区块名</p>
-<p><img src="/../images/image-20250729111002665.png" alt="修改区块名"></p>
-<p>再次查看壳信息，变成无修改加壳了，直接工具脱壳</p>
-<p><img src="/../images/image-20250729111128932.png" alt="再次查看壳信息"></p>
-</li>
-</ul>
-<h2 id="手动脱壳流程"><a href="#手动脱壳流程" class="headerlink" title="手动脱壳流程"></a>手动脱壳流程</h2><ul>
-<li><p>步骤：</p>
-<ul>
-<li>查壳：使用DIE、ExeinfoPE、PEiD等工具查壳</li>
-<li>寻找程序原入口点(OEP)：通过各种方法找到壳代码结束、程序真正开始的地方</li>
-<li>dump内存：借助插件从OEP开始dump出原程序</li>
-<li>输入表(IAT)重建：借助插件重建输入表</li>
-<li>关闭程序重定位：使用DIE等工具关闭程序重定位</li>
-</ul>
-</li>
-<li><p>寻找OEP的方法有很多，而dump和IAT重建以及关闭重定位的方法基本固定。先用一个例子展示整体流程，再详细展开寻找OEP的方法。upx手动脱壳示例：</p>
-<ul>
-<li><p>查壳：显示是upx</p>
-<p><img src="/../images/image-20250729133015652.png" alt="查壳"></p>
-</li>
-<li><p>寻找OEP：</p>
-<p>采用esp定律法（详见下文）找到push ebp开头的一段代码</p>
-<p><img src="/../images/image-20250729134006853.png" alt="寻找OEP"></p>
-</li>
-<li><p>dump内存：</p>
-<p>打开插件scylla，点击“转储”栏中的“转储”，会获得一个_dump后缀的exe文件</p>
-<p><img src="/../images/image-20250729134119537.png" alt="dump"></p>
-</li>
-<li><p>IAT重建：</p>
-<p>点击“IAT自动搜索”，会有弹窗问是否使用高级搜索结果，点“是”。这时候，VA和“大小”两个框会被填充。</p>
-<p><img src="/../images/image-20250729134901607.png" alt="IAT自动搜索"></p>
-<p>接下来点“获取导入”，上方的大框中会出现dll结尾的东西，需要把带红色X的取消勾选</p>
-<p><img src="/../images/image-20250729134937163.png" alt="获取导入"></p>
-<p>然后点击修复转储，选择刚刚dump出来的文件，会得到一个再加上_SCY的exe文件。</p>
-<p>此时程序大概率运行不了，会闪退。但是对于静态分析来说，到这一步已经足够了。</p>
-</li>
-<li><p>关闭重定位：把得到的_dump_SCY.exe文件拖到DIE，点击“区块”栏的“&gt;”，会弹出文件结构界面</p>
-<p><img src="/../images/image-20250729135914719.png" alt="文件结构界面"></p>
-<p>先取消勾选右上角的“只读”</p>
-<p><img src="/../images/image-20250729140239276.png" alt="取消只读"></p>
-<p>点击IMAGE_NT_HEADERS下的IMAGE_FILE_HEADER，在“标志”选项中勾选“RELOCS_STRIPPED”（图中未勾选）</p>
-<p><img src="/../images/image-20250729140145721.png" alt="勾选RELOCS_STRIPPED"></p>
-<p>再点击IMAGE_OPTIONAL_HEADERS，找到另一个标志(DllCharacteristics)，取消勾选“DYNAMIC_BASE”（图中未取消）</p>
-<p><img src="/../images/image-20250729140545940.png" alt="取消勾选DYNAMIC_BASE"></p>
-<p>这样子，我们的程序就脱完壳并且可以正常运行了</p>
-</li>
-<li><p>PS：关于IAT重建这一步骤，为什么不能IAT自动搜索再转储一步到位？</p>
-<p>结合AI的解释，个人见解是IAT自动搜索的过程可能会运行程序，导致地址刷新，OEP失效，dump出来的程序不完整或者不对。因此，dump和IAT重建实际上是两个步骤，不过被集成到了一个界面。其实还有手动重建IAT的方法，这种情况下就确确实实需要先dump再导入重建的IAT了，因为在调试器中找到OEP后还要继续找IAT</p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="寻找OEP的方法（一）"><a href="#寻找OEP的方法（一）" class="headerlink" title="寻找OEP的方法（一）"></a>寻找OEP的方法（一）</h2><h3 id="ESP定律"><a href="#ESP定律" class="headerlink" title="ESP定律"></a>ESP定律</h3><ul>
-<li><p>前文，我们知道了壳程序解析时会有pushad\popad或者pushfd\popfd的操作。pushad时，随着通用寄存器值的入栈，esp的值会发生变化，又因为栈平衡的特性，最终esp的值会回到pushad后的这个值。因此，可以借助这一点，给pushad后的esp值下硬件访问断点，popad后就会触发断点，中断调试，进而实现跳过整个壳解析过程。当然，中断处还不是OEP，一般在中断处后会有一个跨度明显的jmp，甚至jmp后还有一个跳转表jmp才会到达真正的OEP</p>
-</li>
-<li><p>具体操作如下：</p>
-<ul>
-<li><p>xdbg打开，F9到程序所在内存区域</p>
-<p><img src="/../images/image-20250729172225632.png" alt="xdbg打开"></p>
-</li>
-<li><p>可以看到EIP所在就是pushad</p>
-<p><img src="/../images/image-20250729172310628.png" alt="pushad"></p>
-</li>
-<li><p>F8步过，esp更新</p>
-<p><img src="/../images/image-20250729172402698.png" alt="esp更新"></p>
-</li>
-<li><p>在右下角栈窗口设上硬件访问断点</p>
-<p><img src="/../images/image-20250729172449826.png" alt="设置硬件访问断点"></p>
-</li>
-<li><p>点击工具栏“视图”下方的“-&gt;”，程序会执行过popad。可以看到下方不远处有个大跳</p>
-<p><img src="/../images/image-20250729172606653.png" alt="popad"></p>
-</li>
-<li><p>F8到大跳处F7步入，有跳转表继续F7步入，可以看到开辟栈帧操作，这里就是OEP了，在此处直接使用scylla dump出程序</p>
-<p><img src="/../images/image-20250729172759829.png" alt="OEP"></p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="单步跟踪法"><a href="#单步跟踪法" class="headerlink" title="单步跟踪法"></a>单步跟踪法</h3><ul>
-<li>如名，就是一直按F8，让程序尽量向下走，遇到循环就跳过，遇到近call就步入，重点关注大跳</li>
-<li>参考ctf-wiki <a href="https://ctf-wiki.org/reverse/platform/windows/unpack/trace/">https://ctf-wiki.org/reverse/platform/windows/unpack/trace/</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>RELearning</category>
-      </categories>
   </entry>
   <entry>
     <title>记一次blog优化</title>
