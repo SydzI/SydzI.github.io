@@ -2,9 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://sydzi.github.io/2025/06/02/%E5%91%A8%E8%AE%B0/</loc>
+    
+    <lastmod>2025-08-03</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://sydzi.github.io/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>
+    
+    <lastmod>2025-08-03</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://sydzi.github.io/2025/08/02/Day12-%E5%8F%8D%E8%B0%83%E8%AF%95/</loc>
     
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -166,7 +184,7 @@
 
   <url>
     <loc>https://sydzi.github.io/</loc>
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -174,14 +192,14 @@
   
   <url>
     <loc>https://sydzi.github.io/tags/Reverse/</loc>
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/%E6%9D%82%E8%AE%B0/</loc>
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -190,14 +208,21 @@
   
   <url>
     <loc>https://sydzi.github.io/categories/RELearning/</loc>
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://sydzi.github.io/categories/%E5%91%A8%E8%AE%B0/</loc>
+    <lastmod>2025-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
-    <lastmod>2025-08-02</lastmod>
+    <lastmod>2025-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
