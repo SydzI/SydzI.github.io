@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs">
+  <meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"sydzi.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"language":true,"language_text":{"x86asm":"assembly"}},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+<!-- 强制移除目录下划线 -->
+
+<style>
+  /* 覆盖所有可能的目录容器 */
+  [class*="toc"] .nav-item a,
+  [class*="TOC"] .nav-item a,
+  .active > a,
+  .active-current > a {
+    border-bottom: none !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+  }
+
+
+  /* 覆盖伪元素下划线 */
+  [class*="toc"] a::after,
+  [class*="TOC"] a::after {
+    display: none !important;
+  }
+</style>
+
+    <meta name="description" content="IDApythonAPI、SMC自修改代码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day14:IDApython与SMC">
+<meta property="og:url" content="https://sydzi.github.io/2025/08/05/Day14-IDApython/index.html">
+<meta property="og:site_name" content="SydzI&#39;s Blog">
+<meta property="og:description" content="IDApythonAPI、SMC自修改代码">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sydzi.github.io/images/image-20250805234429100.png">
+<meta property="og:image" content="https://sydzi.github.io/images/image-20250805234728191.png">
+<meta property="article:published_time" content="2025-08-05T01:53:56.000Z">
+<meta property="article:modified_time" content="2025-08-05T16:05:20.253Z">
+<meta property="article:author" content="SydzI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sydzi.github.io/images/image-20250805234429100.png">
+
+
+<link rel="canonical" href="https://sydzi.github.io/2025/08/05/Day14-IDApython/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://sydzi.github.io/2025/08/05/Day14-IDApython/","path":"2025/08/05/Day14-IDApython/","title":"Day14:IDApython与SMC"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day14:IDApython与SMC | SydzI's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-app-compat.js" integrity="sha256-k2eD8Bl04gp35v4S01cNbO+3UeLK6mVqpOyUJz4aXzY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-firestore-compat.js" integrity="sha256-r1EpenNle+MZs+KB73PFJnrmIF3k29t5XGrSqfZ9PPw=" crossorigin="anonymous" defer></script>
+  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}</script>
+  <script src="/js/third-party/statistics/firestore.js" defer></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SydzI's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮，吾将上下而求索</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IDApython"><span class="nav-number">1.</span> <span class="nav-text">IDApython</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80API"><span class="nav-number">1.1.</span> <span class="nav-text">基础API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%B5%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.2.</span> <span class="nav-text">段相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.3.</span> <span class="nav-text">函数相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.4.</span> <span class="nav-text">指令相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.5.</span> <span class="nav-text">操作数相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%86%99%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.6.</span> <span class="nav-text">数据读写相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.7.</span> <span class="nav-text">调试相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.8.</span> <span class="nav-text">其他操作相关API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%EF%BC%88SMC%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">自修改代码（SMC）</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="SydzI"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">SydzI</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SydzI" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SydzI" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+
+<div class="post-block">
+  
+
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sydzi.github.io/2025/08/05/Day14-IDApython/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="SydzI">
+    </span>
+    
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SydzI's Blog">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day14:IDApython与SMC | SydzI's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day14:IDApython与SMC
+        </h1>
+    
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-08-05 09:53:56" itemprop="dateCreated datePublished" datetime="2025-08-05T09:53:56+08:00">2025-08-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-08-06 00:05:20" itemprop="dateModified" datetime="2025-08-06T00:05:20+08:00">2025-08-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RELearning/" itemprop="url" rel="index"><span itemprop="name">RELearning</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="firestore-visitors-count"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>IDApythonAPI、SMC自修改代码</p>
+<span id="more"></span>
+
+<h2 id="IDApython"><a href="#IDApython" class="headerlink" title="IDApython"></a>IDApython</h2><ul>
+<li>先贴上官方文档： <a target="_blank" rel="noopener" href="https://python.docs.hex-rays.com/index.html">https://python.docs.hex-rays.com/index.html</a></li>
+</ul>
+<h3 id="基础API"><a href="#基础API" class="headerlink" title="基础API"></a>基础API</h3><ul>
+<li>idc.here() &#x2F; idc.get_screen_ea()：返回光标所在处的地址</li>
+<li>idc.get_inf_attr(INF_MIN_EA) &#x2F; idc.get_inf_attr(INF_MAX_EA)：返回最小&#x2F;最大地址（没有随机化地址情况下）</li>
+<li>idc.generate_disasm_line(ea,0)：返回ea所在处的汇编指令</li>
+<li>idc.prev_head(ea)&#x2F;next_head(ea)：返回ea处上一条&#x2F;下一条指令地址</li>
+<li>idc.print_insn_mnem(ea)：打印ea处的助记符（即mov,add什么的）</li>
+<li>idc.print_operand(ea,n)：打印ea处第n个操作数（n&#x3D;0或者1）</li>
+</ul>
+<h3 id="段相关API"><a href="#段相关API" class="headerlink" title="段相关API"></a>段相关API</h3><ul>
+<li>idautils.Segments()：返回段起始地址列表</li>
+<li>idc.get_segm_name(ea)：返回ea所在段的名字</li>
+<li>idc.get_segm_start(ea)&#x2F;get_segm_end(ea)：返回ea所在段的起始地址&#x2F;结束地址</li>
+<li>idc.get_next_seg(ea)：返回ea所在段的下一个段的起始地址</li>
+</ul>
+<h3 id="函数相关API"><a href="#函数相关API" class="headerlink" title="函数相关API"></a>函数相关API</h3><ul>
+<li>idautils.Functions(start_addr,end_addr)：返回地址间的函数对象（不写参数就是所有函数对象）</li>
+<li>idautils.FuncItems(ea)：返回ea所在函数所有指令的地址（相当于地址列表）</li>
+<li>idaapi.get_func(ea)：获得ea所在函数的对象（含有如start_ea、end_ea、size等属性）</li>
+<li>idc.get_func_name(ea)：返回ea所在函数的名字</li>
+<li>idc.get_func_attr(ea,FUNCATTR_START) &#x2F; idc.get_func_attr(ea,FUNCATTR_END)：返回ea所在函数的起始地址&#x2F;结束地址</li>
+<li>idc.get_next_func(ea) &#x2F; idc.get_prev_func(ea)：返回ea所在函数的上一个&#x2F;下一个函数的起始地址</li>
+</ul>
+<h3 id="指令相关API"><a href="#指令相关API" class="headerlink" title="指令相关API"></a>指令相关API</h3><ul>
+<li>ida_ua.insn_t()，返回一个空的指令对象（或者说创建一个空的指令对象），包含函数的一些属性</li>
+<li>idaapi.decode_insn(out,ea)，解析ea所在处的指令，把解析的结果给out（out必须是一个指令对象）<ul>
+<li>out.ea：指令的起始地址</li>
+<li>out.size：指令占用的字节数</li>
+<li>out.get_cannon_mnemonic()：指令的助记符</li>
+<li>out.itype：助记符的十进制码</li>
+</ul>
+</li>
+</ul>
+<h3 id="操作数相关API"><a href="#操作数相关API" class="headerlink" title="操作数相关API"></a>操作数相关API</h3><ul>
+<li>idc.get_operand_value(ea,n)：返回ea处第n个操作数的值</li>
+<li>idc.get_operand_type(ea,n)：返回ea处第n个操作数的类型</li>
+</ul>
+<h3 id="数据读写相关API"><a href="#数据读写相关API" class="headerlink" title="数据读写相关API"></a>数据读写相关API</h3><ul>
+<li>idc.get_bytes(ea,size)：返回ea处size大小的bytes</li>
+<li>idc.patch_byte(ea,content)：修改ea处的1字节为content</li>
+<li>idc.patch_word(ea,content)：修改ea处的2字节为content</li>
+<li>idc.patch_dword(ea,content)：修改ea处的4字节为content</li>
+<li>idc.patch_qword(ea,content)：修改ea处的8字节为content</li>
+</ul>
+<h3 id="调试相关API"><a href="#调试相关API" class="headerlink" title="调试相关API"></a>调试相关API</h3><ul>
+<li><p>ida_dbg.load_debugger(“local”,0)：启动调试器</p>
+</li>
+<li><p>ida_dbg.add_bpt(ea)：在ea处下断点</p>
+</li>
+<li><p>ida_dbg.del_bpt(ea)：删除ea处断点</p>
+</li>
+<li><p>ida_dbg.start_process(path,args,sdir)：启动调试进程，参数对应路径、命令行参数、工作目录</p>
+</li>
+<li><p>ida_dbg.step_into()：单步步入</p>
+</li>
+<li><p>ida_dbg.step_over()：单步步过</p>
+</li>
+<li><p>ida_dbg.step_until_ret()：运行到返回</p>
+</li>
+<li><p>idc.get_reg_value(regname)：获取regname寄存器的值</p>
+</li>
+<li><p>idc.set_reg_value(value,regname)：设置regname寄存器的值</p>
+</li>
+</ul>
+<h3 id="其他操作相关API"><a href="#其他操作相关API" class="headerlink" title="其他操作相关API"></a>其他操作相关API</h3><ul>
+<li><p>idautils.XrefsFrom(ea)：返回ea处引用的对象（有属性frm、to、type）</p>
+</li>
+<li><p>idautils.XrefsTo(ea)：返回所有引用ea处的对象（有属性frm、to、type）（Ctrl+X）</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idautils,idaapi</span><br><span class="line"><span class="keyword">for</span> xref <span class="keyword">in</span> idautils.XrefsTo(here()):</span><br><span class="line">    <span class="built_in">print</span>(xref.to)<span class="comment">#here()</span></span><br><span class="line">    <span class="built_in">print</span>(xref.frm)<span class="comment">#调用here()的函数地址</span></span><br><span class="line"><span class="keyword">for</span> xref <span class="keyword">in</span> idautils.XrefsFrom(here()):</span><br><span class="line">    <span class="built_in">print</span>(xref.frm)<span class="comment">#here()</span></span><br><span class="line">    <span class="built_in">print</span>(xref.to)<span class="comment">#here()引用的函数地址</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>idautils.Strings()：返回包含所有字符串的对象（有属性ea、length、strtype）（shift+F12）</p>
+</li>
+<li><p>idc.get_strlit_contents(ea)：返回ea处的字符串</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idc,idautils</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> idautils.Strings():</span><br><span class="line">    string=idc.get_strlit_contents(s.ea)</span><br><span class="line">    <span class="built_in">print</span>(string)</span><br><span class="line"><span class="comment">#打印所有字符串</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="自修改代码（SMC）"><a href="#自修改代码（SMC）" class="headerlink" title="自修改代码（SMC）"></a>自修改代码（SMC）</h2><ul>
+<li><p>自修改代码（Self-Modifying-Code）指某部分代码以加密后的形式存在于程序中，程序执行到这部分代码的时候才会进行动态解密，和加壳有点异曲同工。常用来加密关键逻辑，使其不可直接静态分析</p>
+</li>
+<li><p>特征：</p>
+<p>程序中存在对程序自身某部分的运算，一般还需要VirtualProtect() &#x2F; mprotect()来改变内存的属性以便将解密后的代码数据写入内存，或者使用VirtualAlloc把解密后的代码数据写入堆中执行（为了避免API暴露，还可能会新增一个有RWX属性的段来存放加密后的代码）。</p>
+</li>
+<li><p>应对方法有两种：一种是动态调试得到解密后的关键逻辑，另一种是使用脚本解密关键逻辑后再覆盖回去</p>
+<ul>
+<li><p>示例：2021-羊城杯-babysmc</p>
+<p>PS：本来想要自己写一个简单程序试试手的，研究了半个下午没研究出来，程序修正到解密函数可以解密出正确代码了，但是调用关键逻辑check的时候莫名其妙跑飞了，在那个该死的安全检查的位置，跳转后像是个畸形函数，不知道是不是改内存属性的时候影响到了，所以只能去找网上的题目了</p>
+</li>
+<li><p>这是优化后的主函数：</p>
+<p><img src="/../images/image-20250805234429100.png" alt="主函数"></p>
+<p>优化的来源就是，enc的位置是一团数字，而loc_7FF6BF081D00处开始是正常代码，加上对下面的decrypt函数的分析，可以确定enc就是被加密后的first_part</p>
+</li>
+<li><p>这是decrypt函数：</p>
+<p><img src="/../images/image-20250805234728191.png" alt="decrypt函数"></p>
+<p>非常明显地调用了VirtualProtect函数，解密逻辑很简单，就是ror后异或0x5a（ror查出来是循环右移，3就是右移的位数了，这点看汇编可能更清晰点）</p>
+</li>
+<li><p>下面就是今天的成果展示了（ror由DS协助实现），SMC解密脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idautils,idc,idaapi</span><br><span class="line"></span><br><span class="line">enc=idc.get_bytes(<span class="number">0x00007FF6BF081085</span>,<span class="number">0x00007FF6BF081D00</span>-<span class="number">0x00007FF6BF081085</span>)</span><br><span class="line">loc=<span class="number">0x00007FF6BF081085</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ror</span>(<span class="params">value, shift, bits=<span class="number">8</span></span>):</span><br><span class="line">    shift %= bits  <span class="comment"># 确保位移量在有效范围内</span></span><br><span class="line">    <span class="keyword">return</span> (value &gt;&gt; shift) | ((value &lt;&lt; (bits - shift)) &amp; ((<span class="number">1</span> &lt;&lt; bits) - <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> enc:</span><br><span class="line">    idc.patch_byte(loc,(ror(i,<span class="number">3</span>)^<span class="number">0x5a</span>)&amp;<span class="number">0xff</span>)</span><br><span class="line">    loc+=<span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;done&quot;</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>本来是要写完的，但是first_part的函数解析完好几百行了，是我看不懂的加密🫠去找WP，发现是非常混淆的base64，还加了异或，但是我没看出逻辑，索性点到为止，改天把编码和密码的部分补上再说。</p>
+</li>
+<li><p>本来也尝试了动调解密，但是调着调着给我下起东西来了，虽然链接看着是微软的，但是还是有点怕，就舍弃这个方法了（下的是kernel.pdb好像，DS说是缺失符号文件🫠🫠）</p>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+    
+    
+    
+    
+    
+    <footer class="post-footer">
+    
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="prev" title="Day13:反调试（二）">
+                  <i class="fa fa-angle-left"></i> Day13:反调试（二）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">SydzI</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">92k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:47</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"sydzi/sydzi.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body>
+</html>
