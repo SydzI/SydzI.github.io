@@ -1,6 +1,9 @@
 /* global IcarusThemeSettings, firebase */
 
+// Firebase Counter - 阅读量统计功能
+
 if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && IcarusThemeSettings.services.firebase.enable) {
+    
     // 初始化Firebase
     firebase.initializeApp({
         apiKey: IcarusThemeSettings.services.firebase.apiKey,
@@ -14,14 +17,18 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
             return doc.get().then(d => {
                 // Has no data, initialize count
                 let count = d.exists ? d.data().count : 0;
+                
                 // If first view this article
                 if (increaseCount) {
                     // Increase count
                     count++;
-                    doc.set({
+                    return doc.set({
                         count
-                    });
+                    }).then(() => count);
+                } else {
+                    return Promise.resolve(count);
                 }
+                
                 return count;
             });
         };
@@ -43,16 +50,17 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
                 if (titleElement && countElement) {
                     const title = titleElement.textContent.trim();
                     const doc = articles.doc(title);
+                    
                     // 本地测试(hexo s)时不计数，只在生产环境计数
-                let increaseCount = window.location.hostname === document.location.hostname && 
-                                    !['localhost', '127.0.0.1'].includes(window.location.hostname);
-                
-                if (sessionStorage.getItem(title)) {
-                    increaseCount = false;
-                } else {
-                    // Mark as visited in current session
-                    sessionStorage.setItem(title, true);
-                }
+                    let increaseCount = window.location.hostname === document.location.hostname && 
+                                      !['localhost', '127.0.0.1'].includes(window.location.hostname);
+                    
+                    if (sessionStorage.getItem(title)) {
+                        increaseCount = false;
+                    } else {
+                        // Mark as visited in current session
+                        sessionStorage.setItem(title, true);
+                    }
                     
                     getCount(doc, increaseCount).then(count => {
                         countElement.innerText = count;
