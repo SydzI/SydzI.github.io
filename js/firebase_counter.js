@@ -29,17 +29,23 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
         const db = firebase.firestore();
         const articles = db.collection(IcarusThemeSettings.services.firebase.collection);
 
-        // 监听页面加载完成事件
-        document.addEventListener('DOMContentLoaded', () => {
+        // 处理阅读计数的函数
+        const handleViewCount = () => {
             const isArticlePage = document.querySelector('.article-container') !== null;
             const isIndexPage = document.querySelector('.article-list') !== null;
 
             if (isArticlePage) {
                 // 文章页面处理
                 // `https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent`
-                const title = document.querySelector('.title.is-3, .title.is-4-mobile').textContent.trim();
-                const doc = articles.doc(title);
-                let increaseCount = window.location.hostname === document.location.hostname;
+                const titleElement = document.querySelector('.title.is-3, .title.is-4-mobile');
+                const countElement = document.querySelector('.firestore-visitors-count');
+                
+                if (titleElement && countElement) {
+                    const title = titleElement.textContent.trim();
+                    const doc = articles.doc(title);
+                    // 本地测试(hexo s)时不计数，只在生产环境计数
+                let increaseCount = window.location.hostname === document.location.hostname && 
+                                    !['localhost', '127.0.0.1'].includes(window.location.hostname);
                 
                 if (sessionStorage.getItem(title)) {
                     increaseCount = false;
@@ -47,27 +53,38 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
                     // Mark as visited in current session
                     sessionStorage.setItem(title, true);
                 }
-                
-                getCount(doc, increaseCount).then(count => {
-                    document.querySelector('.firestore-visitors-count').innerText = count;
-                }).catch(e => console.error('Error updating count:', e));
+                    
+                    getCount(doc, increaseCount).then(count => {
+                        countElement.innerText = count;
+                    }).catch(e => console.error('Error updating count:', e));
+                }
             } else if (isIndexPage) {
                 // 首页文章列表处理
-                const promises = [...document.querySelectorAll('.article-card .title.is-3, .article-card .title.is-4-mobile')].map(element => {
-                    const title = element.textContent.trim();
-                    const doc = articles.doc(title);
-                    return getCount(doc, false);
-                });
+                const titleElements = document.querySelectorAll('.article-card .title.is-3, .article-card .title.is-4-mobile');
+                const countElements = document.querySelectorAll('.article-card .firestore-visitors-count');
                 
-                Promise.all(promises).then(counts => {
-                    const metas = document.querySelectorAll('.article-card .firestore-visitors-count');
-                    counts.forEach((val, idx) => {
-                        if (metas[idx]) {
-                            metas[idx].innerText = val;
-                        }
+                if (titleElements.length > 0 && countElements.length > 0) {
+                    const promises = [...titleElements].map(element => {
+                        const title = element.textContent.trim();
+                        const doc = articles.doc(title);
+                        return getCount(doc, false);
                     });
-                }).catch(e => console.error('Error fetching counts:', e));
+                    
+                    Promise.all(promises).then(counts => {
+                        counts.forEach((val, idx) => {
+                            if (countElements[idx]) {
+                                countElements[idx].innerText = val;
+                            }
+                        });
+                    }).catch(e => console.error('Error fetching counts:', e));
+                }
             }
-        });
+        };
+
+        // 监听传统页面加载完成事件
+        document.addEventListener('DOMContentLoaded', handleViewCount);
+        
+        // 监听PJAX页面加载完成事件（适配Icarus主题的PJAX机制）
+        document.addEventListener('page:loaded', handleViewCount);
     })();
 }
