@@ -1,331 +1,40 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-  <meta name="google-site-verification" content="upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs">
-  <meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"sydzi.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"language":true,"language_text":{"x86asm":"assembly"}},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
-
-<!-- 强制移除目录下划线 -->
-
-<style>
-  /* 覆盖所有可能的目录容器 */
-  [class*="toc"] .nav-item a,
-  [class*="TOC"] .nav-item a,
-  .active > a,
-  .active-current > a {
-    border-bottom: none !important;
-    text-decoration: none !important;
-    box-shadow: none !important;
-  }
-
-
-  /* 覆盖伪元素下划线 */
-  [class*="toc"] a::after,
-  [class*="TOC"] a::after {
-    display: none !important;
-  }
-</style>
-
-    <meta name="description" content="IDApythonAPI、SMC自修改代码">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Day14:IDApython与SMC">
-<meta property="og:url" content="https://sydzi.github.io/2025/08/05/Day14-IDApython/index.html">
-<meta property="og:site_name" content="SydzI&#39;s Blog">
-<meta property="og:description" content="IDApythonAPI、SMC自修改代码">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://sydzi.github.io/images/image-20250805234429100.png">
-<meta property="og:image" content="https://sydzi.github.io/images/image-20250805234728191.png">
-<meta property="article:published_time" content="2025-08-05T01:53:56.000Z">
-<meta property="article:modified_time" content="2025-08-08T07:29:14.694Z">
-<meta property="article:author" content="SydzI">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://sydzi.github.io/images/image-20250805234429100.png">
-
-
-<link rel="canonical" href="https://sydzi.github.io/2025/08/05/Day14-IDApython/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://sydzi.github.io/2025/08/05/Day14-IDApython/","path":"2025/08/05/Day14-IDApython/","title":"Day14:IDApython与SMC"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Day14:IDApython与SMC | SydzI's Blog</title>
-  
-
-
-
-
-
-
-
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
-<script src="/js/third-party/search/local-search.js" defer></script>
-
-
-
-
-
-
-
-  
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-app-compat.js" integrity="sha256-k2eD8Bl04gp35v4S01cNbO+3UeLK6mVqpOyUJz4aXzY=" crossorigin="anonymous" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-firestore-compat.js" integrity="sha256-r1EpenNle+MZs+KB73PFJnrmIF3k29t5XGrSqfZ9PPw=" crossorigin="anonymous" defer></script>
-  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}</script>
-  <script src="/js/third-party/statistics/firestore.js" defer></script>
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">SydzI's Blog</p>
-      <i class="logo-line"></i>
-    </a>
-      <p class="site-subtitle" itemprop="description">路漫漫其修远兮，吾将上下而求索</p>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup">
-      <div class="search-header">
-        <span class="search-icon">
-          <i class="fa fa-search"></i>
-        </span>
-        <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
-                placeholder="搜索..." spellcheck="false"
-                type="search" class="search-input">
-        </div>
-        <span class="popup-btn-close" role="button">
-          <i class="fa fa-times-circle"></i>
-        </span>
-      </div>
-      <div class="search-result-container">
-        <div class="search-result-icon">
-          <i class="fa fa-spinner fa-pulse fa-5x"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</header>
-        
-  
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IDApython"><span class="nav-number">1.</span> <span class="nav-text">IDApython</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80API"><span class="nav-number">1.1.</span> <span class="nav-text">基础API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%B5%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.2.</span> <span class="nav-text">段相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.3.</span> <span class="nav-text">函数相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.4.</span> <span class="nav-text">指令相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.5.</span> <span class="nav-text">操作数相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%86%99%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.6.</span> <span class="nav-text">数据读写相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.7.</span> <span class="nav-text">调试相关API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3API"><span class="nav-number">1.8.</span> <span class="nav-text">其他操作相关API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%EF%BC%88SMC%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">自修改代码（SMC）</span></a></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="SydzI"
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">SydzI</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">19</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">3</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author animated">
-      <span class="links-of-author-item">
-        <a href="https://github.com/SydzI" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SydzI" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-  </div>
-
-        </div>
-      </div>
-    </div>
-
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Day14:IDApython与SMC - SydzI&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="SydzI&#039;s Blog"><meta name="msapplication-TileImage" content="/img/Newspaper.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SydzI&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="IDApythonAPI、SMC自修改代码"><meta property="og:type" content="blog"><meta property="og:title" content="Day14:IDApython与SMC"><meta property="og:url" content="https://sydzi.github.io/2025/08/05/Day14-IDApython/"><meta property="og:site_name" content="SydzI&#039;s Blog"><meta property="og:description" content="IDApythonAPI、SMC自修改代码"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://sydzi.github.io/images/image-20250805234429100.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250805234728191.png"><meta property="article:published_time" content="2025-08-05T01:53:56.000Z"><meta property="article:modified_time" content="2025-09-01T16:02:21.502Z"><meta property="article:author" content="SydzI"><meta property="article:tag" content="CTF"><meta property="article:tag" content="Reverse"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://sydzi.github.io/images/image-20250805234429100.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://sydzi.github.io/2025/08/05/Day14-IDApython/"},"headline":"Day14:IDApython与SMC","image":["https://sydzi.github.io/images/image-20250805234429100.png","https://sydzi.github.io/images/image-20250805234728191.png"],"datePublished":"2025-08-05T01:53:56.000Z","dateModified":"2025-09-01T16:02:21.502Z","author":{"@type":"Person","name":"SydzI"},"publisher":{"@type":"Organization","name":"SydzI's Blog","logo":{"@type":"ImageObject"}},"description":"IDApythonAPI、SMC自修改代码"}</script><link rel="canonical" href="https://sydzi.github.io/2025/08/05/Day14-IDApython/"><link rel="icon" href="/img/Newspaper.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/xcode.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0"><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
     
-  </aside>
+        gtag('config', 'upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
 
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
 
-    </div>
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
 
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-
-<div class="post-block">
-  
-
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sydzi.github.io/2025/08/05/Day14-IDApython/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="SydzI">
-    </span>
-    
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SydzI's Blog">
-      <meta itemprop="description" content="">
-    </span>
-    
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Day14:IDApython与SMC | SydzI's Blog">
-      <meta itemprop="description" content="IDApythonAPI、SMC自修改代码">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Day14:IDApython与SMC
-        </h1>
-    
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-08-05 09:53:56" itemprop="dateCreated datePublished" datetime="2025-08-05T09:53:56+08:00">2025-08-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-08-08 15:29:14" itemprop="dateModified" datetime="2025-08-08T15:29:14+08:00">2025-08-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/RELearning/" itemprop="url" rel="index"><span itemprop="name">RELearning</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span class="firestore-visitors-count"></span>
-    </span>
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>3.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>6 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-    
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><p>IDApythonAPI、SMC自修改代码</p>
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="SydzI's Blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">SydzI&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">首页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item night" id="night-nav" title="Change Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-9-desktop is-9-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-05</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-02</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/RELearning/">RELearning</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>12 分钟读完 (大约1748个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><h1 class="title is-3 is-size-4-mobile">Day14:IDApython与SMC</h1><div class="content"><p>IDApythonAPI、SMC自修改代码</p>
 <span id="more"></span>
 
 <h2 id="IDApython"><a href="#IDApython" class="headerlink" title="IDApython"></a>IDApython</h2><ul>
@@ -399,13 +108,13 @@
 </li>
 <li><p>idautils.XrefsTo(ea)：返回所有引用ea处的对象（有属性frm、to、type）（Ctrl+X）</p>
 <p>示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idautils,idaapi</span><br><span class="line"><span class="keyword">for</span> xref <span class="keyword">in</span> idautils.XrefsTo(here()):</span><br><span class="line">    <span class="built_in">print</span>(xref.to)<span class="comment">#here()</span></span><br><span class="line">    <span class="built_in">print</span>(xref.frm)<span class="comment">#调用here()的函数地址</span></span><br><span class="line"><span class="keyword">for</span> xref <span class="keyword">in</span> idautils.XrefsFrom(here()):</span><br><span class="line">    <span class="built_in">print</span>(xref.frm)<span class="comment">#here()</span></span><br><span class="line">    <span class="built_in">print</span>(xref.to)<span class="comment">#here()引用的函数地址</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idaapi<br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsTo(here()):<br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#调用here()的函数地址</span><br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsFrom(here()):<br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()引用的函数地址</span><br></code></pre></td></tr></table></figure>
 </li>
 <li><p>idautils.Strings()：返回包含所有字符串的对象（有属性ea、length、strtype）（shift+F12）</p>
 </li>
 <li><p>idc.get_strlit_contents(ea)：返回ea处的字符串</p>
 <p>示例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idc,idautils</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> idautils.Strings():</span><br><span class="line">    string=idc.get_strlit_contents(s.ea)</span><br><span class="line">    <span class="built_in">print</span>(string)</span><br><span class="line"><span class="comment">#打印所有字符串</span></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idc,idautils<br><span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> idautils.Strings():<br>    string=idc.get_strlit_contents(s.ea)<br>    <span class="hljs-built_in">print</span>(string)<br><span class="hljs-comment">#打印所有字符串</span><br></code></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="自修改代码（SMC）"><a href="#自修改代码（SMC）" class="headerlink" title="自修改代码（SMC）"></a>自修改代码（SMC）</h2><ul>
 <li><p>自修改代码（Self-Modifying-Code）指某部分代码以加密后的形式存在于程序中，程序执行到这部分代码的时候才会进行动态解密，和加壳有点异曲同工。常用来加密关键逻辑，使其不可直接静态分析</p>
@@ -427,7 +136,7 @@
 <p>非常明显地调用了VirtualProtect函数，解密逻辑很简单，就是ror后异或0x5a（ror查出来是循环右移，3就是右移的位数了，这点看汇编可能更清晰点）</p>
 </li>
 <li><p>下面就是今天的成果展示了（ror由DS协助实现），SMC解密脚本：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idautils,idc,idaapi</span><br><span class="line"></span><br><span class="line">enc=idc.get_bytes(<span class="number">0x00007FF6BF081085</span>,<span class="number">0x00007FF6BF081D00</span>-<span class="number">0x00007FF6BF081085</span>)</span><br><span class="line">loc=<span class="number">0x00007FF6BF081085</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ror</span>(<span class="params">value, shift, bits=<span class="number">8</span></span>):</span><br><span class="line">    shift %= bits  <span class="comment"># 确保位移量在有效范围内</span></span><br><span class="line">    <span class="keyword">return</span> (value &gt;&gt; shift) | ((value &lt;&lt; (bits - shift)) &amp; ((<span class="number">1</span> &lt;&lt; bits) - <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> enc:</span><br><span class="line">    idc.patch_byte(loc,(ror(i,<span class="number">3</span>)^<span class="number">0x5a</span>)&amp;<span class="number">0xff</span>)</span><br><span class="line">    loc+=<span class="number">1</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;done&quot;</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idc,idaapi<br><br>enc=idc.get_bytes(<span class="hljs-number">0x00007FF6BF081085</span>,<span class="hljs-number">0x00007FF6BF081D00</span>-<span class="hljs-number">0x00007FF6BF081085</span>)<br>loc=<span class="hljs-number">0x00007FF6BF081085</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">ror</span>(<span class="hljs-params">value, shift, bits=<span class="hljs-number">8</span></span>):<br>    shift %= bits  <span class="hljs-comment"># 确保位移量在有效范围内</span><br>    <span class="hljs-keyword">return</span> (value &gt;&gt; shift) | ((value &lt;&lt; (bits - shift)) &amp; ((<span class="hljs-number">1</span> &lt;&lt; bits) - <span class="hljs-number">1</span>))<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> enc:<br>    idc.patch_byte(loc,(ror(i,<span class="hljs-number">3</span>)^<span class="hljs-number">0x5a</span>)&amp;<span class="hljs-number">0xff</span>)<br>    loc+=<span class="hljs-number">1</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;done&quot;</span>)<br></code></pre></td></tr></table></figure>
 </li>
 <li><p>本来是要写完的，但是first_part的函数解析完好几百行了，是我看不懂的加密🫠去找WP，发现是非常混淆的base64，还加了异或，但是我没看出逻辑，索性点到为止，改天把编码和密码的部分补上再说。</p>
 </li>
@@ -436,88 +145,51 @@
 </ul>
 </li>
 </ul>
-
-    </div>
-    
-    
-    
-    
-    
-    <footer class="post-footer">
-    
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="prev" title="Day13:反调试（二）">
-                  <i class="fa fa-angle-left"></i> Day13:反调试（二）
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/" rel="next" title="Day15:指令虚拟化">
-                  Day15:指令虚拟化 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
-
-
-
-
-
-
-    <div class="comments utterances-container"></div>
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2025</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">SydzI</span>
-  </div>
-<div class="wordcount">
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-line"></i>
-    </span>
-    <span title="站点总字数">101k</span>
-  </span>
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">3:03</span>
-  </span>
-</div>
-
-    </div>
-  </footer>
-
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"sydzi/sydzi.github.io","issue_term":"pathname","theme":"github-light"}</script>
-<script src="/js/third-party/comments/utterances.js" defer></script>
-
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body>
-</html>
+</div><div class="article-licensing box"><div class="licensing-title"><p>Day14:IDApython与SMC</p><p><a href="https://sydzi.github.io/2025/08/05/Day14-IDApython/">https://sydzi.github.io/2025/08/05/Day14-IDApython/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>SydzI</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2025-08-05</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-09-02</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/CTF/">CTF</a><a class="link-muted mr-2" rel="tag" href="/tags/Reverse/">Reverse</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=68b654c479868da1c7122aa1&amp;product=inline-share-buttons" defer></script><nav class="post-navigation mt-4 mb-2 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">Day15:指令虚拟化</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/"><span class="level-item">Day13:反调试（二）</span><i class="level-item fas fa-chevron-right"></i></a></div></nav></article></div><!--!--><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">评论</h3><script src="https://utteranc.es/client.js" repo="sydzi/sydzi.github.io" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-3-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.jpg" alt="SydzI"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">SydzI</p><p class="is-size-6 is-block">a CTFer, major in Reverse</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Nanjing,China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">21</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">3</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">5</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/SydzI" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://github.com/SydzI"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#IDApython"><span class="level-left"><span class="level-item">1</span><span class="level-item">IDApython</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#基础API"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">基础API</span></span></a></li><li><a class="level is-mobile" href="#段相关API"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">段相关API</span></span></a></li><li><a class="level is-mobile" href="#函数相关API"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">函数相关API</span></span></a></li><li><a class="level is-mobile" href="#指令相关API"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">指令相关API</span></span></a></li><li><a class="level is-mobile" href="#操作数相关API"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">操作数相关API</span></span></a></li><li><a class="level is-mobile" href="#数据读写相关API"><span class="level-left"><span class="level-item">1.6</span><span class="level-item">数据读写相关API</span></span></a></li><li><a class="level is-mobile" href="#调试相关API"><span class="level-left"><span class="level-item">1.7</span><span class="level-item">调试相关API</span></span></a></li><li><a class="level is-mobile" href="#其他操作相关API"><span class="level-left"><span class="level-item">1.8</span><span class="level-item">其他操作相关API</span></span></a></li></ul></li><li><a class="level is-mobile" href="#自修改代码（SMC）"><span class="level-left"><span class="level-item">2</span><span class="level-item">自修改代码（SMC）</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">SydzI&#039;s Blog</a><p class="is-size-7"><span>&copy; 2025 SydzI</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            },
+            services: {
+                firebase: {"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}
+            }
+        };</script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><script data-pjax src="/js/firebase_counter.js" defer></script><script src="/js/night.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body></html>

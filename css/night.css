@@ -1,0 +1,508 @@
+#universe {
+  display: none;
+}
+.navbar-logo .logo-img-dark,
+.footer-logo .logo-img-dark {
+  display: none;
+}
+body.night {
+  background: url("/img/night_background.jpg") center fixed, #0e1225;
+  background-size: cover;
+}
+.night .content code {
+  color: #cbba7d;
+}
+.night #night-nav #night-icon:before {
+  content: '\f185';
+}
+.night .navbar-menu {
+  background-color: inherit;
+}
+.night .navbar-main .navbar-menu .navbar-item:hover,
+.night .navbar-main .navbar-menu .navbar-item:focus {
+  color: #fff;
+  background-color: #373d48;
+}
+.night .navbar {
+  background-color: rgba(10,10,10,0.3) !important;
+}
+.night .card {
+  background-color: rgba(12,12,12,0.5) !important;
+  border: none;
+}
+.night .card:hover {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .content {
+  color: #fff;
+}
+.night .content a {
+  color: #94d0ff;
+}
+.night .content table thead td,
+.night .content table thead th {
+  color: #fff;
+}
+.night article.article .title a,
+.night article.media .title a,
+.night article.article .title:hover a,
+.night article.media .title:hover a {
+  color: #fff !important;
+}
+.night .tag:not(body) {
+  color: #fff;
+}
+.night .searchbox .searchbox-container,
+.night .searchbox .searchbox-header,
+.night .searchbox .searchbox-header .searchbox-input,
+.night .searchbox .searchbox-header .searchbox-close,
+.night .searchbox .searchbox-body,
+.night .searchbox .searchbox-result-section,
+.night .searchbox .searchbox-result-item {
+  color: #fff;
+}
+.night input:-webkit-autofill {
+  -webkit-text-fill-color: #fff !important;
+}
+.night .footer {
+  background-color: rgba(10,10,10,0.3) !important;
+  border-top: 1px solid rgba(0,0,0,0);
+}
+.night .footer:before {
+  background-color: transparent;
+}
+.night .input,
+.night .textarea {
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+.night .input:focus,
+.night .textarea:focus {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .message.message-immersive {
+  background-color: rgba(255,255,255,0.1);
+}
+.night .message.message-immersive .message-body {
+  color: #fff;
+}
+.night .message.message-immersive.is-info {
+  background-color: rgba(189,195,200,0.2);
+}
+.night .message.message-immersive.is-info .message-body {
+  color: #94d0ff;
+}
+.night .message.message-immersive.is-warning {
+  background-color: rgba(203,200,186,0.2);
+}
+.night .message.message-immersive.is-warning .message-body {
+  color: #ffd700;
+}
+.night .message.message-immersive.is-danger {
+  background-color: rgba(198,186,190,0.2);
+}
+.night .message.message-immersive.is-danger .message-body {
+  color: #ff8080;
+}
+.night .message.message-immersive.is-success {
+  background-color: rgba(191,199,192,0.2);
+}
+.night .message.message-immersive.is-success .message-body {
+  color: #85e085;
+}
+.night .message.message-immersive.is-primary {
+  background-color: rgba(189,192,201,0.2);
+}
+.night .message.message-immersive.is-primary .message-body {
+  color: #94d0ff;
+}
+.night .button.is-primary,
+.night .button.is-light,
+.night .button.is-small {
+  background-color: rgba(12,12,12,0.5);
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+.night .button.is-primary:hover,
+.night .button.is-light:hover,
+.night .button.is-small:hover,
+.night .button.is-primary.is-hovered,
+.night .button.is-light.is-hovered,
+.night .button.is-small.is-hovered {
+  color: #fff;
+  background-color: rgba(10,15,25,0.6);
+}
+.night .button.is-primary:active,
+.night .button.is-light:active,
+.night .button.is-small:active,
+.night .button.is-primary.is-active,
+.night .button.is-light.is-active,
+.night .button.is-small.is-active {
+  color: #fff;
+  background-color: rgba(10,15,25,0.8);
+}
+.night .button.is-white,
+.night .button.is-transparent {
+  background-color: transparent;
+  border: none;
+}
+.night .button.is-white:hover,
+.night .button.is-transparent:hover {
+  background-color: rgba(10,15,25,0.6) !important;
+}
+.night .pagination .pagination-next,
+.night .pagination .pagination-previous,
+.night .pagination-link:not(.is-current) {
+  color: #fff;
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+  transition: background-color 0.2s ease;
+}
+.night .pagination .pagination-next:hover,
+.night .pagination .pagination-previous:hover,
+.night .pagination-link:not(.is-current):hover {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .pagination .pagination-next a,
+.night .pagination .pagination-previous a,
+.night .pagination-link:not(.is-current) a {
+  color: #fff;
+}
+.night .pagination-link.is-current {
+  background-color: rgba(10,15,25,0.8);
+  border: none;
+  color: #fff;
+}
+.night .v .vwrap,
+.night .v .vwrap .vheader .vinput {
+  border: none;
+}
+.night .v .vwrap .vheader .vinput:focus {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .v .vbtn {
+  color: #fff;
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+}
+.night .v .vbtn:hover {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .v .vbtn:active {
+  background-color: rgba(10,15,25,0.8);
+}
+.night .v .vlist .vcard .vhead .vsys {
+  background-color: rgba(10,15,25,0.6);
+}
+.night .v a:hover,
+.night .v .vlist .vcard .vh .vmeta .vat {
+  color: #fff;
+}
+.night .v .vlist .vcard .vcontent.expand:before {
+  background: linear-gradient(180deg, rgba(14,18,37,0), rgba(10,15,25,0.8));
+}
+.night .v .vlist .vcard .vcontent.expand:after {
+  background: rgba(10,15,25,0.8);
+}
+.night .v .vlist .vcard .vh,
+.night .v .vlist .vcard .vquote {
+  border: none;
+}
+.night body,
+.night strong,
+.night time,
+.night .title,
+.night .footer,
+.night .card,
+.night .content h1,
+.night .content h2,
+.night .content h3,
+.night .content h4,
+.night .content h5,
+.night .content h6,
+.night .navbar-item,
+.night .navbar-item.is-active,
+.night .navbar-link,
+.night .menu-list a,
+.night .menu-label,
+.night .level-item,
+.night .input,
+.night .textarea,
+.night .button.is-white,
+.night .button.is-transparent,
+.night .article-licensing,
+.night .v * {
+  color: #fff;
+}
+.night .media-content,
+.night .has-text-grey,
+.night .link-muted {
+  color: #fff !important;
+}
+.night a {
+  color: #94d0ff;
+  transition: color 0.2s ease;
+}
+.night a:hover {
+  color: #fff;
+}
+.night .content blockquote,
+.night .article-licensing {
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+}
+.night .post-copyright {
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+}
+.night .content table {
+  background-color: rgba(12,12,12,0.5);
+  border: none;
+}
+.night .content table thead td,
+.night .content table thead th {
+  color: #fff;
+  background-color: rgba(10,15,25,0.6);
+}
+.night .content table td,
+.night .content table th {
+  border: none;
+}
+.night .content table tr:hover td,
+.night .content table tr:hover th {
+  background-color: rgba(10,15,25,0.6);
+}
+.night hr {
+  background-color: rgba(20,25,35,0.7);
+}
+.night article.article .title:hover a,
+.night article.media .title:hover a {
+  color: #94d0ff !important;
+}
+.night .menu-list .tag {
+  background-color: rgba(128,128,128,0.2);
+  color: #f9f6f6;
+  border: none;
+  transition: none;
+}
+.night .menu-list .tag:hover {
+  background-color: rgba(128,128,128,0.2);
+  color: #e0e0e0;
+}
+.night .tags .tag:first-child {
+  background-color: rgba(52,109,167,0.8);
+  color: #fff;
+  border: none;
+  transition: none;
+}
+.night .tags .tag:first-child:hover {
+  background-color: rgba(52,109,167,0.8);
+  color: #fff;
+}
+.night .tags .tag:last-child {
+  background-color: rgba(128,128,128,0.2);
+  color: #e0e0e0;
+  border: none;
+  transition: none;
+}
+.night .tags .tag:last-child:hover {
+  background-color: rgba(128,128,128,0.2);
+  color: #e0e0e0;
+}
+.night .tag:not(body) {
+  background-color: rgba(128,128,128,0.2);
+  color: #e0e0e0;
+  border: none;
+  transition: none;
+}
+.night .tag:not(body):hover {
+  background-color: rgba(128,128,128,0.2);
+  color: #e0e0e0;
+}
+.night .tag:not(body):after,
+.night .tag:not(body) .tag-count {
+  background-color: #fff;
+  color: #333;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+.night .tag.is-grey {
+  background-color: rgba(100,100,100,0.2);
+  color: #d0d0d0;
+  border: none;
+  transition: none;
+}
+.night .tag.is-grey:hover {
+  background-color: rgba(100,100,100,0.2);
+  color: #d0d0d0;
+}
+.night .menu-list a {
+  color: #e0e0e0;
+  transition: all 0.2s ease;
+}
+.night .menu-list a:hover {
+  background-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.night .menu-list a.is-active {
+  background-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+.night .menu-list li ul {
+  border: none;
+}
+.night .timeline .media:last-child:after {
+  background-color: #252936;
+}
+.night .timeline {
+  border-color: rgba(20,25,35,0.7);
+}
+.night .timeline .media:before {
+  background-color: rgba(20,25,35,0.7);
+}
+.night .searchbox .searchbox-container,
+.night .searchbox .searchbox-header,
+.night .searchbox .searchbox-header .searchbox-input,
+.night .searchbox .searchbox-header .searchbox-close,
+.night .searchbox .searchbox-body,
+.night .searchbox .searchbox-result-section,
+.night .searchbox .searchbox-result-item {
+  color: #fff;
+  background-color: rgba(10,15,25,0.8);
+  border: none;
+}
+.night .searchbox .searchbox-container .searchbox-result-section .searchbox-result-item:hover,
+.night .searchbox .searchbox-container .searchbox-result-section .searchbox-result-item.active,
+.night .searchbox .searchbox-container .searchbox-header .searchbox-close:hover {
+  color: #fff;
+  background-color: rgba(20,25,35,0.7);
+}
+.night ::selection {
+  color: #fff;
+  background-color: rgba(52,109,167,0.8);
+}
+.night ::-moz-selection {
+  color: #fff;
+  background-color: rgba(52,109,167,0.8);
+}
+.night input:-webkit-autofill {
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 0 0px 1000px rgba(12,12,12,0.5) inset;
+}
+.night .hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.8em;
+  color: #abb2bf;
+  background: rgba(10,15,25,0.8);
+  border: none;
+}
+.night .hljs-comment,
+.night .hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+.night .hljs-doctag,
+.night .hljs-keyword,
+.night .hljs-formula {
+  color: #c678dd;
+}
+.night .hljs-section,
+.night .hljs-name,
+.night .hljs-selector-tag,
+.night .hljs-deletion,
+.night .hljs-subst {
+  color: #e06c75;
+}
+.night .hljs-literal {
+  color: #56b6c2;
+}
+.night .hljs-string,
+.night .hljs-regexp,
+.night .hljs-addition,
+.night .hljs-attribute,
+.night .hljs-meta-string {
+  color: #98c379;
+}
+.night .hljs-built_in,
+.night .hljs-class .hljs-title {
+  color: #e6c07b;
+}
+.night .hljs-attr,
+.night .hljs-variable,
+.night .hljs-template-variable,
+.night .hljs-type,
+.night .hljs-selector-class,
+.night .hljs-selector-attr,
+.night .hljs-selector-pseudo,
+.night .hljs-number {
+  color: #d19a66;
+}
+.night .hljs-symbol,
+.night .hljs-bullet,
+.night .hljs-link,
+.night .hljs-meta,
+.night .hljs-selector-id,
+.night .hljs-title {
+  color: #94d0ff;
+}
+.night .hljs-emphasis {
+  font-style: italic;
+}
+.night .hljs-strong {
+  font-weight: bold;
+}
+.night .hljs-link {
+  text-decoration: underline;
+}
+.night .card.widget .level-item.button.is-primary.is-rounded {
+  background-color: rgba(255,255,255,0.62);
+  color: #333;
+  border-radius: 290486px;
+  padding-left: calc(1em + 0.25em);
+  padding-right: calc(1em + 0.25em);
+  transition: all 0.3s ease;
+  transform: scale(1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+}
+.night .card.widget .level-item.button.is-primary.is-rounded:hover {
+  background-color: #fff;
+}
+.night .card.widget .level-item.button.is-transparent.is-marginless,
+.night .card.widget .level-item.button.is-transparent,
+.night .card.widget .level-item.button:not(.is-primary),
+.night .card.widget .social-link,
+.night .card.widget .level-item a.button,
+.night .card.widget .level-item a.button.is-transparent,
+.night .card.widget .level-item a.button.is-transparent.is-marginless {
+  color: #e0e0e0;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  border: 2px solid transparent;
+}
+.night .card.widget .level-item.button.is-transparent.is-marginless:hover,
+.night .card.widget .level-item.button.is-transparent:hover,
+.night .card.widget .level-item.button:hover:not(.is-primary),
+.night .card.widget .social-link:hover,
+.night .card.widget .level-item a.button:hover,
+.night .card.widget .level-item a.button.is-transparent:hover,
+.night .card.widget .level-item a.button.is-transparent.is-marginless:hover {
+  background-color: #fff !important;
+  color: #333 !important;
+  border-color: rgba(5,5,5,0);
+}
+.card.widget .level-item.button.is-primary.is-rounded:hover {
+  background-color: #1d45d5;
+}
+.card.widget .level-item.button.is-transparent.is-marginless:hover,
+.card.widget .level-item.button.is-transparent:hover,
+.card.widget .level-item.button:hover:not(.is-primary) {
+  background-color: rgba(255,255,255,0.8);
+  color: #333;
+  transition: all 0.3s ease;
+}

@@ -1,415 +1,83 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-  <meta name="google-site-verification" content="upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs">
-  <meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"sydzi.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"language":true,"language_text":{"x86asm":"assembly"}},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
-
-<!-- 强制移除目录下划线 -->
-
-<style>
-  /* 覆盖所有可能的目录容器 */
-  [class*="toc"] .nav-item a,
-  [class*="TOC"] .nav-item a,
-  .active > a,
-  .active-current > a {
-    border-bottom: none !important;
-    text-decoration: none !important;
-    box-shadow: none !important;
-  }
-
-
-  /* 覆盖伪元素下划线 */
-  [class*="toc"] a::after,
-  [class*="TOC"] a::after {
-    display: none !important;
-  }
-</style>
-
-    <meta property="og:type" content="website">
-<meta property="og:title" content="SydzI&#39;s Blog">
-<meta property="og:url" content="https://sydzi.github.io/index.html">
-<meta property="og:site_name" content="SydzI&#39;s Blog">
-<meta property="og:locale" content="zh_CN">
-<meta property="article:author" content="SydzI">
-<meta name="twitter:card" content="summary">
-
-
-<link rel="canonical" href="https://sydzi.github.io/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>SydzI's Blog</title>
-  
-
-
-
-
-
-
-
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
-<script src="/js/third-party/search/local-search.js" defer></script>
-
-
-
-
-
-
-
-  
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-app-compat.js" integrity="sha256-k2eD8Bl04gp35v4S01cNbO+3UeLK6mVqpOyUJz4aXzY=" crossorigin="anonymous" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/11.1.0/firebase-firestore-compat.js" integrity="sha256-r1EpenNle+MZs+KB73PFJnrmIF3k29t5XGrSqfZ9PPw=" crossorigin="anonymous" defer></script>
-  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}</script>
-  <script src="/js/third-party/statistics/firestore.js" defer></script>
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <h1 class="site-title">SydzI's Blog</h1>
-      <i class="logo-line"></i>
-    </a>
-      <p class="site-subtitle" itemprop="description">路漫漫其修远兮，吾将上下而求索</p>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup">
-      <div class="search-header">
-        <span class="search-icon">
-          <i class="fa fa-search"></i>
-        </span>
-        <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
-                placeholder="搜索..." spellcheck="false"
-                type="search" class="search-input">
-        </div>
-        <span class="popup-btn-close" role="button">
-          <i class="fa fa-times-circle"></i>
-        </span>
-      </div>
-      <div class="search-result-container">
-        <div class="search-result-icon">
-          <i class="fa fa-spinner fa-pulse fa-5x"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</header>
-        
-  
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-overview-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="SydzI"
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">SydzI</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">19</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">3</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author animated">
-      <span class="links-of-author-item">
-        <a href="https://github.com/SydzI" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SydzI" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-  </div>
-
-        </div>
-      </div>
-    </div>
-
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>SydzI&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="SydzI&#039;s Blog"><meta name="msapplication-TileImage" content="/img/Newspaper.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SydzI&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta property="og:type" content="blog"><meta property="og:title" content="SydzI&#039;s Blog"><meta property="og:url" content="https://sydzi.github.io/"><meta property="og:site_name" content="SydzI&#039;s Blog"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://sydzi.github.io/img/og_image.png"><meta property="article:author" content="SydzI"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://sydzi.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://SydzI.github.io"},"headline":"SydzI's Blog","image":["https://sydzi.github.io/img/og_image.png"],"author":{"@type":"Person","name":"SydzI"},"publisher":{"@type":"Organization","name":"SydzI's Blog","logo":{"@type":"ImageObject"}},"description":""}</script><link rel="alternate" href="/atom.xml" title="SydzI&#039;s Blog" type="application/atom+xml"><link rel="icon" href="/img/Newspaper.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/xcode.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0"><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
     
-  </aside>
+        gtag('config', 'upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
 
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
 
-    </div>
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
 
-    <div class="main-inner index categories-page">
-
-
-
-
-
-<div class="category-cards-container">
-    
-      <div class="category-card">
-        <div class="category-header">
-            <h2 class="category-name">RELearning</h2>
-            <span class="post-count">16篇文章</span>
-          </a>
-        </div>
-
-    <div class="recent-posts-list">
-      
-        <div class="recent-post-item">
-          <a href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/" class="post-title" title="Day15:指令虚拟化">
-            Day15:指令虚拟化
-          </a>
-          <span class="post-date">
-			 
-				08/08
-			
-		</span>
-        </div>
-      
-        <div class="recent-post-item">
-          <a href="/2025/08/05/Day14-IDApython/" class="post-title" title="Day14:IDApython与SMC">
-            Day14:IDApython与SM...
-          </a>
-          <span class="post-date">
-			 
-				08/08
-			
-		</span>
-        </div>
-      
-        <div class="recent-post-item">
-          <a href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/" class="post-title" title="Day13:反调试（二）">
-            Day13:反调试（二）
-          </a>
-          <span class="post-date">
-			 
-				08/03
-			
-		</span>
-        </div>
-      
-
- <div class="more-posts-wrapper">
-	<a href="/categories/RELearning/" class="more-posts-button">
-		更多文章 →
-	</a>
-</div>
-</div>
-
-  </div>
-
-      <div class="category-card">
-        <div class="category-header">
-            <h2 class="category-name">周记</h2>
-            <span class="post-count">1篇文章</span>
-          </a>
-        </div>
-
-    <div class="recent-posts-list">
-      
-        <div class="recent-post-item">
-          <a href="/2025/06/02/%E5%91%A8%E8%AE%B0/" class="post-title" title="周记">
-            周记
-          </a>
-          <span class="post-date">
-			 
-				08/18
-			
-		</span>
-        </div>
-      
-
- <div class="more-posts-wrapper">
-	<a href="/categories/%E5%91%A8%E8%AE%B0/" class="more-posts-button">
-		更多文章 →
-	</a>
-</div>
-</div>
-
-  </div>
-
-      <div class="category-card">
-        <div class="category-header">
-            <h2 class="category-name">杂记</h2>
-            <span class="post-count">2篇文章</span>
-          </a>
-        </div>
-
-    <div class="recent-posts-list">
-      
-        <div class="recent-post-item">
-          <a href="/2025/06/05/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E9%87%8D%E5%BB%BA/" class="post-title" title="记一次blog重建">
-            记一次blog重建
-          </a>
-          <span class="post-date">
-			 
-				06/14
-			
-		</span>
-        </div>
-      
-        <div class="recent-post-item">
-          <a href="/2025/06/02/%E8%AE%B0%E4%B8%80%E6%AC%A1blog%E4%BC%98%E5%8C%96/" class="post-title" title="记一次blog优化">
-            记一次blog优化
-          </a>
-          <span class="post-date">
-			 
-				06/14
-			
-		</span>
-        </div>
-      
-
- <div class="more-posts-wrapper">
-	<a href="/categories/%E6%9D%82%E8%AE%B0/" class="more-posts-button">
-		更多文章 →
-	</a>
-</div>
-</div>
-
-  </div>
-
-</div>
-
-
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2025</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">SydzI</span>
-  </div>
-<div class="wordcount">
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-line"></i>
-    </span>
-    <span title="站点总字数">101k</span>
-  </span>
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">3:03</span>
-  </span>
-</div>
-
-    </div>
-  </footer>
-
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"sydzi/sydzi.github.io","issue_term":"pathname","theme":"github-light"}</script>
-<script src="/js/third-party/comments/utterances.js" defer></script>
-
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body>
-</html>
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">SydzI&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item is-active" href="/">首页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item night" id="night-nav" title="Change Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-09-02</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-03</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/%E6%9D%82%E8%AE%B0/">杂记</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>6 分钟读完 (大约917个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2025/09/02/icarus%E4%B8%BB%E9%A2%98%E4%BC%98%E5%8C%96/">icarus主题优化</a></p><div class="content"><p>icarus主题复制功能重构（仿照next主题）、firebase统计阅读人数</p></div><a class="article-more button is-small is-size-7" href="/2025/09/02/icarus%E4%B8%BB%E9%A2%98%E4%BC%98%E5%8C%96/">阅读更多</a></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-21</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-03</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/RELearning/">RELearning</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>2 分钟读完 (大约240个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2025/08/21/Day16-Z3/">Day16:Z3求解器</a></p><div class="content"><p>z3求解器</p></div><a class="article-more button is-small is-size-7" href="/2025/08/21/Day16-Z3/">阅读更多</a></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-06</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-02</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/RELearning/">RELearning</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>17 分钟读完 (大约2491个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/">Day15:指令虚拟化</a></p><div class="content"><p>指令虚拟化、实现一个小型虚拟机程序、VM逆向实践</p></div><a class="article-more button is-small is-size-7" href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/">阅读更多</a></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-05</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-02</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/RELearning/">RELearning</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>12 分钟读完 (大约1748个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2025/08/05/Day14-IDApython/">Day14:IDApython与SMC</a></p><div class="content"><p>IDApythonAPI、SMC自修改代码</p></div><a class="article-more button is-small is-size-7" href="/2025/08/05/Day14-IDApython/">阅读更多</a></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-03</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-09-02</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/RELearning/">RELearning</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>4 分钟读完 (大约663个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/">Day13:反调试（二）</a></p><div class="content"><p>时间差检测、断点检测</p></div><a class="article-more button is-small is-size-7" href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/">阅读更多</a></article></div><nav class="pagination" role="navigation" aria-label="pagination"><div class="pagination-previous is-invisible is-hidden-mobile"><a href="/page/0/">上一页</a></div><div class="pagination-next"><a href="/page/2/">下一页</a></div><ul class="pagination-list is-hidden-mobile"><li><a class="pagination-link is-current" href="/">1</a></li><li><a class="pagination-link" href="/page/2/">2</a></li><li><span class="pagination-ellipsis">&hellip;</span></li><li><a class="pagination-link" href="/page/5/">5</a></li></ul></nav></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.jpg" alt="SydzI"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">SydzI</p><p class="is-size-6 is-block">a CTFer, major in Reverse</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Nanjing,China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">21</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">3</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">5</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/SydzI" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://github.com/SydzI"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a></div></div></div><!--!--><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/RELearning/"><span class="level-start"><span class="level-item">RELearning</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%91%A8%E8%AE%B0/"><span class="level-start"><span class="level-item">周记</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%9D%82%E8%AE%B0/"><span class="level-start"><span class="level-item">杂记</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-09-02T04:13:44.000Z">2025-09-02</time></p><p class="title"><a href="/2025/09/02/icarus%E4%B8%BB%E9%A2%98%E4%BC%98%E5%8C%96/">icarus主题优化</a></p><p class="categories"><a href="/categories/%E6%9D%82%E8%AE%B0/">杂记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-08-21T04:04:22.000Z">2025-08-21</time></p><p class="title"><a href="/2025/08/21/Day16-Z3/">Day16:Z3求解器</a></p><p class="categories"><a href="/categories/RELearning/">RELearning</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-08-06T07:41:01.000Z">2025-08-06</time></p><p class="title"><a href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/">Day15:指令虚拟化</a></p><p class="categories"><a href="/categories/RELearning/">RELearning</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-08-05T01:53:56.000Z">2025-08-05</time></p><p class="title"><a href="/2025/08/05/Day14-IDApython/">Day14:IDApython与SMC</a></p><p class="categories"><a href="/categories/RELearning/">RELearning</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-08-03T00:38:55.000Z">2025-08-03</time></p><p class="title"><a href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/">Day13:反调试（二）</a></p><p class="categories"><a href="/categories/RELearning/">RELearning</a></p></div></article></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/CTF/"><span class="tag">CTF</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Reverse/"><span class="tag">Reverse</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/blog/"><span class="tag">blog</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%91%A8%E8%AE%B0/"><span class="tag">周记</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9D%82%E8%AE%B0/"><span class="tag">杂记</span><span class="tag">3</span></a></div></div></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2025/09/"><span class="level-start"><span class="level-item">九月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/08/"><span class="level-start"><span class="level-item">八月 2025</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/07/"><span class="level-start"><span class="level-item">七月 2025</span></span><span class="level-end"><span class="level-item tag">11</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/06/"><span class="level-start"><span class="level-item">六月 2025</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">SydzI&#039;s Blog</a><p class="is-size-7"><span>&copy; 2025 SydzI</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            },
+            services: {
+                firebase: {"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}
+            }
+        };</script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><script data-pjax src="/js/firebase_counter.js" defer></script><script src="/js/night.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body></html>
