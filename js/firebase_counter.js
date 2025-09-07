@@ -64,18 +64,28 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
 
             // 处理阅读计数的函数
             const handleViewCount = () => {
-                // 增强文章页面识别：使用多个可能的选择器，特别添加article.article以支持hexo s环境
-            const isArticlePage = document.querySelector('.article-container') !== null || 
-                                 document.querySelector('article.post') !== null ||
-                                 document.querySelector('.article-content') !== null ||
-                                 document.querySelector('[id="post-content"]') !== null ||
-                                 document.querySelector('article.article') !== null ||
-                                 document.querySelector('article.card-content.article') !== null;
+                // 获取当前URL路径
+                const currentPath = window.location.pathname;
                 
                 // 增强首页识别：使用多个可能的选择器
                 const isIndexPage = document.querySelector('.article-list') !== null ||
                                    document.querySelector('.article-card-list') !== null ||
-                                   document.querySelectorAll('.article-card').length > 0;
+                                   document.querySelectorAll('.article-card').length > 0 || // 降低阈值以适应首页
+                                   (currentPath === '/' && document.querySelector('article.article') !== null); // 特殊处理：根路径+article.article元素
+                
+                // 增强文章页面识别：使用更精确的选择器组合
+                // 重要：首页优先判断，且文章页判断要排除首页的情况，并增加特定的文章页特征
+                const isArticlePage = !isIndexPage && (
+                    // 传统文章页选择器
+                    (document.querySelector('.article-container') !== null && document.querySelector('.article-content') !== null) ||
+                    (document.querySelector('article.post') !== null && document.querySelector('.article-content') !== null) ||
+                    document.querySelector('[id="post-content"]') !== null ||
+                    // 针对hexo s环境的增强选择器，但需要确保不是首页
+                    (document.querySelector('article.article') !== null && 
+                     document.querySelector('article.card-content.article') !== null &&
+                     document.querySelectorAll('.article-card').length === 0 &&
+                     currentPath !== '/')
+                );
                                     
                 // 调试信息：输出所有可能的选择器结果，在hexo s环境下始终显示以帮助调试
                 console.log('[Firebase] 页面类型检测结果:');
