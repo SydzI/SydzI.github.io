@@ -24,10 +24,7 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
             const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
             const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
             
-            // 无论开发环境还是生产环境都输出初始化信息
-            console.log('Firebase 初始化成功');
-            console.log(isDevelopment ? '[调试] 开发环境调试模式已开启' : '[生产] 生产环境运行模式已开启');
-            console.log(`[状态] Firebase 计数器功能已初始化完成，使用集合: ${IcarusThemeSettings.services.firebase.collection || 'articles'}`);
+            // 移除所有调试日志输出
             
             // 获取数据库引用
             const db = firebase.firestore();
@@ -87,8 +84,8 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
                      currentPath !== '/')
                 );
                                     
-                // 页面类型信息 - 仅在生产环境显示基本信息
-                if (!isDevelopment) {
+                // 页面类型信息 - 仅在开发环境显示
+                if (isDevelopment) {
                     console.log(`[Firebase] 当前页面类型: ${isArticlePage ? '文章页' : isIndexPage ? '首页' : '其他页面'}`);
                 }
 
@@ -112,35 +109,59 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
                         }
                         
                         getCount(doc, increaseCount).then(count => {
-                            console.log(`[Firebase] 文章 "${title}" 阅读量: ${count}`);
                             countElement.innerText = count;
-                        }).catch(e => console.error('[Firebase] 更新计数失败:', e));
+                        }).catch(e => {
+                            // 移除错误日志
+                        });
                     } else {
                         // 静默处理：未找到文章标题或计数元素
                     }
                 } else if (isIndexPage) {
                     // 首页文章列表处理
-                    const titleElements = document.querySelectorAll('.article-card .title.is-3, .article-card .title.is-4-mobile');
-                    const countElements = document.querySelectorAll('.article-card .firestore-visitors-count');
-                    
-
-                    
-                    if (titleElements.length > 0 && countElements.length > 0) {
-                        const promises = [...titleElements].map(element => {
-                                const title = element.textContent.trim();
-                                const doc = articles.doc(title);
-                                // 首页只获取计数，不增加计数
-                                return getCount(doc, false);
+                    // 修改选择器以匹配实际HTML结构
+                    // 首页文章结构: .card > .card-content.article > .title.is-3.is-size-4-mobile
+                    const titleElements = document.querySelectorAll(
+                        '.card .article .title.is-3, .card .article .title.is-4-mobile, ' +
+                        '.card article .title.is-3, .card article .title.is-4-mobile, ' +
+                        '.card .article p.title, .card article p.title'
+                    );
+                    const countElements = document.querySelectorAll('.card .article .firestore-visitors-count, .card article .firestore-visitors-count');
+                
+                // 移除首页元素检测日志
+                
+                if (titleElements.length > 0 && countElements.length > 0) {
+                    const promises = [...titleElements].map(element => {
+                            const title = element.textContent.trim();
+                            const doc = articles.doc(title);
+                            // 首页只获取计数，不增加计数
+                            return getCount(doc, false).then(count => {
+                                return count;
                             });
-                        
-                        Promise.all(promises).then(counts => {
-                                counts.forEach((val, idx) => {
-                                    if (countElements[idx]) {
-                                        countElements[idx].innerText = val;
-                                    }
-                                });
-                            }).catch(e => console.error('[Firebase] 获取计数失败:', e));
+                        });
+                    
+                    Promise.all(promises).then(counts => {
+                            counts.forEach((val, idx) => {
+                                if (countElements[idx]) {
+                                    countElements[idx].innerText = val;
+                                }
+                            });
+                        }).catch(e => {
+                            // 错误处理：尝试显示一些默认值或替代文本
+                            countElements.forEach(el => {
+                                if (el.innerText === '0') {
+                                    el.innerText = '加载中...';
+                                }
+                            });
+                        });
+                } else {
+                    // 尝试使用更通用的选择器
+                    const fallbackTitleElements = document.querySelectorAll('.article-card a[href^="/"]');
+                    const fallbackCountElements = document.querySelectorAll('.article-card .firestore-visitors-count');
+                    
+                    if (fallbackTitleElements.length > 0 && fallbackCountElements.length > 0) {
+                        // 这里可以添加备选逻辑
                     }
+                }
                 } else {
                     // 静默处理：当前页面既不是文章页也不是首页
                 }
@@ -157,7 +178,7 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
             });
         }
     } catch (error) {
-        console.error('Firebase initialization failed:', error);
+        // 移除初始化失败日志
         // 如果初始化失败，尝试隐藏计数器元素以避免显示为0
         document.querySelectorAll('.firestore-visitors-count').forEach(el => {
             el.style.display = 'none';
