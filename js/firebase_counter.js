@@ -64,8 +64,28 @@ if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.s
 
             // 处理阅读计数的函数
             const handleViewCount = () => {
-                const isArticlePage = document.querySelector('.article-container') !== null;
-                const isIndexPage = document.querySelector('.article-list') !== null;
+                // 增强文章页面识别：使用多个可能的选择器
+                const isArticlePage = document.querySelector('.article-container') !== null || 
+                                     document.querySelector('article.post') !== null ||
+                                     document.querySelector('.article-content') !== null ||
+                                     document.querySelector('[id="post-content"]') !== null;
+                
+                // 增强首页识别：使用多个可能的选择器
+                const isIndexPage = document.querySelector('.article-list') !== null ||
+                                   document.querySelector('.article-card-list') !== null ||
+                                   document.querySelectorAll('.article-card').length > 0;
+                                    
+                // 调试信息：输出所有可能的选择器结果
+                if (isDevelopment) {
+                    console.log('[调试] 页面类型检测结果:');
+                    console.log('  .article-container 存在:', document.querySelector('.article-container') !== null);
+                    console.log('  article.post 存在:', document.querySelector('article.post') !== null);
+                    console.log('  .article-content 存在:', document.querySelector('.article-content') !== null);
+                    console.log('  #post-content 存在:', document.querySelector('[id="post-content"]') !== null);
+                    console.log('  .article-list 存在:', document.querySelector('.article-list') !== null);
+                    console.log('  .article-card-list 存在:', document.querySelector('.article-card-list') !== null);
+                    console.log('  .article-card 数量:', document.querySelectorAll('.article-card').length);
+                }
 
                 // 无论开发环境还是生产环境都显示基本信息
                 if (isDevelopment) {
