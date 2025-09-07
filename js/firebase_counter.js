@@ -2,28 +2,41 @@
 
 // Firebase Counter - 阅读量统计功能
 
-if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && IcarusThemeSettings.services.firebase.enable) {
+if (IcarusThemeSettings && IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && IcarusThemeSettings.services.firebase.enable) {
     
     // 初始化Firebase
     try {
+        // 确保firebase对象存在
+        if (typeof firebase === 'undefined') {
+            console.error('Firebase library not loaded');
+            // 如果Firebase库未加载，隐藏计数器元素
+            document.querySelectorAll('.firestore-visitors-count').forEach(el => {
+                el.style.display = 'none';
+            });
+            // 提前退出
+            return;
+        }
+        
         firebase.initializeApp({
             apiKey: IcarusThemeSettings.services.firebase.apiKey,
             projectId: IcarusThemeSettings.services.firebase.projectId
         });
+        
+        // 开发环境检测
         const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
         const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
-        if (isDevelopment) console.log('Firebase 初始化成功');
-    } catch (error) {
-        console.error('Firebase initialization failed:', error);
-        // 如果初始化失败，尝试隐藏计数器元素以避免显示为0
-        document.querySelectorAll('.firestore-visitors-count').forEach(el => {
-            el.style.display = 'none';
-        });
-        // 提前退出，避免后续代码执行
-        return;
-    }
-
-    (function() {
+        
+        if (isDevelopment) {
+            console.log('Firebase 初始化成功');
+            console.log('[调试] Firebase 计数器功能已初始化完成');
+            console.log('[调试] 开发环境调试模式已开启');
+        }
+        
+        // 获取数据库引用
+        const db = firebase.firestore();
+        const articlesCollection = IcarusThemeSettings.services.firebase.collection || 'articles';
+        const articles = db.collection(articlesCollection);
+        
         // 获取阅读次数函数
         const getCount = (doc, increaseCount) => {
             // 获取文档数据
@@ -36,14 +49,15 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
                     // 增加计数
                     count++;
                     return doc.set({ count }).then(() => {
-                        const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-                        const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
                         if (isDevelopment) console.log('计数已更新:', count);
                         return count;
+                    }).catch(error => {
+                        console.error('Error updating count:', error);
+                        return count; // 返回增加前的计数
                     });
                 }
                 
-                return Promise.resolve(count);
+                return count;
             }).catch(error => {
                 console.error('Error getting count:', error);
                 // 出错时返回默认值0
@@ -51,22 +65,15 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
             });
         };
 
-        const db = firebase.firestore();
-        const articles = db.collection(IcarusThemeSettings.services.firebase.collection);
-
         // 处理阅读计数的函数
         const handleViewCount = () => {
             const isArticlePage = document.querySelector('.article-container') !== null;
             const isIndexPage = document.querySelector('.article-list') !== null;
 
-            // 在本地开发环境显示调试信息
-            const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-            const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
-            
             if (isDevelopment) {
                 // 显示Firebase配置信息（注意不要泄露敏感信息）
                 console.log('\n=========== Firebase 调试信息 ===========');
-                console.log('Collection:', IcarusThemeSettings.services.firebase.collection);
+                console.log('Collection:', articlesCollection);
                 console.log('当前URL:', window.location.href);
                 console.log('是否文章页:', isArticlePage);
                 console.log('是否首页:', isIndexPage);
@@ -139,26 +146,20 @@ if (IcarusThemeSettings.services && IcarusThemeSettings.services.firebase && Ica
 
         // 监听传统页面加载完成事件
         document.addEventListener('DOMContentLoaded', () => {
-            const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-            const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
             if (isDevelopment) console.log('[调试] DOMContentLoaded 事件触发，开始处理阅读量统计');
             handleViewCount();
         });
         
         // 监听PJAX页面加载完成事件（适配Icarus主题的PJAX机制）
         document.addEventListener('page:loaded', () => {
-            const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-            const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
             if (isDevelopment) console.log('[调试] page:loaded 事件触发，开始处理阅读量统计');
             handleViewCount();
         });
-        
-        // 开发环境下显示初始化完成信息
-        const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-        const isDevelopment = isLocalhost || window.location.hostname.includes('192.168.');
-        if (isDevelopment) {
-            console.log('[调试] Firebase 计数器功能已初始化完成');
-            console.log('[调试] 开发环境调试模式已开启');
-        }
-    })();
+    } catch (error) {
+        console.error('Firebase initialization failed:', error);
+        // 如果初始化失败，尝试隐藏计数器元素以避免显示为0
+        document.querySelectorAll('.firestore-visitors-count').forEach(el => {
+            el.style.display = 'none';
+        });
+    }
 }
