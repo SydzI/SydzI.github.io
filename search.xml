@@ -321,6 +321,183 @@
       </tags>
   </entry>
   <entry>
+    <title>Day10:壳与脱壳（二）</title>
+    <url>/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[<p>二次断点法、一次断点法、特征查找法（均基于Xdbg）、Dll手动脱壳</p>
+<span id="more"></span>
+
+<h2 id="寻找OEP的方法（二）"><a href="#寻找OEP的方法（二）" class="headerlink" title="寻找OEP的方法（二）"></a>寻找OEP的方法（二）</h2><h3 id="二次断点法"><a href="#二次断点法" class="headerlink" title="二次断点法"></a>二次断点法</h3><ul>
+<li><p>又叫内存镜像法，原理是壳程序解析时会从.rsrc段获取资源，解析后回到代码段，因此可以通过现在.rsrc段设置内存读取断点，然后在代码段(.text&#x2F;.code)设置内存写入断点来监控壳程序执行。</p>
+</li>
+<li><p>通常这个方法是基于OllyDbg的，但是从原理出发Xdbg也不是不能用。除了有一步是在OllyDbg中设置忽略所有异常，Xdbg好像没有这个设置选项，但是经过实测是可以用这个方法在Xdbg脱upx壳的。</p>
+</li>
+<li><p>Upx脱壳示例：</p>
+<ul>
+<li><p>Xdbg载入程序，先在“断点”模块把预设的断点删除，避免程序在非关注的异常处（断点处）停下</p>
+<p><img src="/../images/image-20250730155018782.png" alt="移除断点"></p>
+</li>
+<li><p>然后到“内存映射”模块找到程序的.rsrc（注意所属方为用户），下一次性内存读取断点</p>
+<p><img src="/../images/image-20250730155602928.png" alt="下内存读取断点"></p>
+</li>
+<li><p>shift+F9运行，然后在上方的upx0处下一次性内存写入断点</p>
+<p><img src="/../images/image-20250730155656485.png" alt="下内存写入断点"></p>
+</li>
+<li><p>shift+F9运行，回到“CPU”模块，会发现下方不远处就有一个大跳（隔得有点远截不到eip和大跳的同框图），在大跳前下断点，F9运行到断点处，然后步进就可以到达OEP了</p>
+</li>
+</ul>
+</li>
+<li><p>但是有一点奇怪的地方：结合upx的解析原理，upx好像是从upx1段加载数据解析到upx0段的（AI说的，不确定对不对），所以按道理，在upx1处下内存读取断点不是也有类似的监控效果吗？但是实测这样子会跑飞🤔有过一个想法就是，因为在upx1段下了读取断点，壳程序解析前中断了，然后又在upx0段下写入断点，然后按道理应该停在解析然后写入这一步，就是解析了还没写入，或者说刚刚写入一次，那这样也不至于直接调试终止吧🤔</p>
+</li>
+</ul>
+<h3 id="一次断点法（二次断点法plus"><a href="#一次断点法（二次断点法plus" class="headerlink" title="一次断点法（二次断点法plus)"></a>一次断点法（二次断点法plus)</h3><ul>
+<li><p>这个方法是基于二次断点法和upx实测出来的，因为根据壳程序解析的原理，最终都会发生向内存写入解析完的数据的操作，所以直接在写入的地方下内存写入断点，这样调试器中断的地方就离OEP不远了（接近壳程序解析的尾声，但还是远到截不到eip和大跳的同框图）</p>
+</li>
+<li><p>示例</p>
+<ul>
+<li><p>首先，同样要先去掉预设断点</p>
+<p><img src="/../images/image-20250730163429021.png" alt="去掉预设断点"></p>
+</li>
+<li><p>然后在“内存映射”模块给upx0下一次性内存写入断点&#x2F;给upx1下一次性内存读取断点</p>
+<p><img src="/../images/image-20250730164034182.png" alt="下内存写入断点"></p>
+</li>
+<li><p>shift+F9运行，中断的地方就差不多是壳程序解析写入&#x2F;开始解析的地方了，在下方大跳前F2断点+F9运行一步到位，然后就可以跳转到OEP了</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="特征查找法"><a href="#特征查找法" class="headerlink" title="特征查找法"></a>特征查找法</h3><ul>
+<li><p>借助特征指令popad，在程序区域搜索指令，然后下断点运行至此，再接着运行到OEP处</p>
+</li>
+<li><p>示例：</p>
+<ul>
+<li><p>F9运行到程序区域，此时断在pushad</p>
+<p><img src="/../images/image-20250730165414432.png" alt="F9运行"></p>
+</li>
+<li><p>右键在当前区域搜索命令popad</p>
+<p><img src="/../images/image-20250730165457171.png" alt="搜索"></p>
+</li>
+<li><p>双击搜索结果跳转，下方不远处就是到OEP的大跳了。直接在jmp前一条指令下断点，F9到此，然后步进</p>
+<p><img src="/../images/image-20250730165636809.png" alt="搜索结果"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Dll手动脱壳"><a href="#Dll手动脱壳" class="headerlink" title="Dll手动脱壳"></a>Dll手动脱壳</h2><ul>
+<li><p>若出现Dll程序加壳的情况，可以先把Dll程序转化成exe程序，然后使用和exe手动脱壳一样的步骤即可</p>
+</li>
+<li><p>示例：</p>
+<ul>
+<li><p>用DIE打开Dll程序，可以看到显示加了upx壳</p>
+<p><img src="/../images/image-20250730224157270.png" alt="DIE查看"></p>
+</li>
+<li><p>点击“区块”下方的“&gt;”，打开文件结构界面</p>
+<p><img src="/../images/image-20250730224231764.png" alt="文件结构页面"></p>
+</li>
+<li><p>取消勾选右上角”只读“，然后点击IMAGE_FILE_HEADER，取消勾选”标志“中的”Dll“（图中未取消）</p>
+<p><img src="/../images/image-20250730224435928.png" alt="取消勾选Dll"></p>
+<p>此时可以发现，Characteristics的值变了</p>
+</li>
+<li><p>然后把dll后缀改成exe就可以按照exe手动脱壳的步骤进行脱壳了</p>
+</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Reverse Engineering</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Day11:花指令</title>
+    <url>/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/</url>
+    <content><![CDATA[<p>花指令</p>
+<span id="more"></span>
+
+<h2 id="花指令"><a href="#花指令" class="headerlink" title="花指令"></a>花指令</h2><ul>
+<li><p>又叫垃圾指令，不影响程序原始逻辑，但会干扰IDA反编译或者反汇编。</p>
+</li>
+<li><p>原理：</p>
+<p>因为反编译器多是静态分析的，不会通过执行来分析逻辑，只会根据反汇编出来的指令分析，因此有空可乘：例如可以通过内联汇编不完整指令但是跳过不完整指令来模糊指令边界、内联汇编永跳永不跳分支来误导运行逻辑分析、内联汇编无意义指令误导主要逻辑</p>
+</li>
+<li><p>显著特征是出现红色行，而应对方法是选中花指令所在的区域改为“nop”（空指令）</p>
+</li>
+</ul>
+<h3 id="恒跳型"><a href="#恒跳型" class="headerlink" title="恒跳型"></a>恒跳型</h3><ul>
+<li><p>实测IDA9.0.241217不会报红，也就是混淆失效，所以就看看源码吧</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs C"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;windows.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>	_asm&#123;<br>		xor eax, eax;<br>		jz s;<br>		add esp, <span class="hljs-number">0x11</span>;<br>	s:<br>	&#125;;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;hello\n&quot;</span>);<br>	system(<span class="hljs-string">&quot;pause&quot;</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="call-ret相消型"><a href="#call-ret相消型" class="headerlink" title="call-ret相消型"></a>call-ret相消型</h3><ul>
+<li><p>来看效果</p>
+<p><img src="/../images/image-20250731203000820.png" alt="报红"></p>
+</li>
+<li><p>可以看到，在函数中间出现了sp-analysis failed，而上面一条就是retn，明显不对。</p>
+<p>往前看，rep stosd初始化后，call了$+5，即当前位置+5&#x3D;0046308C，也就是下一条的add</p>
+<p>然后给esp的值+7（call的时候push eip即push 0046308c了）</p>
+<p>此时esp存放值为0046308c+7&#x3D;00463093，所以retn时会pop 00463093，程序跳到00463093</p>
+<p>往下看，00463093正是没识别出来的三个数的最后一个，下面还有一个offset没有指令。</p>
+<p>第三个数68h和offset结合刚好是push offset，对应上了下面的call（函数传参）</p>
+</li>
+<li><p>选中没识别的三个数，按“U”（undefine)，可以看到三个数分开了</p>
+<p><img src="/../images/image-20250731203817109.png" alt="按U"></p>
+</li>
+<li><p>选中db 68h和dd offset aHello，按C转化为汇编指令，可以看到push offset恢复了</p>
+<p><img src="/../images/image-20250731204815374.png" alt="恢复push"></p>
+</li>
+<li><p>选中call $+5到db 34h，右键选择”Fill with NOPs“（实测db 34h会nop不干净，要选中到db 34h下一行）</p>
+<p><img src="/../images/image-20250731204858702.png" alt="NOP"></p>
+</li>
+<li><p>可以看到函数变成这样，这是因为插入了retn导致函数范围分析错误，需要纠正</p>
+<p><img src="/../images/image-20250731205500606.png" alt="NOP完"></p>
+</li>
+<li><p>点击函数名，然后右键edit fuction，把end address改成末尾那个真正的retn的地址就OK了</p>
+<p><img src="/../images/image-20250731205807130.png" alt="纠正函数范围"></p>
+</li>
+</ul>
+<h3 id="jz-操作数不全型"><a href="#jz-操作数不全型" class="headerlink" title="jz-操作数不全型"></a>jz-操作数不全型</h3><ul>
+<li><p>这种情况下会出现和上一种一样的指令识别错误的问题，且看图：</p>
+<p><img src="/../images/image-20250801002342967.png" alt="图"></p>
+</li>
+<li><p>这是按照MSVS C++初始化规则跳转后，在本来main函数的地方的截图。但是跳转过程中会发现，跳转到main函数的代码是jmp loc_xxxxxx而不是jmp sub_xxxxxx。但是目前还不影响，先分析报错的地方。</p>
+</li>
+<li><p>可以看到 xor ebp,[eax+50h] 处报红了，并且下面是一段没分析出来的数和字符串”pause”，下面进行分析</p>
+</li>
+<li><p>首先，rep stosd初始化后，进行了一个恒跳，跳转的地方是0046308E，在 xor ebp,[eax+50h] 这条指令里，所以这里红了</p>
+</li>
+<li><p>把 xor ebp,[eax+50h] 这条指令undefine一下</p>
+<p><img src="/../images/image-20250801002409823.png" alt="undefine一下"></p>
+</li>
+<li><p>根据逻辑，程序是肯定会跳到0046308E的，所以前面的代码冗余，直接nop掉。选中 xor eax,eax 到0046308E（根据上一种类型的经验，要多覆盖一位才能刚好nop掉目标代码）</p>
+<p><img src="/../images/image-20250801002510740.png" alt="NOP"></p>
+</li>
+<li><p>nop完成后（如果有db 90h就按”C“转成code）就会发现下面没分析的数立刻分析出指令了</p>
+<p><img src="/../images/image-20250801002536258.png" alt="去混淆成功"></p>
+</li>
+<li><p>但是还没完，此时按F5是无法反编译的，因为报错的地方是loc_xxxxxx范围里的，不是一个函数，也就是前面说的jmp loc_xxxxxx而不是jmp sub_xxxxxx的问题了。这里可以看出，IDA这类混淆会导致IDA把函数识别成一个引用而不是函数。</p>
+</li>
+<li><p>到最开始push ebp开辟栈帧的引用loc_463070处，把它undefine一下，再按“P”重新分析一下，就可以得到main函数了</p>
+<p><img src="/../images/image-20250801002703125.png" alt="修复的main函数"></p>
+</li>
+<li><p>这类有一个特征就是jz loc_xxxxxx+1，据此可以快速找到加了混淆的地方</p>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>上述三种（实际上有混淆效果的只有两种）是比较基础的花指令。识别花指令的要点主要是看红色错误，也可以结合一些特征来识别。解决方法就是nop掉混淆代码。</li>
+<li>在实际设计题目时，笔者意外发现了一些更强力的混淆，单单是在上述三种类型的基础上加一点其他指令，就会导致一个函数完全无法被识别（被放在rdata段而不是text段的那种），但是程序还能正常执行，而报错的地方在无法识别的函数的上级函数里（跳转到这个函数的那个函数），可能要结合AI才能实现快捷的分析。因此，花指令还是一个具有挑战性的混淆方式（当然也可能是笔者太菜了没石粒）</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Reverse Engineering</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Day12:反调试（一）</title>
     <url>/2025/08/02/Day12-%E5%8F%8D%E8%B0%83%E8%AF%95/</url>
     <content><![CDATA[<p>反调试基本原理、WINAPI检测、数据检测、进程检测</p>
@@ -459,183 +636,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Day11:花指令</title>
-    <url>/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/</url>
-    <content><![CDATA[<p>花指令</p>
-<span id="more"></span>
-
-<h2 id="花指令"><a href="#花指令" class="headerlink" title="花指令"></a>花指令</h2><ul>
-<li><p>又叫垃圾指令，不影响程序原始逻辑，但会干扰IDA反编译或者反汇编。</p>
-</li>
-<li><p>原理：</p>
-<p>因为反编译器多是静态分析的，不会通过执行来分析逻辑，只会根据反汇编出来的指令分析，因此有空可乘：例如可以通过内联汇编不完整指令但是跳过不完整指令来模糊指令边界、内联汇编永跳永不跳分支来误导运行逻辑分析、内联汇编无意义指令误导主要逻辑</p>
-</li>
-<li><p>显著特征是出现红色行，而应对方法是选中花指令所在的区域改为“nop”（空指令）</p>
-</li>
-</ul>
-<h3 id="恒跳型"><a href="#恒跳型" class="headerlink" title="恒跳型"></a>恒跳型</h3><ul>
-<li><p>实测IDA9.0.241217不会报红，也就是混淆失效，所以就看看源码吧</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs C"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;windows.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>	_asm&#123;<br>		xor eax, eax;<br>		jz s;<br>		add esp, <span class="hljs-number">0x11</span>;<br>	s:<br>	&#125;;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;hello\n&quot;</span>);<br>	system(<span class="hljs-string">&quot;pause&quot;</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="call-ret相消型"><a href="#call-ret相消型" class="headerlink" title="call-ret相消型"></a>call-ret相消型</h3><ul>
-<li><p>来看效果</p>
-<p><img src="/../images/image-20250731203000820.png" alt="报红"></p>
-</li>
-<li><p>可以看到，在函数中间出现了sp-analysis failed，而上面一条就是retn，明显不对。</p>
-<p>往前看，rep stosd初始化后，call了$+5，即当前位置+5&#x3D;0046308C，也就是下一条的add</p>
-<p>然后给esp的值+7（call的时候push eip即push 0046308c了）</p>
-<p>此时esp存放值为0046308c+7&#x3D;00463093，所以retn时会pop 00463093，程序跳到00463093</p>
-<p>往下看，00463093正是没识别出来的三个数的最后一个，下面还有一个offset没有指令。</p>
-<p>第三个数68h和offset结合刚好是push offset，对应上了下面的call（函数传参）</p>
-</li>
-<li><p>选中没识别的三个数，按“U”（undefine)，可以看到三个数分开了</p>
-<p><img src="/../images/image-20250731203817109.png" alt="按U"></p>
-</li>
-<li><p>选中db 68h和dd offset aHello，按C转化为汇编指令，可以看到push offset恢复了</p>
-<p><img src="/../images/image-20250731204815374.png" alt="恢复push"></p>
-</li>
-<li><p>选中call $+5到db 34h，右键选择”Fill with NOPs“（实测db 34h会nop不干净，要选中到db 34h下一行）</p>
-<p><img src="/../images/image-20250731204858702.png" alt="NOP"></p>
-</li>
-<li><p>可以看到函数变成这样，这是因为插入了retn导致函数范围分析错误，需要纠正</p>
-<p><img src="/../images/image-20250731205500606.png" alt="NOP完"></p>
-</li>
-<li><p>点击函数名，然后右键edit fuction，把end address改成末尾那个真正的retn的地址就OK了</p>
-<p><img src="/../images/image-20250731205807130.png" alt="纠正函数范围"></p>
-</li>
-</ul>
-<h3 id="jz-操作数不全型"><a href="#jz-操作数不全型" class="headerlink" title="jz-操作数不全型"></a>jz-操作数不全型</h3><ul>
-<li><p>这种情况下会出现和上一种一样的指令识别错误的问题，且看图：</p>
-<p><img src="/../images/image-20250801002342967.png" alt="图"></p>
-</li>
-<li><p>这是按照MSVS C++初始化规则跳转后，在本来main函数的地方的截图。但是跳转过程中会发现，跳转到main函数的代码是jmp loc_xxxxxx而不是jmp sub_xxxxxx。但是目前还不影响，先分析报错的地方。</p>
-</li>
-<li><p>可以看到 xor ebp,[eax+50h] 处报红了，并且下面是一段没分析出来的数和字符串”pause”，下面进行分析</p>
-</li>
-<li><p>首先，rep stosd初始化后，进行了一个恒跳，跳转的地方是0046308E，在 xor ebp,[eax+50h] 这条指令里，所以这里红了</p>
-</li>
-<li><p>把 xor ebp,[eax+50h] 这条指令undefine一下</p>
-<p><img src="/../images/image-20250801002409823.png" alt="undefine一下"></p>
-</li>
-<li><p>根据逻辑，程序是肯定会跳到0046308E的，所以前面的代码冗余，直接nop掉。选中 xor eax,eax 到0046308E（根据上一种类型的经验，要多覆盖一位才能刚好nop掉目标代码）</p>
-<p><img src="/../images/image-20250801002510740.png" alt="NOP"></p>
-</li>
-<li><p>nop完成后（如果有db 90h就按”C“转成code）就会发现下面没分析的数立刻分析出指令了</p>
-<p><img src="/../images/image-20250801002536258.png" alt="去混淆成功"></p>
-</li>
-<li><p>但是还没完，此时按F5是无法反编译的，因为报错的地方是loc_xxxxxx范围里的，不是一个函数，也就是前面说的jmp loc_xxxxxx而不是jmp sub_xxxxxx的问题了。这里可以看出，IDA这类混淆会导致IDA把函数识别成一个引用而不是函数。</p>
-</li>
-<li><p>到最开始push ebp开辟栈帧的引用loc_463070处，把它undefine一下，再按“P”重新分析一下，就可以得到main函数了</p>
-<p><img src="/../images/image-20250801002703125.png" alt="修复的main函数"></p>
-</li>
-<li><p>这类有一个特征就是jz loc_xxxxxx+1，据此可以快速找到加了混淆的地方</p>
-</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>上述三种（实际上有混淆效果的只有两种）是比较基础的花指令。识别花指令的要点主要是看红色错误，也可以结合一些特征来识别。解决方法就是nop掉混淆代码。</li>
-<li>在实际设计题目时，笔者意外发现了一些更强力的混淆，单单是在上述三种类型的基础上加一点其他指令，就会导致一个函数完全无法被识别（被放在rdata段而不是text段的那种），但是程序还能正常执行，而报错的地方在无法识别的函数的上级函数里（跳转到这个函数的那个函数），可能要结合AI才能实现快捷的分析。因此，花指令还是一个具有挑战性的混淆方式（当然也可能是笔者太菜了没石粒）</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Day10:壳与脱壳（二）</title>
-    <url>/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-    <content><![CDATA[<p>二次断点法、一次断点法、特征查找法（均基于Xdbg）、Dll手动脱壳</p>
-<span id="more"></span>
-
-<h2 id="寻找OEP的方法（二）"><a href="#寻找OEP的方法（二）" class="headerlink" title="寻找OEP的方法（二）"></a>寻找OEP的方法（二）</h2><h3 id="二次断点法"><a href="#二次断点法" class="headerlink" title="二次断点法"></a>二次断点法</h3><ul>
-<li><p>又叫内存镜像法，原理是壳程序解析时会从.rsrc段获取资源，解析后回到代码段，因此可以通过现在.rsrc段设置内存读取断点，然后在代码段(.text&#x2F;.code)设置内存写入断点来监控壳程序执行。</p>
-</li>
-<li><p>通常这个方法是基于OllyDbg的，但是从原理出发Xdbg也不是不能用。除了有一步是在OllyDbg中设置忽略所有异常，Xdbg好像没有这个设置选项，但是经过实测是可以用这个方法在Xdbg脱upx壳的。</p>
-</li>
-<li><p>Upx脱壳示例：</p>
-<ul>
-<li><p>Xdbg载入程序，先在“断点”模块把预设的断点删除，避免程序在非关注的异常处（断点处）停下</p>
-<p><img src="/../images/image-20250730155018782.png" alt="移除断点"></p>
-</li>
-<li><p>然后到“内存映射”模块找到程序的.rsrc（注意所属方为用户），下一次性内存读取断点</p>
-<p><img src="/../images/image-20250730155602928.png" alt="下内存读取断点"></p>
-</li>
-<li><p>shift+F9运行，然后在上方的upx0处下一次性内存写入断点</p>
-<p><img src="/../images/image-20250730155656485.png" alt="下内存写入断点"></p>
-</li>
-<li><p>shift+F9运行，回到“CPU”模块，会发现下方不远处就有一个大跳（隔得有点远截不到eip和大跳的同框图），在大跳前下断点，F9运行到断点处，然后步进就可以到达OEP了</p>
-</li>
-</ul>
-</li>
-<li><p>但是有一点奇怪的地方：结合upx的解析原理，upx好像是从upx1段加载数据解析到upx0段的（AI说的，不确定对不对），所以按道理，在upx1处下内存读取断点不是也有类似的监控效果吗？但是实测这样子会跑飞🤔有过一个想法就是，因为在upx1段下了读取断点，壳程序解析前中断了，然后又在upx0段下写入断点，然后按道理应该停在解析然后写入这一步，就是解析了还没写入，或者说刚刚写入一次，那这样也不至于直接调试终止吧🤔</p>
-</li>
-</ul>
-<h3 id="一次断点法（二次断点法plus"><a href="#一次断点法（二次断点法plus" class="headerlink" title="一次断点法（二次断点法plus)"></a>一次断点法（二次断点法plus)</h3><ul>
-<li><p>这个方法是基于二次断点法和upx实测出来的，因为根据壳程序解析的原理，最终都会发生向内存写入解析完的数据的操作，所以直接在写入的地方下内存写入断点，这样调试器中断的地方就离OEP不远了（接近壳程序解析的尾声，但还是远到截不到eip和大跳的同框图）</p>
-</li>
-<li><p>示例</p>
-<ul>
-<li><p>首先，同样要先去掉预设断点</p>
-<p><img src="/../images/image-20250730163429021.png" alt="去掉预设断点"></p>
-</li>
-<li><p>然后在“内存映射”模块给upx0下一次性内存写入断点&#x2F;给upx1下一次性内存读取断点</p>
-<p><img src="/../images/image-20250730164034182.png" alt="下内存写入断点"></p>
-</li>
-<li><p>shift+F9运行，中断的地方就差不多是壳程序解析写入&#x2F;开始解析的地方了，在下方大跳前F2断点+F9运行一步到位，然后就可以跳转到OEP了</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="特征查找法"><a href="#特征查找法" class="headerlink" title="特征查找法"></a>特征查找法</h3><ul>
-<li><p>借助特征指令popad，在程序区域搜索指令，然后下断点运行至此，再接着运行到OEP处</p>
-</li>
-<li><p>示例：</p>
-<ul>
-<li><p>F9运行到程序区域，此时断在pushad</p>
-<p><img src="/../images/image-20250730165414432.png" alt="F9运行"></p>
-</li>
-<li><p>右键在当前区域搜索命令popad</p>
-<p><img src="/../images/image-20250730165457171.png" alt="搜索"></p>
-</li>
-<li><p>双击搜索结果跳转，下方不远处就是到OEP的大跳了。直接在jmp前一条指令下断点，F9到此，然后步进</p>
-<p><img src="/../images/image-20250730165636809.png" alt="搜索结果"></p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="Dll手动脱壳"><a href="#Dll手动脱壳" class="headerlink" title="Dll手动脱壳"></a>Dll手动脱壳</h2><ul>
-<li><p>若出现Dll程序加壳的情况，可以先把Dll程序转化成exe程序，然后使用和exe手动脱壳一样的步骤即可</p>
-</li>
-<li><p>示例：</p>
-<ul>
-<li><p>用DIE打开Dll程序，可以看到显示加了upx壳</p>
-<p><img src="/../images/image-20250730224157270.png" alt="DIE查看"></p>
-</li>
-<li><p>点击“区块”下方的“&gt;”，打开文件结构界面</p>
-<p><img src="/../images/image-20250730224231764.png" alt="文件结构页面"></p>
-</li>
-<li><p>取消勾选右上角”只读“，然后点击IMAGE_FILE_HEADER，取消勾选”标志“中的”Dll“（图中未取消）</p>
-<p><img src="/../images/image-20250730224435928.png" alt="取消勾选Dll"></p>
-<p>此时可以发现，Characteristics的值变了</p>
-</li>
-<li><p>然后把dll后缀改成exe就可以按照exe手动脱壳的步骤进行脱壳了</p>
-</li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Day14:IDApython与SMC</title>
     <url>/2025/08/05/Day14-IDApython/</url>
     <content><![CDATA[<p>IDApythonAPI、SMC自修改代码</p>
@@ -759,6 +759,81 @@
       </tags>
   </entry>
   <entry>
+    <title>Day13:反调试（二）</title>
+    <url>/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[<p>时间差检测、断点检测</p>
+<span id="more"></span>
+
+<h2 id="时间差检测"><a href="#时间差检测" class="headerlink" title="时间差检测"></a>时间差检测</h2><ul>
+<li>CPU的运行十分迅速，一段代码可能在几毫秒内就可以执行完毕，但是调试的时候，代码运行时间会显著地变慢，这就是时间差检测的原理。时间差检测主要通过计算时间差然后与预设的值比较实现。</li>
+</ul>
+<h3 id="RDTSC指令计算"><a href="#RDTSC指令计算" class="headerlink" title="RDTSC指令计算"></a>RDTSC指令计算</h3><ul>
+<li><p>rdtsc是一个汇编指令，用于将时间读入edx:eax寄存器（高32位：低32位）。通过取两次时间把结果相减可以得到一个时间差。显著特征就是rdtsc指令</p>
+</li>
+<li><p>效果：</p>
+<p><img src="/../images/image-20250803103503205.png" alt="IDA"></p>
+<p><img src="/../images/image-20250803103510223.png" alt="XDbg"></p>
+</li>
+<li><p>应对方法：</p>
+<p>根据程序的逻辑，可以在计算出时间差并比较之后改变比较结果。</p>
+</li>
+</ul>
+<h3 id="GetTickCount计算"><a href="#GetTickCount计算" class="headerlink" title="GetTickCount计算"></a>GetTickCount计算</h3><ul>
+<li><p>原理和RDTSC类似，只不过时间差采用GetTickCount计算。GetTickCount也是WINAPI，会有明显标记。</p>
+</li>
+<li><p>效果：</p>
+<p><img src="/../images/image-20250803110132263.png" alt="IDA"></p>
+<p><img src="/../images/image-20250803110151704.png" alt="XDbg"></p>
+</li>
+<li><p>应对方法：</p>
+<p>修改比较结果即可</p>
+</li>
+</ul>
+<h3 id="QueryPerformanceCounter计算"><a href="#QueryPerformanceCounter计算" class="headerlink" title="QueryPerformanceCounter计算"></a>QueryPerformanceCounter计算</h3><ul>
+<li><p>原理类似，只是采用QueryPerformanceCounter计算，也是WINAPI，比较好识别</p>
+</li>
+<li><p>效果：</p>
+<p><img src="/../images/image-20250803111252719.png" alt="IDA"></p>
+<p><img src="/../images/image-20250803111302239.png" alt="XDbg"></p>
+</li>
+<li><p>应对方法：</p>
+<p>修改比较结果即可</p>
+</li>
+</ul>
+<h2 id="断点检测"><a href="#断点检测" class="headerlink" title="断点检测"></a>断点检测</h2><ul>
+<li>断点是调试的一个显著特点。断点可以分为软件断点、硬件断点和内存断点。软件断点通过将目标代码修改为中断指令（X86\X64下一般为INT3\0xCC）实现；硬件断点通过将指令地址写入调试寄存器的DR0-DR3监控地址访问来实现；内存断点通过修改内存页（一片片内存区域）的访问权限实现。三者的实现方法都会触发异常让调试器捕获进而中断。反调试的断点检测主要利用软件断点和硬件断点，内存断点由于针对内存区域而非具体指令，精度太低，一般不考虑。</li>
+</ul>
+<h3 id="软件断点检测"><a href="#软件断点检测" class="headerlink" title="软件断点检测"></a>软件断点检测</h3><ul>
+<li><p>常见手段是在内存区域搜索0xCC（使用汇编指令repnz scasb）</p>
+</li>
+<li><p>效果：</p>
+<p><img src="/../images/image-20250803184326511.png" alt="IDA"></p>
+<p><img src="/../images/image-20250803184332179.png" alt="XDbg"></p>
+</li>
+<li><p>因为进行了比较，所以修改比较结果即可绕过</p>
+</li>
+</ul>
+<h3 id="硬件断点检测"><a href="#硬件断点检测" class="headerlink" title="硬件断点检测"></a>硬件断点检测</h3><ul>
+<li><p>常见手段是获取DR寄存器的值并和0比较。特征是GetThreadContext函数（或者其他ThreadContext相关的函数）和与0的比较</p>
+</li>
+<li><p>效果：</p>
+<p><img src="/../images/image-20250803190042096.png" alt="IDA"></p>
+<p><img src="/../images/image-20250803190057497.png" alt="XDbg"></p>
+</li>
+<li><p>应对方法：</p>
+<p>还是进行了比较，修改比较结果绕过</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Reverse Engineering</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Day15:指令虚拟化</title>
     <url>/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/</url>
     <content><![CDATA[<p>指令虚拟化、实现一个小型虚拟机程序、VM逆向实践</p>
@@ -867,81 +942,6 @@
 <figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-keyword">mov</span> mem[<span class="hljs-number">16</span>],H<br><span class="hljs-keyword">mov</span> mem[<span class="hljs-number">17</span>],e<br><span class="hljs-keyword">mov</span> mem[<span class="hljs-number">18</span>],l<br><span class="hljs-keyword">mov</span> mem[<span class="hljs-number">19</span>],l<br><span class="hljs-keyword">mov</span> mem[<span class="hljs-number">20</span>],o<br><span class="hljs-number">12345</span><br>scanf mem<br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r2</span>,<span class="hljs-number">33</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r1</span>,<span class="hljs-number">0</span><br><span class="hljs-keyword">xor</span> mem[<span class="hljs-number">0</span>],<span class="hljs-number">33</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r1</span>,<span class="hljs-number">1</span><br><span class="hljs-keyword">xor</span> mem[<span class="hljs-number">1</span>],<span class="hljs-number">33</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r1</span>,<span class="hljs-number">2</span><br><span class="hljs-keyword">xor</span> mem[<span class="hljs-number">2</span>],<span class="hljs-number">33</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r1</span>,<span class="hljs-number">3</span><br><span class="hljs-keyword">xor</span> mem[<span class="hljs-number">3</span>],<span class="hljs-number">33</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">r1</span>,<span class="hljs-number">4</span><br><span class="hljs-keyword">xor</span> mem[<span class="hljs-number">4</span>],<span class="hljs-number">33</span><br>failed<br></code></pre></td></tr></table></figure>
 </li>
 <li><p>可以看到，程序先把”Hello”传给了mem的一片区域，然后获取输入，把输入的数与33异或，最后执行返回处的判断。返回处是对比mem[0]和mem[op1]，对比op2位，结合code最后几位，知道是对比mem[0]和mem[16]，对比5位。所以要求的输入是”Hello”逐位异或的结果（不可见字符，尝试输入失败）</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Day13:反调试（二）</title>
-    <url>/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-    <content><![CDATA[<p>时间差检测、断点检测</p>
-<span id="more"></span>
-
-<h2 id="时间差检测"><a href="#时间差检测" class="headerlink" title="时间差检测"></a>时间差检测</h2><ul>
-<li>CPU的运行十分迅速，一段代码可能在几毫秒内就可以执行完毕，但是调试的时候，代码运行时间会显著地变慢，这就是时间差检测的原理。时间差检测主要通过计算时间差然后与预设的值比较实现。</li>
-</ul>
-<h3 id="RDTSC指令计算"><a href="#RDTSC指令计算" class="headerlink" title="RDTSC指令计算"></a>RDTSC指令计算</h3><ul>
-<li><p>rdtsc是一个汇编指令，用于将时间读入edx:eax寄存器（高32位：低32位）。通过取两次时间把结果相减可以得到一个时间差。显著特征就是rdtsc指令</p>
-</li>
-<li><p>效果：</p>
-<p><img src="/../images/image-20250803103503205.png" alt="IDA"></p>
-<p><img src="/../images/image-20250803103510223.png" alt="XDbg"></p>
-</li>
-<li><p>应对方法：</p>
-<p>根据程序的逻辑，可以在计算出时间差并比较之后改变比较结果。</p>
-</li>
-</ul>
-<h3 id="GetTickCount计算"><a href="#GetTickCount计算" class="headerlink" title="GetTickCount计算"></a>GetTickCount计算</h3><ul>
-<li><p>原理和RDTSC类似，只不过时间差采用GetTickCount计算。GetTickCount也是WINAPI，会有明显标记。</p>
-</li>
-<li><p>效果：</p>
-<p><img src="/../images/image-20250803110132263.png" alt="IDA"></p>
-<p><img src="/../images/image-20250803110151704.png" alt="XDbg"></p>
-</li>
-<li><p>应对方法：</p>
-<p>修改比较结果即可</p>
-</li>
-</ul>
-<h3 id="QueryPerformanceCounter计算"><a href="#QueryPerformanceCounter计算" class="headerlink" title="QueryPerformanceCounter计算"></a>QueryPerformanceCounter计算</h3><ul>
-<li><p>原理类似，只是采用QueryPerformanceCounter计算，也是WINAPI，比较好识别</p>
-</li>
-<li><p>效果：</p>
-<p><img src="/../images/image-20250803111252719.png" alt="IDA"></p>
-<p><img src="/../images/image-20250803111302239.png" alt="XDbg"></p>
-</li>
-<li><p>应对方法：</p>
-<p>修改比较结果即可</p>
-</li>
-</ul>
-<h2 id="断点检测"><a href="#断点检测" class="headerlink" title="断点检测"></a>断点检测</h2><ul>
-<li>断点是调试的一个显著特点。断点可以分为软件断点、硬件断点和内存断点。软件断点通过将目标代码修改为中断指令（X86\X64下一般为INT3\0xCC）实现；硬件断点通过将指令地址写入调试寄存器的DR0-DR3监控地址访问来实现；内存断点通过修改内存页（一片片内存区域）的访问权限实现。三者的实现方法都会触发异常让调试器捕获进而中断。反调试的断点检测主要利用软件断点和硬件断点，内存断点由于针对内存区域而非具体指令，精度太低，一般不考虑。</li>
-</ul>
-<h3 id="软件断点检测"><a href="#软件断点检测" class="headerlink" title="软件断点检测"></a>软件断点检测</h3><ul>
-<li><p>常见手段是在内存区域搜索0xCC（使用汇编指令repnz scasb）</p>
-</li>
-<li><p>效果：</p>
-<p><img src="/../images/image-20250803184326511.png" alt="IDA"></p>
-<p><img src="/../images/image-20250803184332179.png" alt="XDbg"></p>
-</li>
-<li><p>因为进行了比较，所以修改比较结果即可绕过</p>
-</li>
-</ul>
-<h3 id="硬件断点检测"><a href="#硬件断点检测" class="headerlink" title="硬件断点检测"></a>硬件断点检测</h3><ul>
-<li><p>常见手段是获取DR寄存器的值并和0比较。特征是GetThreadContext函数（或者其他ThreadContext相关的函数）和与0的比较</p>
-</li>
-<li><p>效果：</p>
-<p><img src="/../images/image-20250803190042096.png" alt="IDA"></p>
-<p><img src="/../images/image-20250803190057497.png" alt="XDbg"></p>
-</li>
-<li><p>应对方法：</p>
-<p>还是进行了比较，修改比较结果绕过</p>
 </li>
 </ul>
 ]]></content>
@@ -1225,64 +1225,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Day3:函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</title>
-    <url>/2025/07/08/Day3-%E5%87%BD%E6%95%B0%E4%B8%8E%E5%A0%86%E6%A0%88/</url>
-    <content><![CDATA[<p>函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</p>
-<span id="more"></span>
-
-<h2 id="函数与栈帧"><a href="#函数与栈帧" class="headerlink" title="函数与栈帧"></a>函数与栈帧</h2><ul>
-<li><p>“栈“是内存中的一部分，可以理解为连续的一块内存，它为程序运行提供了一个暂时的存放数据的地方，地址、数据等可以通过push指令从寄存器中被复制到栈中，进而寄存器可以进行其他操作，等到这些数据再次被需要时再从栈中被pop出来。栈遵循先进后出的规则，先push的在高地址，后push的在低地址</p>
-</li>
-<li><p>在程序运行时，每个函数都会拥有独立的栈帧，即独立的栈上的一部分空间。有两个寄存器，esp，ebp（x86即32位环境下）负责维护函数的栈空间。ebp存放的是函数栈空间的栈基址，esp存放的是函数栈空间的栈顶。可以理解为ebp是指向函数栈空间最高位的一个指针（因为栈空间从高地址开始分配，因此指向的是最高位，但是是栈空间的起始地址），而esp是指向函数栈空间最低位的一个指针（指向的是最低位，但是会随着后续栈空间的扩充而变化）。</p>
-</li>
-<li><p>CALL指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;call一个函数的时候，会发生以下内容</span><br><span class="hljs-keyword">push</span> 返回地址（<span class="hljs-keyword">call</span>所在指令的下一条）<br><span class="hljs-keyword">jmp</span> 目标函数地址<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>RET指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;函数结束时，RET指令会发生以下内容</span><br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">eip</span> <span class="hljs-comment">;从栈上弹出返回地址到eip（保存下一步指令地址的寄存器）</span><br></code></pre></td></tr></table></figure>
-</li>
-<li><p>栈帧：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;跳转到每一个函数，会发生以下内容以开辟栈帧</span><br><span class="hljs-keyword">push</span> <span class="hljs-built_in">ebp</span>			<span class="hljs-comment">;把上一个函数的ebp值放到栈上</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>,<span class="hljs-built_in">esp</span>			<span class="hljs-comment">;把esp值给ebp，开辟新函数的栈帧</span><br><span class="hljs-comment">;函数执行完毕后，会发生以下内容清理栈帧</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">esp</span>,<span class="hljs-built_in">ebp</span>			<span class="hljs-comment">;把ebp值给esp，清理函数栈帧</span><br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">ebp</span>				<span class="hljs-comment">;恢复ebp原来的值，即上一个函数的ebp</span><br><span class="hljs-keyword">ret</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="数组与串指令"><a href="#数组与串指令" class="headerlink" title="数组与串指令"></a>数组与串指令</h2><ul>
-<li><p>声明数组：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-meta">.data</span>			<span class="hljs-comment">;在数据段声明</span><br> szHello <span class="hljs-built_in">db</span> <span class="hljs-string">&#x27;HelloWorld&#x27;</span>,<span class="hljs-number">0</span>			<span class="hljs-comment">;声明一个字符串</span><br> nNumber <span class="hljs-built_in">dd</span> <span class="hljs-number">20</span> dup(<span class="hljs-number">0</span>)				<span class="hljs-comment">;声明一个DWORD数组，20位，使用dup()初始化数组内容为0</span><br></code></pre></td></tr></table></figure>
-</li>
-<li><p>使用数组基址的几种方式：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-keyword">lea</span> <span class="hljs-built_in">eax</span>,szHello<br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebx</span>,offset Nnumber<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>访问数组成员：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;[数组起始地址+索引寄存器*比例因子+偏移量]（索引寄存器用来存放索引值，比例因子对应类型的字节大小，偏移量可用于结构体数组等场景）</span><br><span class="hljs-comment">;如：</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebx</span>,offset Array	<span class="hljs-comment">;把数组基址给ebx</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">esi</span>,<span class="hljs-number">0</span>				<span class="hljs-comment">;esi用来当索引寄存器</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>,<span class="hljs-number">10</span>				<span class="hljs-comment">;ecx用来放索引上限（ecx常用作计数器）</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol">loop_start:</span>				<span class="hljs-comment">;创建一个循环</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">ebx</span>+<span class="hljs-built_in">esi</span>*<span class="hljs-number">4</span>]	<span class="hljs-comment">;取出数组内容放到eax中</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">esi</span>,<span class="hljs-number">1</span>			<span class="hljs-comment">;索引递增</span><br>	<span class="hljs-keyword">cmp</span> <span class="hljs-built_in">esi</span>,<span class="hljs-built_in">ecx</span>			<span class="hljs-comment">;与索引上限比较，判断是否遍历完数组</span><br>	<span class="hljs-keyword">jl</span> loop_start		<span class="hljs-comment">;还没遍历完数组就循环操作，jump到loop_start再走一遍</span><br></code></pre></td></tr></table></figure>
-</li>
-<li><p>串指令：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;stos系列:stosb,stosw,stosd,stosq（分别对应byte,word,dword,qword,功能是把al/ax/eax/rax中的内容存到edi/rdi）</span><br><span class="hljs-comment">;lods系列:lodsb,lodsw,lodsd,lodsq（同样分别对应四个类型，功能是把esi/rsi的内容加载到al/ax/eax/rax中）</span><br><span class="hljs-comment">;movs系列:movsb,movsw,movsd,movsq（同样分别对应四个类型，功能是把esi的内容复制到edi中）</span><br><span class="hljs-comment">;cmps系列:cmpsb,cmpsw,cmpsd,cmpsq（同样分别对应四个类型，功能是比较esi和edi的内容并设置标志位）</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="宏与结构体"><a href="#宏与结构体" class="headerlink" title="宏与结构体"></a>宏与结构体</h2><ul>
-<li><p>宏：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;无参宏使用关键字EQU，如</span><br>PI <span class="hljs-built_in">EQU</span> <span class="hljs-number">3</span>		<span class="hljs-comment">;定义PI=3</span><br><span class="hljs-comment">;含参宏使用关键字MACRO，用endm结尾，如</span><br>Myadd MACRO Number<br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">eax</span>,Number<br>endm			<span class="hljs-comment">;定义Myadd函数实现eax加上参数</span><br><span class="hljs-comment">;含参宏的调用：</span><br>Myadd&lt;参数&gt;<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>结构体：</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;使用关键字struct和ends，如</span><br>Point struct<br>	x <span class="hljs-built_in">word</span> ?<br>	y <span class="hljs-built_in">word</span> ?<br>Point ends<br><br><span class="hljs-comment">;实例化结构体</span><br>MyPoint Point&lt;?&gt;	<span class="hljs-comment">;实例化出MyPoint</span><br><br><span class="hljs-comment">;访问结构体成员</span><br><span class="hljs-keyword">mov</span> MyPoint<span class="hljs-number">.</span>x,<span class="hljs-number">123</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="x64汇编框架-MASM"><a href="#x64汇编框架-MASM" class="headerlink" title="x64汇编框架(MASM)"></a>x64汇编框架(MASM)</h2><figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈</span><br><span class="hljs-meta">.code</span><br><span class="hljs-comment">;Add函数声明</span><br><span class="hljs-keyword">Add</span> proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-built_in">rbp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rbp</span>,<span class="hljs-built_in">rsp</span><br>	<span class="hljs-keyword">lea</span> <span class="hljs-built_in">rax</span>,[<span class="hljs-built_in">rdi</span> + <span class="hljs-built_in">rsi</span>]		<span class="hljs-comment">;从寄存器中取参数</span><br>	<span class="hljs-keyword">pop</span> <span class="hljs-built_in">rbp</span><br>	<span class="hljs-keyword">ret</span><br><span class="hljs-keyword">Add</span> endp<br><br>main proc			<br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rdi</span>,<span class="hljs-number">2</span>		<span class="hljs-comment">;把参数传入寄存器中</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rsi</span>,<span class="hljs-number">3</span><br>	<span class="hljs-keyword">call</span> <span class="hljs-keyword">Add</span><br>	<span class="hljs-keyword">ret</span><br>main endp<br>end<br><br><br><span class="hljs-comment">;x86环境下的代码，传参使用栈</span><br><span class="hljs-meta">.code</span><br><span class="hljs-comment">;Add函数声明</span><br><span class="hljs-keyword">Add</span> proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-built_in">ebp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>,<span class="hljs-built_in">esp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">esp</span>+<span class="hljs-number">8</span>]			<span class="hljs-comment">;从栈上取参数</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">esp</span>+<span class="hljs-number">12</span>]<br>	<span class="hljs-keyword">pop</span> <span class="hljs-built_in">ebp</span><br>	<span class="hljs-keyword">ret</span><br><span class="hljs-keyword">Add</span> endp<br><br>main proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-number">3</span>			<span class="hljs-comment">;把参数压入栈中</span><br>	<span class="hljs-keyword">push</span> <span class="hljs-number">2</span><br>	<span class="hljs-keyword">call</span> <span class="hljs-keyword">Add</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">esp</span>,<span class="hljs-number">8</span><br>main endp<br></code></pre></td></tr></table></figure>
-
-<h2 id="内联汇编与混合编程"><a href="#内联汇编与混合编程" class="headerlink" title="内联汇编与混合编程"></a>内联汇编与混合编程</h2><ul>
-<li><p>x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm{}直接写在C++代码中:</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    _asm&#123;<br>        <span class="hljs-keyword">xor</span> eax,eax<br>        mov eax,<span class="hljs-number">1</span><br>        add eax,<span class="hljs-number">1</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>x64下，在Microsoft Visual C++ (MSVC)程序中使用汇编，需要独立的asm文件，通过extern声明使用：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-function"><span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">Add</span><span class="hljs-params">(<span class="hljs-type">long</span> <span class="hljs-type">long</span> number1,<span class="hljs-type">long</span> <span class="hljs-type">long</span> number2)</span></span>;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-type">long</span> <span class="hljs-type">long</span> res=<span class="hljs-built_in">Add</span>(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>);<br>    std::cout&lt;&lt;res&lt;&lt;std::endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-comment">//asm文件</span><br>.code<br>Add proc<br>    push rbp<br>    mov rbp,rsp<br>    <span class="hljs-keyword">xor</span> rax,rax<br>    add rax,rcx<br>    add rax,rdx<br>    pop rbp<br>    ret<br>Add endp<br>end<br></code></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Day4:Linux汇编框架、操作系统与汇编器、主函数跳转流程</title>
     <url>/2025/07/11/Day4-Linux%E6%B1%87%E7%BC%96%E6%A1%86%E6%9E%B6/</url>
     <content><![CDATA[<p>Linux汇编框架、操作系统与汇编器、主函数跳转流程</p>
@@ -1367,6 +1309,95 @@
 <figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;x64 Debug 跳转特征 </span><br><span class="hljs-comment">;step1</span><br><span class="hljs-keyword">jmp</span>			<span class="hljs-comment">;直接jmp</span><br><br><span class="hljs-comment">;step2</span><br><span class="hljs-keyword">call</span>		<span class="hljs-comment">;第一个call</span><br><br><span class="hljs-comment">;step3</span><br><span class="hljs-keyword">call</span><br><span class="hljs-keyword">call</span> &lt;--	<span class="hljs-comment">;连续两个call进第二个</span><br><br><span class="hljs-comment">;step4</span><br><span class="hljs-number">2</span>*<span class="hljs-keyword">jz</span>--&gt;<span class="hljs-keyword">call</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">call</span>		<span class="hljs-comment">;两个jz指向的同一个call且此call后紧跟mov和call</span><br><br><span class="hljs-comment">;step5</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">call</span>		<span class="hljs-comment">;连续5个mov后的call（传参）</span><br><br><span class="hljs-comment">;step6</span><br><span class="hljs-keyword">jmp</span>			<span class="hljs-comment">;直接jmp</span><br></code></pre></td></tr></table></figure>
 
 <figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;x64 Release 跳转特征 </span><br><span class="hljs-comment">;step1</span><br><span class="hljs-keyword">call</span><br><span class="hljs-keyword">jmp</span>			<span class="hljs-comment">;call后的jmp</span><br><br><span class="hljs-comment">;step2</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">call</span><br><span class="hljs-keyword">mov</span><br><span class="hljs-keyword">call</span>		<span class="hljs-comment">;三个mov后的call（传参）且此call后紧跟mov和call</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Reverse Engineering</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Day3:函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</title>
+    <url>/2025/07/08/Day3-%E5%87%BD%E6%95%B0%E4%B8%8E%E5%A0%86%E6%A0%88/</url>
+    <content><![CDATA[<p>函数与栈帧、数组与串指令、宏与结构体、x64汇编框架、内联汇编与混合编程</p>
+<span id="more"></span>
+
+<h2 id="函数与栈帧"><a href="#函数与栈帧" class="headerlink" title="函数与栈帧"></a>函数与栈帧</h2><ul>
+<li><p>“栈“是内存中的一部分，可以理解为连续的一块内存，它为程序运行提供了一个暂时的存放数据的地方，地址、数据等可以通过push指令从寄存器中被复制到栈中，进而寄存器可以进行其他操作，等到这些数据再次被需要时再从栈中被pop出来。栈遵循先进后出的规则，先push的在高地址，后push的在低地址</p>
+</li>
+<li><p>在程序运行时，每个函数都会拥有独立的栈帧，即独立的栈上的一部分空间。有两个寄存器，esp，ebp（x86即32位环境下）负责维护函数的栈空间。ebp存放的是函数栈空间的栈基址，esp存放的是函数栈空间的栈顶。可以理解为ebp是指向函数栈空间最高位的一个指针（因为栈空间从高地址开始分配，因此指向的是最高位，但是是栈空间的起始地址），而esp是指向函数栈空间最低位的一个指针（指向的是最低位，但是会随着后续栈空间的扩充而变化）。</p>
+</li>
+<li><p>CALL指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;call一个函数的时候，会发生以下内容</span><br><span class="hljs-keyword">push</span> 返回地址（<span class="hljs-keyword">call</span>所在指令的下一条）<br><span class="hljs-keyword">jmp</span> 目标函数地址<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>RET指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;函数结束时，RET指令会发生以下内容</span><br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">eip</span> <span class="hljs-comment">;从栈上弹出返回地址到eip（保存下一步指令地址的寄存器）</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>栈帧：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;跳转到每一个函数，会发生以下内容以开辟栈帧</span><br><span class="hljs-keyword">push</span> <span class="hljs-built_in">ebp</span>			<span class="hljs-comment">;把上一个函数的ebp值放到栈上</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>,<span class="hljs-built_in">esp</span>			<span class="hljs-comment">;把esp值给ebp，开辟新函数的栈帧</span><br><span class="hljs-comment">;函数执行完毕后，会发生以下内容清理栈帧</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">esp</span>,<span class="hljs-built_in">ebp</span>			<span class="hljs-comment">;把ebp值给esp，清理函数栈帧</span><br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">ebp</span>				<span class="hljs-comment">;恢复ebp原来的值，即上一个函数的ebp</span><br><span class="hljs-keyword">ret</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="数组与串指令"><a href="#数组与串指令" class="headerlink" title="数组与串指令"></a>数组与串指令</h2><ul>
+<li><p>声明数组：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-meta">.data</span>			<span class="hljs-comment">;在数据段声明</span><br> szHello <span class="hljs-built_in">db</span> <span class="hljs-string">&#x27;HelloWorld&#x27;</span>,<span class="hljs-number">0</span>			<span class="hljs-comment">;声明一个字符串</span><br> nNumber <span class="hljs-built_in">dd</span> <span class="hljs-number">20</span> dup(<span class="hljs-number">0</span>)				<span class="hljs-comment">;声明一个DWORD数组，20位，使用dup()初始化数组内容为0</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>使用数组基址的几种方式：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-keyword">lea</span> <span class="hljs-built_in">eax</span>,szHello<br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebx</span>,offset Nnumber<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>访问数组成员：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;[数组起始地址+索引寄存器*比例因子+偏移量]（索引寄存器用来存放索引值，比例因子对应类型的字节大小，偏移量可用于结构体数组等场景）</span><br><span class="hljs-comment">;如：</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebx</span>,offset Array	<span class="hljs-comment">;把数组基址给ebx</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">esi</span>,<span class="hljs-number">0</span>				<span class="hljs-comment">;esi用来当索引寄存器</span><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>,<span class="hljs-number">10</span>				<span class="hljs-comment">;ecx用来放索引上限（ecx常用作计数器）</span><br><span class="hljs-symbol"></span><br><span class="hljs-symbol">loop_start:</span>				<span class="hljs-comment">;创建一个循环</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">ebx</span>+<span class="hljs-built_in">esi</span>*<span class="hljs-number">4</span>]	<span class="hljs-comment">;取出数组内容放到eax中</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">esi</span>,<span class="hljs-number">1</span>			<span class="hljs-comment">;索引递增</span><br>	<span class="hljs-keyword">cmp</span> <span class="hljs-built_in">esi</span>,<span class="hljs-built_in">ecx</span>			<span class="hljs-comment">;与索引上限比较，判断是否遍历完数组</span><br>	<span class="hljs-keyword">jl</span> loop_start		<span class="hljs-comment">;还没遍历完数组就循环操作，jump到loop_start再走一遍</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>串指令：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;stos系列:stosb,stosw,stosd,stosq（分别对应byte,word,dword,qword,功能是把al/ax/eax/rax中的内容存到edi/rdi）</span><br><span class="hljs-comment">;lods系列:lodsb,lodsw,lodsd,lodsq（同样分别对应四个类型，功能是把esi/rsi的内容加载到al/ax/eax/rax中）</span><br><span class="hljs-comment">;movs系列:movsb,movsw,movsd,movsq（同样分别对应四个类型，功能是把esi的内容复制到edi中）</span><br><span class="hljs-comment">;cmps系列:cmpsb,cmpsw,cmpsd,cmpsq（同样分别对应四个类型，功能是比较esi和edi的内容并设置标志位）</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="宏与结构体"><a href="#宏与结构体" class="headerlink" title="宏与结构体"></a>宏与结构体</h2><ul>
+<li><p>宏：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;无参宏使用关键字EQU，如</span><br>PI <span class="hljs-built_in">EQU</span> <span class="hljs-number">3</span>		<span class="hljs-comment">;定义PI=3</span><br><span class="hljs-comment">;含参宏使用关键字MACRO，用endm结尾，如</span><br>Myadd MACRO Number<br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">eax</span>,Number<br>endm			<span class="hljs-comment">;定义Myadd函数实现eax加上参数</span><br><span class="hljs-comment">;含参宏的调用：</span><br>Myadd&lt;参数&gt;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>结构体：</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;使用关键字struct和ends，如</span><br>Point struct<br>	x <span class="hljs-built_in">word</span> ?<br>	y <span class="hljs-built_in">word</span> ?<br>Point ends<br><br><span class="hljs-comment">;实例化结构体</span><br>MyPoint Point&lt;?&gt;	<span class="hljs-comment">;实例化出MyPoint</span><br><br><span class="hljs-comment">;访问结构体成员</span><br><span class="hljs-keyword">mov</span> MyPoint<span class="hljs-number">.</span>x,<span class="hljs-number">123</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="x64汇编框架-MASM"><a href="#x64汇编框架-MASM" class="headerlink" title="x64汇编框架(MASM)"></a>x64汇编框架(MASM)</h2><figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">;x64环境下的代码，传参的时候先使用寄存器(Windows:rcx,rdx,r8,r9  Linux:rdi,rsi,rdx,rcx,r8,r9)再使用栈</span><br><span class="hljs-meta">.code</span><br><span class="hljs-comment">;Add函数声明</span><br><span class="hljs-keyword">Add</span> proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-built_in">rbp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rbp</span>,<span class="hljs-built_in">rsp</span><br>	<span class="hljs-keyword">lea</span> <span class="hljs-built_in">rax</span>,[<span class="hljs-built_in">rdi</span> + <span class="hljs-built_in">rsi</span>]		<span class="hljs-comment">;从寄存器中取参数</span><br>	<span class="hljs-keyword">pop</span> <span class="hljs-built_in">rbp</span><br>	<span class="hljs-keyword">ret</span><br><span class="hljs-keyword">Add</span> endp<br><br>main proc			<br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rdi</span>,<span class="hljs-number">2</span>		<span class="hljs-comment">;把参数传入寄存器中</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">rsi</span>,<span class="hljs-number">3</span><br>	<span class="hljs-keyword">call</span> <span class="hljs-keyword">Add</span><br>	<span class="hljs-keyword">ret</span><br>main endp<br>end<br><br><br><span class="hljs-comment">;x86环境下的代码，传参使用栈</span><br><span class="hljs-meta">.code</span><br><span class="hljs-comment">;Add函数声明</span><br><span class="hljs-keyword">Add</span> proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-built_in">ebp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>,<span class="hljs-built_in">esp</span><br>	<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">esp</span>+<span class="hljs-number">8</span>]			<span class="hljs-comment">;从栈上取参数</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">eax</span>,[<span class="hljs-built_in">esp</span>+<span class="hljs-number">12</span>]<br>	<span class="hljs-keyword">pop</span> <span class="hljs-built_in">ebp</span><br>	<span class="hljs-keyword">ret</span><br><span class="hljs-keyword">Add</span> endp<br><br>main proc<br>	<span class="hljs-keyword">push</span> <span class="hljs-number">3</span>			<span class="hljs-comment">;把参数压入栈中</span><br>	<span class="hljs-keyword">push</span> <span class="hljs-number">2</span><br>	<span class="hljs-keyword">call</span> <span class="hljs-keyword">Add</span><br>	<span class="hljs-keyword">add</span> <span class="hljs-built_in">esp</span>,<span class="hljs-number">8</span><br>main endp<br></code></pre></td></tr></table></figure>
+
+<h2 id="内联汇编与混合编程"><a href="#内联汇编与混合编程" class="headerlink" title="内联汇编与混合编程"></a>内联汇编与混合编程</h2><ul>
+<li><p>x86下，在Microsoft Visual C++ (MSVC)程序中使用汇编，可以通过_asm{}直接写在C++代码中:</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    _asm&#123;<br>        <span class="hljs-keyword">xor</span> eax,eax<br>        mov eax,<span class="hljs-number">1</span><br>        add eax,<span class="hljs-number">1</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>x64下，在Microsoft Visual C++ (MSVC)程序中使用汇编，需要独立的asm文件，通过extern声明使用：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-function"><span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">Add</span><span class="hljs-params">(<span class="hljs-type">long</span> <span class="hljs-type">long</span> number1,<span class="hljs-type">long</span> <span class="hljs-type">long</span> number2)</span></span>;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-type">long</span> <span class="hljs-type">long</span> res=<span class="hljs-built_in">Add</span>(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>);<br>    std::cout&lt;&lt;res&lt;&lt;std::endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-comment">//asm文件</span><br>.code<br>Add proc<br>    push rbp<br>    mov rbp,rsp<br>    <span class="hljs-keyword">xor</span> rax,rax<br>    add rax,rcx<br>    add rax,rdx<br>    pop rbp<br>    ret<br>Add endp<br>end<br></code></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Reverse Engineering</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Day5:函数调用约定</title>
+    <url>/2025/07/12/Day5-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/</url>
+    <content><![CDATA[<p>函数调用约定</p>
+<span id="more"></span>
+
+<h2 id="函数调用约定"><a href="#函数调用约定" class="headerlink" title="函数调用约定"></a>函数调用约定</h2><ul>
+<li><p>主要有三种：cdecl、stdcall、fastcall。以求和函数为例</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//求和</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">sum</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b,<span class="hljs-type">int</span> c)</span>&#123;<br>    <span class="hljs-keyword">return</span> a+b+c;<br>&#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">int</span> res=sum(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>,res);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>cdecl：完全栈传参，参数从右往左入栈，由调用者清理参数占用的栈空间</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">2</span>               <span class="hljs-comment">; 参数b入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">1</span>               <span class="hljs-comment">; 参数a入栈</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YAHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0Ch</span>			<span class="hljs-comment">;这里调用者进行了清理参数占用的栈空间的操作(3个参数×4字节)，被调用者不负责</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br><br><span class="hljs-comment">; int __cdecl sum(int a, int b, int c)</span><br>?sum@@YAHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">0Ch</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">10h</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;sum函数自身的栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edi</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span>                     <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;清理自身栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>?sum@@YAHHHH@Z  endp<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>stdcall：完全栈传参，参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">2</span>               <span class="hljs-comment">; 参数b入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">1</span>               <span class="hljs-comment">; 参数a入栈</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YGHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span>		<span class="hljs-comment">;这里直接到把返回值给res了，调用者不负责清理参数占用的栈空间</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br>  <br><span class="hljs-comment">; int __stdcall sum(int a, int b, int c)</span><br>?sum@@YGHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">0Ch</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">10h</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;sum的栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>              	 <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edi</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span>                     <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;清理自身栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span>    <span class="hljs-number">0Ch</span>			<span class="hljs-comment">;被调用者通过返回指令给esp增加0Ch，清理参数占用的栈空间</span><br>?sum@@YGHHHH@Z  endp<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>fastcall：寄存器+栈传参，优先使用寄存器，剩余参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
+<p>寄存器传参优先级：</p>
+<p>x86：ecx  edx  栈</p>
+<p>x64：rcx  rdx  r8  r9  栈</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edx</span>, <span class="hljs-number">2</span>          <span class="hljs-comment">; 参数b存入寄存器</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">1</span>          <span class="hljs-comment">; 参数a存入寄存器</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YIHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span>		<span class="hljs-comment">;这里也是没有调用者对参数占用的栈空间的清理</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br><br><span class="hljs-comment">; int __fastcall sum(int a, int b, int c)</span><br>?sum@@YIHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>var_18          = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">18h</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">14h</span><br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0D8h</span>		<span class="hljs-comment">;sum开辟栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ecx</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_18]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">6</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+b], <span class="hljs-built_in">edx</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+a], <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0D8h</span>		<span class="hljs-comment">;sum清理栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span>    <span class="hljs-number">4</span>				<span class="hljs-comment">;由于只有一个参数被push到栈上，所以被调用者返回4，清理参数占用的栈空间</span><br>?sum@@YIHHHH@Z  endp<br></code></pre></td></tr></table></figure></li>
 </ul>
 ]]></content>
       <categories>
@@ -1490,137 +1521,6 @@
 
 <p>源码</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> i = <span class="hljs-number">10</span>;<br><span class="hljs-keyword">do</span> &#123;<br>	count += i;<br>	i--;<br>&#125; <span class="hljs-keyword">while</span> (i &gt; <span class="hljs-number">0</span>);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;count : %d &quot;</span>, count);<br></code></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Day9:壳与脱壳（一）</title>
-    <url>/2025/07/29/Day9-%E5%A3%B3/</url>
-    <content><![CDATA[<p>壳、壳的加载过程、工具脱壳、手动脱壳流程、esp定律（基于Xdbg）</p>
-<span id="more"></span>
-
-<h2 id="壳"><a href="#壳" class="headerlink" title="壳"></a>壳</h2><ul>
-<li><p>先看ctf-wiki对壳的介绍：</p>
-<p><strong>壳</strong> 是在一些计算机软件里一段专门负责保护软件不被非法修改或反编译的程序。</p>
-<p>它们一般都是先于程序运行，拿到控制权，然后完成它们保护软件的任务。</p>
-</li>
-<li><p>因此，加壳程序包含壳程序和原程序两个部分，且原程序在壳程序运行后才恢复到独立可执行的状态。因此，可以借助动态调试器在壳程序运行完后进行dump，从而获得独立可执行的原程序</p>
-</li>
-<li><p>常见的壳有压缩壳和加密壳两种：</p>
-<p>压缩壳：upx、ASpack、PECompat等</p>
-<p>加密壳：VMProtect、Themida、ASProtector等</p>
-</li>
-</ul>
-<h2 id="壳的加载过程"><a href="#壳的加载过程" class="headerlink" title="壳的加载过程"></a>壳的加载过程</h2><ul>
-<li>壳和原程序在逻辑上基本没有关联，因此，壳程序在解析加壳后的二进制文件前，会先保存各寄存器的值，通常用pushad&#x2F;puahfd实现</li>
-<li>解析完成后，是原程序的逻辑部分，此时，壳程序给出控制权，寄存器恢复到解析前的状态，通常用popad&#x2F;popfd实现</li>
-<li>最后，程序跳到原程序入口点开始执行</li>
-</ul>
-<h2 id="工具脱壳"><a href="#工具脱壳" class="headerlink" title="工具脱壳"></a>工具脱壳</h2><ul>
-<li><p>直接使用工具脱壳的情况主要有两种：一种是无修改的、只使用加壳程序加壳；另一种是使用加壳程序加壳后修改了区块名的。前者可以直接使用加壳程序脱壳（如果具备脱壳功能的话），后者先修改区块名再使用加壳程序脱壳。</p>
-</li>
-<li><p>upx无修改加壳示例：</p>
-<p>拿到可执行文件，先到DIE查看，发现有壳。对壳的信息描述没有出现“modified”字眼，因此判断是无修改加壳，直接使用工具脱壳</p>
-<p><img src="/../images/image-20250729103439484.png" alt="查看壳信息"></p>
-<p>直接使用upx -d脱壳</p>
-<p><img src="/../images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-29%20103724.png" alt="upx-d脱壳"></p>
-<p>再次用DIE打开，发现没有识别出壳了</p>
-<p><img src="/../images/image-20250729104311684.png" alt="脱壳后查看壳信息"></p>
-</li>
-<li><p>upx修改区块名加壳示例：</p>
-<p>先到DIE查看壳信息，发现是upx modified</p>
-<p><img src="/../images/image-20250729110711262.png" alt="查看壳信息"></p>
-<p>点击“区块“下方的”&gt;“查看区块信息，发现区块名有改动</p>
-<p><img src="/../images/image-20250729110752177.png" alt="区块名改动"></p>
-<p>010editor修改区块名</p>
-<p><img src="/../images/image-20250729111002665.png" alt="修改区块名"></p>
-<p>再次查看壳信息，变成无修改加壳了，直接工具脱壳</p>
-<p><img src="/../images/image-20250729111128932.png" alt="再次查看壳信息"></p>
-</li>
-</ul>
-<h2 id="手动脱壳流程"><a href="#手动脱壳流程" class="headerlink" title="手动脱壳流程"></a>手动脱壳流程</h2><ul>
-<li><p>步骤：</p>
-<ul>
-<li>查壳：使用DIE、ExeinfoPE、PEiD等工具查壳</li>
-<li>寻找程序原入口点(OEP)：通过各种方法找到壳代码结束、程序真正开始的地方</li>
-<li>dump内存：借助插件从OEP开始dump出原程序</li>
-<li>输入表(IAT)重建：借助插件重建输入表</li>
-<li>关闭程序重定位：使用DIE等工具关闭程序重定位</li>
-</ul>
-</li>
-<li><p>寻找OEP的方法有很多，而dump和IAT重建以及关闭重定位的方法基本固定。先用一个例子展示整体流程，再详细展开寻找OEP的方法。upx手动脱壳示例：</p>
-<ul>
-<li><p>查壳：显示是upx</p>
-<p><img src="/../images/image-20250729133015652.png" alt="查壳"></p>
-</li>
-<li><p>寻找OEP：</p>
-<p>采用esp定律法（详见下文）找到push ebp开头的一段代码</p>
-<p><img src="/../images/image-20250729134006853.png" alt="寻找OEP"></p>
-</li>
-<li><p>dump内存：</p>
-<p>打开插件scylla，点击“转储”栏中的“转储”，会获得一个_dump后缀的exe文件</p>
-<p><img src="/../images/image-20250729134119537.png" alt="dump"></p>
-</li>
-<li><p>IAT重建：</p>
-<p>点击“IAT自动搜索”，会有弹窗问是否使用高级搜索结果，点“是”。这时候，VA和“大小”两个框会被填充。</p>
-<p><img src="/../images/image-20250729134901607.png" alt="IAT自动搜索"></p>
-<p>接下来点“获取导入”，上方的大框中会出现dll结尾的东西，需要把带红色X的取消勾选</p>
-<p><img src="/../images/image-20250729134937163.png" alt="获取导入"></p>
-<p>然后点击修复转储，选择刚刚dump出来的文件，会得到一个再加上_SCY的exe文件。</p>
-<p>此时程序大概率运行不了，会闪退。但是对于静态分析来说，到这一步已经足够了。</p>
-</li>
-<li><p>关闭重定位：把得到的_dump_SCY.exe文件拖到DIE，点击“区块”栏的“&gt;”，会弹出文件结构界面</p>
-<p><img src="/../images/image-20250729135914719.png" alt="文件结构界面"></p>
-<p>先取消勾选右上角的“只读”</p>
-<p><img src="/../images/image-20250729140239276.png" alt="取消只读"></p>
-<p>点击IMAGE_NT_HEADERS下的IMAGE_FILE_HEADER，在“标志”选项中勾选“RELOCS_STRIPPED”（图中未勾选）</p>
-<p><img src="/../images/image-20250729140145721.png" alt="勾选RELOCS_STRIPPED"></p>
-<p>再点击IMAGE_OPTIONAL_HEADERS，找到另一个标志(DllCharacteristics)，取消勾选“DYNAMIC_BASE”（图中未取消）</p>
-<p><img src="/../images/image-20250729140545940.png" alt="取消勾选DYNAMIC_BASE"></p>
-<p>这样子，我们的程序就脱完壳并且可以正常运行了</p>
-</li>
-<li><p>PS：关于IAT重建这一步骤，为什么不能IAT自动搜索再转储一步到位？</p>
-<p>结合AI的解释，个人见解是IAT自动搜索的过程可能会运行程序，导致地址刷新，OEP失效，dump出来的程序不完整或者不对。因此，dump和IAT重建实际上是两个步骤，不过被集成到了一个界面。其实还有手动重建IAT的方法，这种情况下就确确实实需要先dump再导入重建的IAT了，因为在调试器中找到OEP后还要继续找IAT</p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="寻找OEP的方法（一）"><a href="#寻找OEP的方法（一）" class="headerlink" title="寻找OEP的方法（一）"></a>寻找OEP的方法（一）</h2><h3 id="ESP定律"><a href="#ESP定律" class="headerlink" title="ESP定律"></a>ESP定律</h3><ul>
-<li><p>前文，我们知道了壳程序解析时会有pushad\popad或者pushfd\popfd的操作。pushad时，随着通用寄存器值的入栈，esp的值会发生变化，又因为栈平衡的特性，最终esp的值会回到pushad后的这个值。因此，可以借助这一点，给pushad后的esp值下硬件访问断点，popad后就会触发断点，中断调试，进而实现跳过整个壳解析过程。当然，中断处还不是OEP，一般在中断处后会有一个跨度明显的jmp，甚至jmp后还有一个跳转表jmp才会到达真正的OEP</p>
-</li>
-<li><p>具体操作如下：</p>
-<ul>
-<li><p>xdbg打开，F9到程序所在内存区域</p>
-<p><img src="/../images/image-20250729172225632.png" alt="xdbg打开"></p>
-</li>
-<li><p>可以看到EIP所在就是pushad</p>
-<p><img src="/../images/image-20250729172310628.png" alt="pushad"></p>
-</li>
-<li><p>F8步过，esp更新</p>
-<p><img src="/../images/image-20250729172402698.png" alt="esp更新"></p>
-</li>
-<li><p>在右下角栈窗口设上硬件访问断点</p>
-<p><img src="/../images/image-20250729172449826.png" alt="设置硬件访问断点"></p>
-</li>
-<li><p>点击工具栏“视图”下方的“-&gt;”，程序会执行过popad。可以看到下方不远处有个大跳</p>
-<p><img src="/../images/image-20250729172606653.png" alt="popad"></p>
-</li>
-<li><p>F8到大跳处F7步入，有跳转表继续F7步入，可以看到开辟栈帧操作，这里就是OEP了，在此处直接使用scylla dump出程序</p>
-<p><img src="/../images/image-20250729172759829.png" alt="OEP"></p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="单步跟踪法"><a href="#单步跟踪法" class="headerlink" title="单步跟踪法"></a>单步跟踪法</h3><ul>
-<li>如名，就是一直按F8，让程序尽量向下走，遇到循环就跳过，遇到近call就步入，重点关注大跳</li>
-<li>参考ctf-wiki <a href="https://ctf-wiki.org/reverse/platform/windows/unpack/trace/">https://ctf-wiki.org/reverse/platform/windows/unpack/trace/</a></li>
 </ul>
 ]]></content>
       <categories>
@@ -1826,26 +1726,134 @@
       </tags>
   </entry>
   <entry>
-    <title>week27-week30</title>
-    <url>/2025/09/08/week27-week30/</url>
-    <content><![CDATA[<p>2025年9月篇</p>
+    <title>Day9:壳与脱壳（一）</title>
+    <url>/2025/07/29/Day9-%E5%A3%B3/</url>
+    <content><![CDATA[<p>壳、壳的加载过程、工具脱壳、手动脱壳流程、esp定律（基于Xdbg）</p>
 <span id="more"></span>
 
-<h2 id="week27-2025-9-1-2025-9-7"><a href="#week27-2025-9-1-2025-9-7" class="headerlink" title="week27 (2025.9.1-2025.9.7)"></a>week27 (2025.9.1-2025.9.7)</h2><ul>
-<li>接下来打算把周记分成四周一篇了，每周照样更新，但是四周一篇文章</li>
-<li>这周（其实是上周，这段是补的）把博客主题给换了。原先想着先配置完，到时候直接把文章移到新的博客文件里，但是进度太慢了。这周直接给原博客换皮😋还更了一篇博客,真好😋(虽然还是AI出力)</li>
-<li>moe week4上新题了,但是week3甚至week2还有没写完的题</li>
-<li>安卓这块的笔记还没更,开学了找找时间补上</li>
+<h2 id="壳"><a href="#壳" class="headerlink" title="壳"></a>壳</h2><ul>
+<li><p>先看ctf-wiki对壳的介绍：</p>
+<p><strong>壳</strong> 是在一些计算机软件里一段专门负责保护软件不被非法修改或反编译的程序。</p>
+<p>它们一般都是先于程序运行，拿到控制权，然后完成它们保护软件的任务。</p>
+</li>
+<li><p>因此，加壳程序包含壳程序和原程序两个部分，且原程序在壳程序运行后才恢复到独立可执行的状态。因此，可以借助动态调试器在壳程序运行完后进行dump，从而获得独立可执行的原程序</p>
+</li>
+<li><p>常见的壳有压缩壳和加密壳两种：</p>
+<p>压缩壳：upx、ASpack、PECompat等</p>
+<p>加密壳：VMProtect、Themida、ASProtector等</p>
+</li>
 </ul>
-<h2 id="week28-2025-9-8-2025-9-14"><a href="#week28-2025-9-8-2025-9-14" class="headerlink" title="week28 (2025.9.8-2025.9.14)"></a>week28 (2025.9.8-2025.9.14)</h2><ul>
-<li>好的手忙脚乱的开学第一周，目前学习计划有待更新。</li>
+<h2 id="壳的加载过程"><a href="#壳的加载过程" class="headerlink" title="壳的加载过程"></a>壳的加载过程</h2><ul>
+<li>壳和原程序在逻辑上基本没有关联，因此，壳程序在解析加壳后的二进制文件前，会先保存各寄存器的值，通常用pushad&#x2F;puahfd实现</li>
+<li>解析完成后，是原程序的逻辑部分，此时，壳程序给出控制权，寄存器恢复到解析前的状态，通常用popad&#x2F;popfd实现</li>
+<li>最后，程序跳到原程序入口点开始执行</li>
+</ul>
+<h2 id="工具脱壳"><a href="#工具脱壳" class="headerlink" title="工具脱壳"></a>工具脱壳</h2><ul>
+<li><p>直接使用工具脱壳的情况主要有两种：一种是无修改的、只使用加壳程序加壳；另一种是使用加壳程序加壳后修改了区块名的。前者可以直接使用加壳程序脱壳（如果具备脱壳功能的话），后者先修改区块名再使用加壳程序脱壳。</p>
+</li>
+<li><p>upx无修改加壳示例：</p>
+<p>拿到可执行文件，先到DIE查看，发现有壳。对壳的信息描述没有出现“modified”字眼，因此判断是无修改加壳，直接使用工具脱壳</p>
+<p><img src="/../images/image-20250729103439484.png" alt="查看壳信息"></p>
+<p>直接使用upx -d脱壳</p>
+<p><img src="/../images/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-07-29%20103724.png" alt="upx-d脱壳"></p>
+<p>再次用DIE打开，发现没有识别出壳了</p>
+<p><img src="/../images/image-20250729104311684.png" alt="脱壳后查看壳信息"></p>
+</li>
+<li><p>upx修改区块名加壳示例：</p>
+<p>先到DIE查看壳信息，发现是upx modified</p>
+<p><img src="/../images/image-20250729110711262.png" alt="查看壳信息"></p>
+<p>点击“区块“下方的”&gt;“查看区块信息，发现区块名有改动</p>
+<p><img src="/../images/image-20250729110752177.png" alt="区块名改动"></p>
+<p>010editor修改区块名</p>
+<p><img src="/../images/image-20250729111002665.png" alt="修改区块名"></p>
+<p>再次查看壳信息，变成无修改加壳了，直接工具脱壳</p>
+<p><img src="/../images/image-20250729111128932.png" alt="再次查看壳信息"></p>
+</li>
+</ul>
+<h2 id="手动脱壳流程"><a href="#手动脱壳流程" class="headerlink" title="手动脱壳流程"></a>手动脱壳流程</h2><ul>
+<li><p>步骤：</p>
+<ul>
+<li>查壳：使用DIE、ExeinfoPE、PEiD等工具查壳</li>
+<li>寻找程序原入口点(OEP)：通过各种方法找到壳代码结束、程序真正开始的地方</li>
+<li>dump内存：借助插件从OEP开始dump出原程序</li>
+<li>输入表(IAT)重建：借助插件重建输入表</li>
+<li>关闭程序重定位：使用DIE等工具关闭程序重定位</li>
+</ul>
+</li>
+<li><p>寻找OEP的方法有很多，而dump和IAT重建以及关闭重定位的方法基本固定。先用一个例子展示整体流程，再详细展开寻找OEP的方法。upx手动脱壳示例：</p>
+<ul>
+<li><p>查壳：显示是upx</p>
+<p><img src="/../images/image-20250729133015652.png" alt="查壳"></p>
+</li>
+<li><p>寻找OEP：</p>
+<p>采用esp定律法（详见下文）找到push ebp开头的一段代码</p>
+<p><img src="/../images/image-20250729134006853.png" alt="寻找OEP"></p>
+</li>
+<li><p>dump内存：</p>
+<p>打开插件scylla，点击“转储”栏中的“转储”，会获得一个_dump后缀的exe文件</p>
+<p><img src="/../images/image-20250729134119537.png" alt="dump"></p>
+</li>
+<li><p>IAT重建：</p>
+<p>点击“IAT自动搜索”，会有弹窗问是否使用高级搜索结果，点“是”。这时候，VA和“大小”两个框会被填充。</p>
+<p><img src="/../images/image-20250729134901607.png" alt="IAT自动搜索"></p>
+<p>接下来点“获取导入”，上方的大框中会出现dll结尾的东西，需要把带红色X的取消勾选</p>
+<p><img src="/../images/image-20250729134937163.png" alt="获取导入"></p>
+<p>然后点击修复转储，选择刚刚dump出来的文件，会得到一个再加上_SCY的exe文件。</p>
+<p>此时程序大概率运行不了，会闪退。但是对于静态分析来说，到这一步已经足够了。</p>
+</li>
+<li><p>关闭重定位：把得到的_dump_SCY.exe文件拖到DIE，点击“区块”栏的“&gt;”，会弹出文件结构界面</p>
+<p><img src="/../images/image-20250729135914719.png" alt="文件结构界面"></p>
+<p>先取消勾选右上角的“只读”</p>
+<p><img src="/../images/image-20250729140239276.png" alt="取消只读"></p>
+<p>点击IMAGE_NT_HEADERS下的IMAGE_FILE_HEADER，在“标志”选项中勾选“RELOCS_STRIPPED”（图中未勾选）</p>
+<p><img src="/../images/image-20250729140145721.png" alt="勾选RELOCS_STRIPPED"></p>
+<p>再点击IMAGE_OPTIONAL_HEADERS，找到另一个标志(DllCharacteristics)，取消勾选“DYNAMIC_BASE”（图中未取消）</p>
+<p><img src="/../images/image-20250729140545940.png" alt="取消勾选DYNAMIC_BASE"></p>
+<p>这样子，我们的程序就脱完壳并且可以正常运行了</p>
+</li>
+<li><p>PS：关于IAT重建这一步骤，为什么不能IAT自动搜索再转储一步到位？</p>
+<p>结合AI的解释，个人见解是IAT自动搜索的过程可能会运行程序，导致地址刷新，OEP失效，dump出来的程序不完整或者不对。因此，dump和IAT重建实际上是两个步骤，不过被集成到了一个界面。其实还有手动重建IAT的方法，这种情况下就确确实实需要先dump再导入重建的IAT了，因为在调试器中找到OEP后还要继续找IAT</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="寻找OEP的方法（一）"><a href="#寻找OEP的方法（一）" class="headerlink" title="寻找OEP的方法（一）"></a>寻找OEP的方法（一）</h2><h3 id="ESP定律"><a href="#ESP定律" class="headerlink" title="ESP定律"></a>ESP定律</h3><ul>
+<li><p>前文，我们知道了壳程序解析时会有pushad\popad或者pushfd\popfd的操作。pushad时，随着通用寄存器值的入栈，esp的值会发生变化，又因为栈平衡的特性，最终esp的值会回到pushad后的这个值。因此，可以借助这一点，给pushad后的esp值下硬件访问断点，popad后就会触发断点，中断调试，进而实现跳过整个壳解析过程。当然，中断处还不是OEP，一般在中断处后会有一个跨度明显的jmp，甚至jmp后还有一个跳转表jmp才会到达真正的OEP</p>
+</li>
+<li><p>具体操作如下：</p>
+<ul>
+<li><p>xdbg打开，F9到程序所在内存区域</p>
+<p><img src="/../images/image-20250729172225632.png" alt="xdbg打开"></p>
+</li>
+<li><p>可以看到EIP所在就是pushad</p>
+<p><img src="/../images/image-20250729172310628.png" alt="pushad"></p>
+</li>
+<li><p>F8步过，esp更新</p>
+<p><img src="/../images/image-20250729172402698.png" alt="esp更新"></p>
+</li>
+<li><p>在右下角栈窗口设上硬件访问断点</p>
+<p><img src="/../images/image-20250729172449826.png" alt="设置硬件访问断点"></p>
+</li>
+<li><p>点击工具栏“视图”下方的“-&gt;”，程序会执行过popad。可以看到下方不远处有个大跳</p>
+<p><img src="/../images/image-20250729172606653.png" alt="popad"></p>
+</li>
+<li><p>F8到大跳处F7步入，有跳转表继续F7步入，可以看到开辟栈帧操作，这里就是OEP了，在此处直接使用scylla dump出程序</p>
+<p><img src="/../images/image-20250729172759829.png" alt="OEP"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="单步跟踪法"><a href="#单步跟踪法" class="headerlink" title="单步跟踪法"></a>单步跟踪法</h3><ul>
+<li>如名，就是一直按F8，让程序尽量向下走，遇到循环就跳过，遇到近call就步入，重点关注大跳</li>
+<li>参考ctf-wiki <a href="https://ctf-wiki.org/reverse/platform/windows/unpack/trace/">https://ctf-wiki.org/reverse/platform/windows/unpack/trace/</a></li>
 </ul>
 ]]></content>
       <categories>
-        <category>周记</category>
+        <category>Reverse Engineering</category>
       </categories>
       <tags>
-        <tag>周记</tag>
+        <tag>CTF</tag>
+        <tag>Reverse</tag>
       </tags>
   </entry>
   <entry>
@@ -1884,37 +1892,6 @@
       <tags>
         <tag>blog</tag>
         <tag>杂记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Day5:函数调用约定</title>
-    <url>/2025/07/12/Day5-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/</url>
-    <content><![CDATA[<p>函数调用约定</p>
-<span id="more"></span>
-
-<h2 id="函数调用约定"><a href="#函数调用约定" class="headerlink" title="函数调用约定"></a>函数调用约定</h2><ul>
-<li><p>主要有三种：cdecl、stdcall、fastcall。以求和函数为例</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//求和</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">sum</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b,<span class="hljs-type">int</span> c)</span>&#123;<br>    <span class="hljs-keyword">return</span> a+b+c;<br>&#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-type">int</span> res=sum(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>,res);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>cdecl：完全栈传参，参数从右往左入栈，由调用者清理参数占用的栈空间</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">2</span>               <span class="hljs-comment">; 参数b入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">1</span>               <span class="hljs-comment">; 参数a入栈</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YAHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0Ch</span>			<span class="hljs-comment">;这里调用者进行了清理参数占用的栈空间的操作(3个参数×4字节)，被调用者不负责</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br><br><span class="hljs-comment">; int __cdecl sum(int a, int b, int c)</span><br>?sum@@YAHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">0Ch</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">10h</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;sum函数自身的栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edi</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span>                     <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;清理自身栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>?sum@@YAHHHH@Z  endp<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>stdcall：完全栈传参，参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">2</span>               <span class="hljs-comment">; 参数b入栈</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">1</span>               <span class="hljs-comment">; 参数a入栈</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YGHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span>		<span class="hljs-comment">;这里直接到把返回值给res了，调用者不负责清理参数占用的栈空间</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br>  <br><span class="hljs-comment">; int __stdcall sum(int a, int b, int c)</span><br>?sum@@YGHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">0Ch</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">10h</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;sum的栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>              	 <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edi</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span>                     <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0C0h</span>		<span class="hljs-comment">;清理自身栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span>    <span class="hljs-number">0Ch</span>			<span class="hljs-comment">;被调用者通过返回指令给esp增加0Ch，清理参数占用的栈空间</span><br>?sum@@YGHHHH@Z  endp<br></code></pre></td></tr></table></figure>
-</li>
-<li><p>fastcall：寄存器+栈传参，优先使用寄存器，剩余参数从右往左入栈，由被调用者清理参数占用的栈空间</p>
-<p>寄存器传参优先级：</p>
-<p>x86：ecx  edx  栈</p>
-<p>x64：rcx  rdx  r8  r9  栈</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><code class="hljs x86asm"><span class="hljs-comment">; int __cdecl main()</span><br>_main           proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: j__main↑j</span><br>  <br>var_C           = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">0Ch</span><br>res             = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart_2:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_C]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">3</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd_2:</span>                   <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp<br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-number">3</span>               <span class="hljs-comment">; 参数c入栈</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">edx</span>, <span class="hljs-number">2</span>          <span class="hljs-comment">; 参数b存入寄存器</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">1</span>          <span class="hljs-comment">; 参数a存入寄存器</span><br>                <span class="hljs-keyword">call</span>    j_?sum@@YIHHHH@Z <span class="hljs-comment">; sum(int,int,int)</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+res], <span class="hljs-built_in">eax</span>		<span class="hljs-comment">;这里也是没有调用者对参数占用的栈空间的清理</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+res]<br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">push</span>    offset _Format  <span class="hljs-comment">; &quot;%d\n&quot;</span><br>                <span class="hljs-keyword">call</span>    j__printf<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">8</span><br>                <span class="hljs-keyword">xor</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-built_in">eax</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0CCh</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span><br>_main           endp<br><br><span class="hljs-comment">; int __fastcall sum(int a, int b, int c)</span><br>?sum@@YIHHHH@Z  proc <span class="hljs-built_in">near</span>               <span class="hljs-comment">; CODE XREF: sum(int,int,int)↑j</span><br>  <br>var_18          = <span class="hljs-built_in">byte</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">18h</span><br>b               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">14h</span><br>a               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span> -<span class="hljs-number">8</span><br>c               = <span class="hljs-built_in">dword</span> <span class="hljs-built_in">ptr</span>  <span class="hljs-number">8</span><br>  <br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">sub</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0D8h</span>		<span class="hljs-comment">;sum开辟栈空间</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">push</span>    <span class="hljs-built_in">ecx</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitStart:</span><br>                <span class="hljs-keyword">lea</span>     <span class="hljs-built_in">edi</span>, [<span class="hljs-built_in">ebp</span>+var_18]<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, <span class="hljs-number">6</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, <span class="hljs-number">0CCCCCCCCh</span><br>                <span class="hljs-keyword">rep</span> <span class="hljs-keyword">stosd</span><br><span class="hljs-symbol">  </span><br><span class="hljs-symbol">__$EncStackInitEnd:</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+b], <span class="hljs-built_in">edx</span><br>                <span class="hljs-keyword">mov</span>     [<span class="hljs-built_in">ebp</span>+a], <span class="hljs-built_in">ecx</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">ecx</span>, offset _6005466B_entry@cpp <span class="hljs-comment">; JMC_flag</span><br>                <span class="hljs-keyword">call</span>    j_@__CheckForDebuggerJustMyCode@<span class="hljs-number">4</span> <span class="hljs-comment">; __CheckForDebuggerJustMyCode(x)</span><br>                <span class="hljs-keyword">nop</span><br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+a]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+b]<br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">ebp</span>+c]<br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">edi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">esi</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebx</span><br>                <span class="hljs-keyword">add</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-number">0D8h</span>		<span class="hljs-comment">;sum清理栈空间</span><br>                <span class="hljs-keyword">cmp</span>     <span class="hljs-built_in">ebp</span>, <span class="hljs-built_in">esp</span><br>                <span class="hljs-keyword">call</span>    j___RTC_CheckEsp<br>                <span class="hljs-keyword">mov</span>     <span class="hljs-built_in">esp</span>, <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">pop</span>     <span class="hljs-built_in">ebp</span><br>                <span class="hljs-keyword">retn</span>    <span class="hljs-number">4</span>				<span class="hljs-comment">;由于只有一个参数被push到栈上，所以被调用者返回4，清理参数占用的栈空间</span><br>?sum@@YIHHHH@Z  endp<br></code></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Reverse Engineering</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>Reverse</tag>
       </tags>
   </entry>
   <entry>
@@ -2142,6 +2119,35 @@
       <tags>
         <tag>blog</tag>
         <tag>杂记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>week27-week30</title>
+    <url>/2025/09/08/week27-week30/</url>
+    <content><![CDATA[<p>2025年9月篇</p>
+<span id="more"></span>
+
+<h2 id="week27-2025-9-1-2025-9-7"><a href="#week27-2025-9-1-2025-9-7" class="headerlink" title="week27 (2025.9.1-2025.9.7)"></a>week27 (2025.9.1-2025.9.7)</h2><ul>
+<li>接下来打算把周记分成四周一篇了，每周照样更新，但是四周一篇文章</li>
+<li>这周（其实是上周，这段是补的）把博客主题给换了。原先想着先配置完，到时候直接把文章移到新的博客文件里，但是进度太慢了。这周直接给原博客换皮😋还更了一篇博客,真好😋(虽然还是AI出力)</li>
+<li>moe week4上新题了,但是week3甚至week2还有没写完的题</li>
+<li>安卓这块的笔记还没更,开学了找找时间补上</li>
+</ul>
+<h2 id="week28-2025-9-8-2025-9-14"><a href="#week28-2025-9-8-2025-9-14" class="headerlink" title="week28 (2025.9.8-2025.9.14)"></a>week28 (2025.9.8-2025.9.14)</h2><ul>
+<li>好的手忙脚乱的开学第一周，目前学习计划有待更新。</li>
+<li>这周和X2c的新师傅们组队参加了湾区杯，独立解出了一道题，还是太菜了。考察方向还挺全面，pc端、安卓甚至微信小程序都有。</li>
+</ul>
+<h2 id="week29-2025-9-15-2025-9-21"><a href="#week29-2025-9-15-2025-9-21" class="headerlink" title="week29 (2025.9.15-2025.9.21)"></a>week29 (2025.9.15-2025.9.21)</h2><ul>
+<li>这周有个长城杯（还有个铁人三项长城杯，这俩好像不是一个），只分web、AI安全、数据安全三个方向，没做出来，爆0了</li>
+<li>开学了学习状态又开始不稳定了，老是偷懒不找时间学😖这学期多门数学相关课，要燃尽了</li>
+<li>给博客新开了数据结构分类，能不能更下去看造化了(</li>
+</ul>
+]]></content>
+      <categories>
+        <category>周记</category>
+      </categories>
+      <tags>
+        <tag>周记</tag>
       </tags>
   </entry>
   <entry>
