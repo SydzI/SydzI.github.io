@@ -2,11 +2,15 @@
 /**
  * Icarus 夜间模式 by iMaeGoo
  * https://www.imaegoo.com/
+ * 增强版：确保页面间模式状态同步
  */
 
-var isNight = localStorage.getItem('night');
-var nightNav;
-var nightIcon;
+// 使用全局变量存储夜间模式状态
+window.IcarusNightMode = {
+    isNight: localStorage.getItem('night'),
+    nightNav: null,
+    nightIcon: null
+};
 
 function applyNight(value) {
     // 确保value是布尔值
@@ -15,68 +19,85 @@ function applyNight(value) {
         document.body.classList.remove('light');
         document.body.classList.add('night');
         // 夜间模式显示太阳图标
-        if (nightIcon) {
-            nightIcon.classList.remove('fa-moon');
-            nightIcon.classList.add('fa-sun');
+        if (window.IcarusNightMode.nightIcon) {
+            window.IcarusNightMode.nightIcon.classList.remove('fa-moon');
+            window.IcarusNightMode.nightIcon.classList.add('fa-sun');
         }
     } else {
         document.body.classList.remove('night');
         document.body.classList.add('light');
         // 日间模式显示月亮图标
-        if (nightIcon) {
-            nightIcon.classList.remove('fa-sun');
-            nightIcon.classList.add('fa-moon');
+        if (window.IcarusNightMode.nightIcon) {
+            window.IcarusNightMode.nightIcon.classList.remove('fa-sun');
+            window.IcarusNightMode.nightIcon.classList.add('fa-moon');
         }
     }
 }
 
 function findNightNav() {
-    nightNav = document.getElementById('night-nav');
-    nightIcon = document.getElementById('night-icon');
-    if (!nightNav || !nightIcon) {
+    window.IcarusNightMode.nightNav = document.getElementById('night-nav');
+    window.IcarusNightMode.nightIcon = document.getElementById('night-icon');
+    if (!window.IcarusNightMode.nightNav || !window.IcarusNightMode.nightIcon) {
         setTimeout(findNightNav, 100);
     } else {
         // 移除已有的事件监听器，避免重复绑定
-        nightNav.removeEventListener('click', switchNight);
+        window.IcarusNightMode.nightNav.removeEventListener('click', switchNight);
         // 重新绑定事件监听器
-        nightNav.addEventListener('click', switchNight);
+        window.IcarusNightMode.nightNav.addEventListener('click', switchNight);
         // 初始化图标
-        if (isNight && (isNight === 'true' || isNight === true)) {
-            nightIcon.classList.remove('fa-moon');
-            nightIcon.classList.add('fa-sun');
+        if (window.IcarusNightMode.isNight && (window.IcarusNightMode.isNight === 'true' || window.IcarusNightMode.isNight === true)) {
+            window.IcarusNightMode.nightIcon.classList.remove('fa-moon');
+            window.IcarusNightMode.nightIcon.classList.add('fa-sun');
         } else {
-            nightIcon.classList.remove('fa-sun');
-            nightIcon.classList.add('fa-moon');
+            window.IcarusNightMode.nightIcon.classList.remove('fa-sun');
+            window.IcarusNightMode.nightIcon.classList.add('fa-moon');
         }
     }
 }
 
 function switchNight() {
     // 简化切换逻辑，确保类型一致性
-    isNight = isNight === 'true' || isNight === true ? 'false' : 'true';
-    applyNight(isNight);
-    localStorage.setItem('night', isNight);
+    window.IcarusNightMode.isNight = window.IcarusNightMode.isNight === 'true' || window.IcarusNightMode.isNight === true ? 'false' : 'true';
+    applyNight(window.IcarusNightMode.isNight);
+    localStorage.setItem('night', window.IcarusNightMode.isNight);
 }
 
 // 初始化夜间模式
 function initNightMode() {
     // 从localStorage获取最新的夜间模式状态
-    isNight = localStorage.getItem('night');
+    window.IcarusNightMode.isNight = localStorage.getItem('night');
     // 查找导航按钮并绑定事件
     findNightNav();
     // 应用夜间模式
-    applyNight(isNight);
+    applyNight(window.IcarusNightMode.isNight);
 }
 
 // 初始加载时执行
 initNightMode();
 
-// 监听Pjax页面切换事件，确保页面局部刷新后夜间模式仍然有效
-// 兼容Hexo的Pjax实现
+// 监听更多页面切换相关事件，确保在各种场景下模式状态都能同步
 if (window.addEventListener) {
+    // Pjax页面切换事件
     window.addEventListener('pjax:end', initNightMode);
     window.addEventListener('pjax:success', initNightMode);
-    // 兼容NexT主题的Pjax实现
     document.addEventListener('pjax:success', initNightMode);
+    
+    // 页面加载完成事件
+    window.addEventListener('load', initNightMode);
+    
+    // 页面可见性变化事件（处理页面从后台切回前台的情况）
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            initNightMode();
+        }
+    });
+    
+    // 监听storage事件，处理多个标签页间的模式同步
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'night') {
+            window.IcarusNightMode.isNight = event.newValue;
+            applyNight(window.IcarusNightMode.isNight);
+        }
+    });
 }
 }());
