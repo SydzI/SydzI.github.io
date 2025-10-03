@@ -11101,6 +11101,15 @@ footer.footer .level-end .field {
 .post-navigation .level-item {
   margin-bottom: 0;
 }
+body.night .timeline {
+  border-left-color: #4a5568 /* 较深的灰色，适配夜间模式 */;
+}
+body.night .timeline .media:before {
+  background-color: #4a5568 /* 较深的灰色，适配夜间模式 */;
+}
+body.night .timeline .media:last-child:after {
+  background-color: #2d3748 /* 更深的背景色，与夜间模式协调 */;
+}
 .timeline {
   margin-left: 1rem;
   padding: 1rem 0 0 1.5rem;
