@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://sydzi.github.io/2025/10/10/0xGame2025Week1Reverse%E5%85%A8%E8%A7%A3/</loc>
+    <loc>https://sydzi.github.io/2025/10/10/0xGame2025Week1ReverseWriteUp/</loc>
     
     <lastmod>2025-10-10</lastmod>
     
@@ -311,6 +311,13 @@
   </url>
   
   <url>
+    <loc>https://sydzi.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2025-10-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://sydzi.github.io/tags/%E9%80%86%E5%90%91%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -325,7 +332,7 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</loc>
+    <loc>https://sydzi.github.io/tags/%E5%91%A8%E8%AE%B0/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -346,21 +353,7 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/tags/%E5%91%A8%E8%AE%B0/</loc>
-    <lastmod>2025-10-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://sydzi.github.io/tags/%E5%A4%8D%E7%8E%B0/</loc>
-    <lastmod>2025-10-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/tags/Rev/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -370,13 +363,6 @@
   
   <url>
     <loc>https://sydzi.github.io/categories/WriteUp-%E5%A4%8D%E7%8E%B0/</loc>
-    <lastmod>2025-10-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/categories/%E9%80%86%E5%90%91%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -397,7 +383,7 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
+    <loc>https://sydzi.github.io/categories/%E9%80%86%E5%90%91%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -405,6 +391,13 @@
   
   <url>
     <loc>https://sydzi.github.io/categories/%E5%91%A8%E8%AE%B0/</loc>
+    <lastmod>2025-10-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
     <lastmod>2025-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
