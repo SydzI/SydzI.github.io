@@ -94,9 +94,9 @@
     <link href="https://sydzi.github.io/2025/10/05/week31-week34/"/>
     <id>https://sydzi.github.io/2025/10/05/week31-week34/</id>
     <published>2025-10-05T03:43:33.000Z</published>
-    <updated>2025-10-11T16:00:13.671Z</updated>
+    <updated>2025-10-12T14:35:10.760Z</updated>
     
-    <content type="html"><![CDATA[<p>2025年10月篇</p><span id="more"></span><h2 id="week31-2025-9-29-2025-10-5"><a href="#week31-2025-9-29-2025-10-5" class="headerlink" title="week31 (2025.9.29-2025.10.5)"></a>week31 (2025.9.29-2025.10.5)</h2><ul><li>这周碰上国庆假期，趁着假期狠狠研究moectf的upx_revenge。花了两天时间琢磨出了.rsrc段应该有问题（之前不知道哪里找的工具给修复到能运行但是闪退了，后面拿正常加壳程序对比一下不同的地方在.rsrc段），然后把.rsrc段的ResourceDirectoryTable给修复的差不多了，剩一个Data一直对不上。没招了去找出题人交流，结果发现是upx特征段的问题🫠太好了，终于是ak过的人了😭</li><li>0xGame2025也是开打了，靠新生赛攒经验这一块(</li><li>想着接下来朝逆向开发这一块学学，发现这一类笔记应该归为开发而不是逆向🤔所以又开了一个新分类。</li><li>哈基米的，老是感觉自己懂得太少了，但是又不知道从哪里开始学这些知识😭</li></ul>]]></content>
+    <content type="html"><![CDATA[<p>2025年10月篇</p><span id="more"></span><h2 id="week31-2025-9-29-2025-10-5"><a href="#week31-2025-9-29-2025-10-5" class="headerlink" title="week31 (2025.9.29-2025.10.5)"></a>week31 (2025.9.29-2025.10.5)</h2><ul><li>这周碰上国庆假期，趁着假期狠狠研究moectf的upx_revenge。花了两天时间琢磨出了.rsrc段应该有问题（之前不知道哪里找的工具给修复到程序能运行但是闪退了，后面拿正常加壳程序对比一下不同的地方在.rsrc段），然后把.rsrc段的ResourceDirectoryTable给修复的差不多了，剩一个Data一直对不上。没招了去找出题人交流，结果发现是upx特征段的问题🫠一个月了终于解出这道题了😭太好了，终于是ak过的人了😭</li><li>0xGame2025也是开打了，靠新生赛攒经验这一块(</li><li>想着接下来朝逆向开发这一块学学，发现这一类笔记应该归为开发而不是逆向🤔所以又开了一个新分类。</li><li>哈基米的，老是感觉自己懂得太少了，但是又不知道从哪里开始学这些知识😭</li></ul><h2 id="week32-2025-10-6-2025-10-12"><a href="#week32-2025-10-6-2025-10-12" class="headerlink" title="week32 (2025.10.6-2025.10.12)"></a>week32 (2025.10.6-2025.10.12)</h2><ul><li>这周好像没什么可以写的🫥一半放假一半上课的，有点割裂感</li><li>0xGameweek1和Moectf的WriteUP也是放上了。这周主要在做0xGame还有?CTF的题，周末有个羊城杯可以打，但是国庆玩过头了没报上名🫥还有个领航杯来着，这个截止的更早，9.29截止的，没注意看时间也错过了🫠</li><li>好想莫名其妙的哈几下气🫥</li></ul>]]></content>
     
     
     <summary type="html">&lt;p&gt;2025年10月篇&lt;/p&gt;</summary>
