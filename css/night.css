@@ -506,3 +506,15 @@ body.night {
   color: #333;
   transition: all 0.3s ease;
 }
+/* 黑夜模式置顶标签 */
+.stick-top {
+  border: none;
+  border-radius: 2px;
+  color: #fff;
+  display: inline-block;
+  padding: 0 0.5em;
+  font-size: 0.75em;
+  margin-right: 0.5em;
+  background-color: rgba(52,109,167,0.8);
+  transition: none;
+}
