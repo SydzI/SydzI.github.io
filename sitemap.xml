@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://sydzi.github.io/about/index.html</loc>
+    
+    <lastmod>2025-10-29</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://sydzi.github.io/2025/08/21/Day16-Z3/</loc>
+    
+    <lastmod>2025-10-29</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://sydzi.github.io/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>
     
     <lastmod>2025-10-29</lastmod>
@@ -38,27 +56,9 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/2025/08/21/Day16-Z3/</loc>
-    
-    <lastmod>2025-10-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://sydzi.github.io/2025/10/19/0xGame2025Week2ReverseWriteUp/</loc>
     
     <lastmod>2025-10-23</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/about/index.html</loc>
-    
-    <lastmod>2025-10-22</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

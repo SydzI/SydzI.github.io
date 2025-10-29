@@ -280,12 +280,12 @@
     <link href="https://sydzi.github.io/2025/08/21/Day16-Z3/"/>
     <id>https://sydzi.github.io/2025/08/21/Day16-Z3/</id>
     <published>2025-08-21T04:04:22.000Z</published>
-    <updated>2025-10-24T03:14:32.679Z</updated>
+    <updated>2025-10-29T07:14:16.230Z</updated>
     
     <content type="html"><![CDATA[<p>z3求解器</p><span id="more"></span><h2 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h2><ul><li>Int：整数</li><li>BitVec：二进制数据（如BitVec(‘a’,8)：8个比特位的一个变量a）</li><li>Real：有理数</li><li>Bool：布尔值</li><li>Array：数组</li></ul><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><h3 id="设变量"><a href="#设变量" class="headerlink" title="设变量"></a>设变量</h3><ul><li>使用基本数据类型来声明变量，如：x&#x3D;Int(‘x’)</li></ul><h3 id="创建求解器"><a href="#创建求解器" class="headerlink" title="创建求解器"></a>创建求解器</h3><ul><li>使用函数Solve()创建一个求解器：s&#x3D;Solver()</li></ul><h3 id="添加约束条件"><a href="#添加约束条件" class="headerlink" title="添加约束条件"></a>添加约束条件</h3><ul><li>使用函数add()添加约束条件：s.add(一个方程&#x2F;不等式)</li></ul><h3 id="判断是否有解"><a href="#判断是否有解" class="headerlink" title="判断是否有解"></a>判断是否有解</h3><ul><li>使用函数check()检查是否有解，有解返回’sat’，无解返回’unsat’</li></ul><h3 id="取解的交集"><a href="#取解的交集" class="headerlink" title="取解的交集"></a>取解的交集</h3><ul><li>使用函数model()取满足每个条件的解的交集，返回的是字典，用model[变量名]可以得到变量的解</li></ul><h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>解方程{x,y|30x+15y&#x3D;675,12x+5y&#x3D;265}</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> z3 <span class="hljs-keyword">import</span> *<br><br>x=Int(<span class="hljs-string">&#x27;x&#x27;</span>)<br>y=Int(<span class="hljs-string">&#x27;y&#x27;</span>)<br><br>s=Solver()<br>s.add(<span class="hljs-number">30</span>*x+<span class="hljs-number">15</span>*y==<span class="hljs-number">675</span>)<br>s.add(<span class="hljs-number">12</span>*x+<span class="hljs-number">5</span>*y==<span class="hljs-number">265</span>)<br><span class="hljs-keyword">if</span> s.check()==sat:<br>    <span class="hljs-built_in">print</span>(s.model())<br><span class="hljs-comment">#得到解[x = 20, y = 5]</span><br></code></pre></td></tr></table></figure>]]></content>
     
     
-    <summary type="html">z3求解器</summary>
+    <summary type="html">介绍Z3约束求解器在逆向工程和CTF中的应用，包括基本数据类型(Int、BitVec、Real等)、使用流程和实际案例分析。</summary>
     
     
     
