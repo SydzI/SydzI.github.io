@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Day14:IDApython与SMC - SydzI&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="SydzI&#039;s Blog"><meta name="msapplication-TileImage" content="/img/Newspaper.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SydzI&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="IDApythonAPI、SMC自修改代码"><meta property="og:type" content="blog"><meta property="og:title" content="Day14:IDApython与SMC"><meta property="og:url" content="https://sydzi.github.io/2025/08/05/Day14-IDApython%E4%B8%8ESMC/"><meta property="og:site_name" content="SydzI&#039;s Blog"><meta property="og:description" content="IDApythonAPI、SMC自修改代码"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://sydzi.github.io/images/image-20250805234429100.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250805234728191.png"><meta property="article:published_time" content="2025-08-05T01:53:56.000Z"><meta property="article:modified_time" content="2025-10-03T11:37:14.381Z"><meta property="article:author" content="SydzI"><meta property="article:tag" content="CTF"><meta property="article:tag" content="Reverse"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://sydzi.github.io/images/image-20250805234429100.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://sydzi.github.io/2025/08/05/Day14-IDApython%E4%B8%8ESMC/"},"headline":"Day14:IDApython与SMC","image":["https://sydzi.github.io/images/image-20250805234429100.png","https://sydzi.github.io/images/image-20250805234728191.png"],"datePublished":"2025-08-05T01:53:56.000Z","dateModified":"2025-10-03T11:37:14.381Z","author":{"@type":"Person","name":"SydzI"},"publisher":{"@type":"Organization","name":"SydzI's Blog","logo":{"@type":"ImageObject"}},"description":"IDApythonAPI、SMC自修改代码"}</script><link rel="canonical" href="https://sydzi.github.io/2025/08/05/Day14-IDApython%E4%B8%8ESMC/"><link rel="icon" href="/img/Newspaper.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/xcode.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0"><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="SydzI's Blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">SydzI&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">首页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item night" id="night-nav" title="Change Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-9-desktop is-9-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-08-05</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-10-03</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Reverse学习笔记</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>12 分钟读完 (大约1748个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><h1 class="title is-3 is-size-4-mobile">Day14:IDApython与SMC</h1><div class="content"><p>IDApythonAPI、SMC自修改代码</p>
+<span id="more"></span>
+
+<h2 id="IDApython"><a href="#IDApython" class="headerlink" title="IDApython"></a>IDApython</h2><ul>
+<li>先贴上官方文档： <a target="_blank" rel="noopener" href="https://python.docs.hex-rays.com/index.html">https://python.docs.hex-rays.com/index.html</a></li>
+</ul>
+<h3 id="基础API"><a href="#基础API" class="headerlink" title="基础API"></a>基础API</h3><ul>
+<li>idc.here() &#x2F; idc.get_screen_ea()：返回光标所在处的地址</li>
+<li>idc.get_inf_attr(INF_MIN_EA) &#x2F; idc.get_inf_attr(INF_MAX_EA)：返回最小&#x2F;最大地址（没有随机化地址情况下）</li>
+<li>idc.generate_disasm_line(ea,0)：返回ea所在处的汇编指令</li>
+<li>idc.prev_head(ea)&#x2F;next_head(ea)：返回ea处上一条&#x2F;下一条指令地址</li>
+<li>idc.print_insn_mnem(ea)：打印ea处的助记符（即mov,add什么的）</li>
+<li>idc.print_operand(ea,n)：打印ea处第n个操作数（n&#x3D;0或者1）</li>
+</ul>
+<h3 id="段相关API"><a href="#段相关API" class="headerlink" title="段相关API"></a>段相关API</h3><ul>
+<li>idautils.Segments()：返回段起始地址列表</li>
+<li>idc.get_segm_name(ea)：返回ea所在段的名字</li>
+<li>idc.get_segm_start(ea)&#x2F;get_segm_end(ea)：返回ea所在段的起始地址&#x2F;结束地址</li>
+<li>idc.get_next_seg(ea)：返回ea所在段的下一个段的起始地址</li>
+</ul>
+<h3 id="函数相关API"><a href="#函数相关API" class="headerlink" title="函数相关API"></a>函数相关API</h3><ul>
+<li>idautils.Functions(start_addr,end_addr)：返回地址间的函数对象（不写参数就是所有函数对象）</li>
+<li>idautils.FuncItems(ea)：返回ea所在函数所有指令的地址（相当于地址列表）</li>
+<li>idaapi.get_func(ea)：获得ea所在函数的对象（含有如start_ea、end_ea、size等属性）</li>
+<li>idc.get_func_name(ea)：返回ea所在函数的名字</li>
+<li>idc.get_func_attr(ea,FUNCATTR_START) &#x2F; idc.get_func_attr(ea,FUNCATTR_END)：返回ea所在函数的起始地址&#x2F;结束地址</li>
+<li>idc.get_next_func(ea) &#x2F; idc.get_prev_func(ea)：返回ea所在函数的上一个&#x2F;下一个函数的起始地址</li>
+</ul>
+<h3 id="指令相关API"><a href="#指令相关API" class="headerlink" title="指令相关API"></a>指令相关API</h3><ul>
+<li>ida_ua.insn_t()，返回一个空的指令对象（或者说创建一个空的指令对象），包含函数的一些属性</li>
+<li>idaapi.decode_insn(out,ea)，解析ea所在处的指令，把解析的结果给out（out必须是一个指令对象）<ul>
+<li>out.ea：指令的起始地址</li>
+<li>out.size：指令占用的字节数</li>
+<li>out.get_cannon_mnemonic()：指令的助记符</li>
+<li>out.itype：助记符的十进制码</li>
+</ul>
+</li>
+</ul>
+<h3 id="操作数相关API"><a href="#操作数相关API" class="headerlink" title="操作数相关API"></a>操作数相关API</h3><ul>
+<li>idc.get_operand_value(ea,n)：返回ea处第n个操作数的值</li>
+<li>idc.get_operand_type(ea,n)：返回ea处第n个操作数的类型</li>
+</ul>
+<h3 id="数据读写相关API"><a href="#数据读写相关API" class="headerlink" title="数据读写相关API"></a>数据读写相关API</h3><ul>
+<li>idc.get_bytes(ea,size)：返回ea处size大小的bytes</li>
+<li>idc.patch_byte(ea,content)：修改ea处的1字节为content</li>
+<li>idc.patch_word(ea,content)：修改ea处的2字节为content</li>
+<li>idc.patch_dword(ea,content)：修改ea处的4字节为content</li>
+<li>idc.patch_qword(ea,content)：修改ea处的8字节为content</li>
+</ul>
+<h3 id="调试相关API"><a href="#调试相关API" class="headerlink" title="调试相关API"></a>调试相关API</h3><ul>
+<li><p>ida_dbg.load_debugger(“local”,0)：启动调试器</p>
+</li>
+<li><p>ida_dbg.add_bpt(ea)：在ea处下断点</p>
+</li>
+<li><p>ida_dbg.del_bpt(ea)：删除ea处断点</p>
+</li>
+<li><p>ida_dbg.start_process(path,args,sdir)：启动调试进程，参数对应路径、命令行参数、工作目录</p>
+</li>
+<li><p>ida_dbg.step_into()：单步步入</p>
+</li>
+<li><p>ida_dbg.step_over()：单步步过</p>
+</li>
+<li><p>ida_dbg.step_until_ret()：运行到返回</p>
+</li>
+<li><p>idc.get_reg_value(regname)：获取regname寄存器的值</p>
+</li>
+<li><p>idc.set_reg_value(value,regname)：设置regname寄存器的值</p>
+</li>
+</ul>
+<h3 id="其他操作相关API"><a href="#其他操作相关API" class="headerlink" title="其他操作相关API"></a>其他操作相关API</h3><ul>
+<li><p>idautils.XrefsFrom(ea)：返回ea处引用的对象（有属性frm、to、type）</p>
+</li>
+<li><p>idautils.XrefsTo(ea)：返回所有引用ea处的对象（有属性frm、to、type）（Ctrl+X）</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idaapi<br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsTo(here()):<br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#调用here()的函数地址</span><br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsFrom(here()):<br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()引用的函数地址</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>idautils.Strings()：返回包含所有字符串的对象（有属性ea、length、strtype）（shift+F12）</p>
+</li>
+<li><p>idc.get_strlit_contents(ea)：返回ea处的字符串</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idc,idautils<br><span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> idautils.Strings():<br>    string=idc.get_strlit_contents(s.ea)<br>    <span class="hljs-built_in">print</span>(string)<br><span class="hljs-comment">#打印所有字符串</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="自修改代码（SMC）"><a href="#自修改代码（SMC）" class="headerlink" title="自修改代码（SMC）"></a>自修改代码（SMC）</h2><ul>
+<li><p>自修改代码（Self-Modifying-Code）指某部分代码以加密后的形式存在于程序中，程序执行到这部分代码的时候才会进行动态解密，和加壳有点异曲同工。常用来加密关键逻辑，使其不可直接静态分析</p>
+</li>
+<li><p>特征：</p>
+<p>程序中存在对程序自身某部分的运算，一般还需要VirtualProtect() &#x2F; mprotect()来改变内存的属性以便将解密后的代码数据写入内存，或者使用VirtualAlloc把解密后的代码数据写入堆中执行（为了避免API暴露，还可能会新增一个有RWX属性的段来存放加密后的代码）。</p>
+</li>
+<li><p>应对方法有两种：一种是动态调试得到解密后的关键逻辑，另一种是使用脚本解密关键逻辑后再覆盖回去</p>
+<ul>
+<li><p>示例：2021-羊城杯-babysmc</p>
+<p>PS：本来想要自己写一个简单程序试试手的，研究了半个下午没研究出来，程序修正到解密函数可以解密出正确代码了，但是调用关键逻辑check的时候莫名其妙跑飞了，在那个安全检查的位置，跳转后像是个畸形函数，不知道是不是改内存属性的时候影响到了，所以只能去找网上的题目了</p>
+</li>
+<li><p>这是优化后的主函数：</p>
+<p><img src="/../images/image-20250805234429100.png" alt="主函数"></p>
+<p>优化的来源就是，enc的位置是一团数字，而loc_7FF6BF081D00处开始是正常代码，加上对下面的decrypt函数的分析，可以确定enc就是被加密后的first_part</p>
+</li>
+<li><p>这是decrypt函数：</p>
+<p><img src="/../images/image-20250805234728191.png" alt="decrypt函数"></p>
+<p>非常明显地调用了VirtualProtect函数，解密逻辑很简单，就是ror后异或0x5a（ror查出来是循环右移，3就是右移的位数了，这点看汇编可能更清晰点）</p>
+</li>
+<li><p>下面就是今天的成果展示了（ror由DS协助实现），SMC解密脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idc,idaapi<br><br>enc=idc.get_bytes(<span class="hljs-number">0x00007FF6BF081085</span>,<span class="hljs-number">0x00007FF6BF081D00</span>-<span class="hljs-number">0x00007FF6BF081085</span>)<br>loc=<span class="hljs-number">0x00007FF6BF081085</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">ror</span>(<span class="hljs-params">value, shift, bits=<span class="hljs-number">8</span></span>):<br>    shift %= bits  <span class="hljs-comment"># 确保位移量在有效范围内</span><br>    <span class="hljs-keyword">return</span> (value &gt;&gt; shift) | ((value &lt;&lt; (bits - shift)) &amp; ((<span class="hljs-number">1</span> &lt;&lt; bits) - <span class="hljs-number">1</span>))<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> enc:<br>    idc.patch_byte(loc,(ror(i,<span class="hljs-number">3</span>)^<span class="hljs-number">0x5a</span>)&amp;<span class="hljs-number">0xff</span>)<br>    loc+=<span class="hljs-number">1</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;done&quot;</span>)<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>本来是要写完的，但是first_part的函数解析完好几百行了，是我看不懂的加密🫠去找WP，发现是非常混淆的base64，还加了异或，但是我没看出逻辑，索性点到为止，改天把编码和密码的部分补上再说。</p>
+</li>
+<li><p>本来也尝试了动调解密，但是调着调着给我下起东西来了，虽然链接看着是微软的，但是还是有点怕，就舍弃这个方法了（下的是kernel.pdb好像，DS说是缺失符号文件🫠🫠）</p>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="article-licensing box"><div class="licensing-title"><p>Day14:IDApython与SMC</p><p><a href="https://sydzi.github.io/2025/08/05/Day14-IDApython与SMC/">https://sydzi.github.io/2025/08/05/Day14-IDApython与SMC/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>SydzI</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2025-08-05</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-10-03</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/CTF/">CTF</a><a class="link-muted mr-2" rel="tag" href="/tags/Reverse/">Reverse</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=68b654c479868da1c7122aa1&amp;product=inline-share-buttons" defer></script><nav class="post-navigation mt-4 mb-2 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2025/08/06/Day15-%E6%8C%87%E4%BB%A4%E8%99%9A%E6%8B%9F%E5%8C%96/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">Day15:指令虚拟化</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2025/08/03/Day13-%E5%8F%8D%E8%B0%83%E8%AF%95%EF%BC%88%E4%BA%8C%EF%BC%89/"><span class="level-item">Day13:反调试（二）</span><i class="level-item fas fa-chevron-right"></i></a></div></nav></article></div><!--!--><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">评论</h3><script src="https://utteranc.es/client.js" repo="sydzi/sydzi.github.io" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-3-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.jpg" alt="SydzI"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">SydzI</p><p class="is-size-6 is-block">Action over inaction</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Nanjing, China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">31</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">6</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">10</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/SydzI" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://github.com/SydzI"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#IDApython"><span class="level-left"><span class="level-item">1</span><span class="level-item">IDApython</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#基础API"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">基础API</span></span></a></li><li><a class="level is-mobile" href="#段相关API"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">段相关API</span></span></a></li><li><a class="level is-mobile" href="#函数相关API"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">函数相关API</span></span></a></li><li><a class="level is-mobile" href="#指令相关API"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">指令相关API</span></span></a></li><li><a class="level is-mobile" href="#操作数相关API"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">操作数相关API</span></span></a></li><li><a class="level is-mobile" href="#数据读写相关API"><span class="level-left"><span class="level-item">1.6</span><span class="level-item">数据读写相关API</span></span></a></li><li><a class="level is-mobile" href="#调试相关API"><span class="level-left"><span class="level-item">1.7</span><span class="level-item">调试相关API</span></span></a></li><li><a class="level is-mobile" href="#其他操作相关API"><span class="level-left"><span class="level-item">1.8</span><span class="level-item">其他操作相关API</span></span></a></li></ul></li><li><a class="level is-mobile" href="#自修改代码（SMC）"><span class="level-left"><span class="level-item">2</span><span class="level-item">自修改代码（SMC）</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">SydzI&#039;s Blog</a><p class="is-size-7"><span>&copy; 2025 SydzI</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            },
+            services: {
+                firebase: {"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}
+            }
+        };</script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><script data-pjax src="/js/firebase_counter.js" defer></script><script src="/js/night.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body></html>

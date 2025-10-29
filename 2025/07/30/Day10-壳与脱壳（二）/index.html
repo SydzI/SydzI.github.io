@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Day10:壳与脱壳（二） - SydzI&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="SydzI&#039;s Blog"><meta name="msapplication-TileImage" content="/img/Newspaper.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SydzI&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="二次断点法、一次断点法、特征查找法（基于Xdbg）、Dll手动脱壳"><meta property="og:type" content="blog"><meta property="og:title" content="Day10:壳与脱壳（二）"><meta property="og:url" content="https://sydzi.github.io/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/"><meta property="og:site_name" content="SydzI&#039;s Blog"><meta property="og:description" content="二次断点法、一次断点法、特征查找法（基于Xdbg）、Dll手动脱壳"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730155018782.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730155602928.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730155656485.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730163429021.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730164034182.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730165414432.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730165457171.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730165636809.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730224157270.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730224231764.png"><meta property="og:image" content="https://sydzi.github.io/images/image-20250730224435928.png"><meta property="article:published_time" content="2025-07-30T05:13:02.000Z"><meta property="article:modified_time" content="2025-10-29T06:57:16.823Z"><meta property="article:author" content="SydzI"><meta property="article:tag" content="CTF"><meta property="article:tag" content="Reverse"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://sydzi.github.io/images/image-20250730155018782.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://sydzi.github.io/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/"},"headline":"Day10:壳与脱壳（二）","image":["https://sydzi.github.io/images/image-20250730155018782.png","https://sydzi.github.io/images/image-20250730155602928.png","https://sydzi.github.io/images/image-20250730155656485.png","https://sydzi.github.io/images/image-20250730163429021.png","https://sydzi.github.io/images/image-20250730164034182.png","https://sydzi.github.io/images/image-20250730165414432.png","https://sydzi.github.io/images/image-20250730165457171.png","https://sydzi.github.io/images/image-20250730165636809.png","https://sydzi.github.io/images/image-20250730224157270.png","https://sydzi.github.io/images/image-20250730224231764.png","https://sydzi.github.io/images/image-20250730224435928.png"],"datePublished":"2025-07-30T05:13:02.000Z","dateModified":"2025-10-29T06:57:16.823Z","author":{"@type":"Person","name":"SydzI"},"publisher":{"@type":"Organization","name":"SydzI's Blog","logo":{"@type":"ImageObject"}},"description":"二次断点法、一次断点法、特征查找法（基于Xdbg）、Dll手动脱壳"}</script><link rel="canonical" href="https://sydzi.github.io/2025/07/30/Day10-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%BA%8C%EF%BC%89/"><link rel="icon" href="/img/Newspaper.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/xcode.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><meta name="msvalidate.01" content="9FE0F2242662A1EB82C139F80B4118F0"><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'upLteeXJeF0vtcEfQngBefAoRrZBdbYGiIdhlziWygs');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="SydzI's Blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">SydzI&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">首页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item night" id="night-nav" title="Change Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-9-desktop is-9-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 level is-mobile"><div class="level-left"><span class="level-item"><i class="fas fa-calendar-alt mr-1"></i><time datetime="${date_xml(page.date)}" title="${new Date(page.date).toLocaleString()}">2025-07-30</time></span><span class="level-item"><i class="fas fa-sync-alt mr-1"></i><time datetime="${date_xml(page.updated)}" title="${new Date(page.updated).toLocaleString()}">2025-10-29</time></span><span class="level-item"><i class="far fa-folder-open mr-1"></i><a class="link-muted" href="/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Reverse学习笔记</a></span><span class="level-item"><i class="far fa-clock mr-1"></i>8 分钟读完 (大约1177个字)</span><span class="level-item"><i class="far fa-eye mr-1"></i><span class="firestore-visitors-count">0</span></span></div></div><h1 class="title is-3 is-size-4-mobile">Day10:壳与脱壳（二）</h1><div class="content"><p>二次断点法、一次断点法、特征查找法（均基于Xdbg）、Dll手动脱壳</p>
+<span id="more"></span>
+
+<h2 id="寻找OEP的方法（二）"><a href="#寻找OEP的方法（二）" class="headerlink" title="寻找OEP的方法（二）"></a>寻找OEP的方法（二）</h2><h3 id="二次断点法"><a href="#二次断点法" class="headerlink" title="二次断点法"></a>二次断点法</h3><ul>
+<li><p>又叫内存镜像法，原理是壳程序解析时会从.rsrc段获取资源，解析后回到代码段，因此可以通过现在.rsrc段设置内存读取断点，然后在代码段(.text&#x2F;.code)设置内存写入断点来监控壳程序执行。</p>
+</li>
+<li><p>通常这个方法是基于OllyDbg的，但是从原理出发Xdbg也不是不能用。除了有一步是在OllyDbg中设置忽略所有异常，Xdbg好像没有这个设置选项，但是经过实测是可以用这个方法在Xdbg脱upx壳的。</p>
+</li>
+<li><p>Upx脱壳示例：</p>
+<ul>
+<li><p>Xdbg载入程序，先在“断点”模块把预设的断点删除，避免程序在非关注的异常处（断点处）停下</p>
+<p><img src="/../images/image-20250730155018782.png" alt="移除断点"></p>
+</li>
+<li><p>然后到“内存映射”模块找到程序的.rsrc（注意所属方为用户），下一次性内存读取断点</p>
+<p><img src="/../images/image-20250730155602928.png" alt="下内存读取断点"></p>
+</li>
+<li><p>shift+F9运行，然后在上方的upx0处下一次性内存写入断点</p>
+<p><img src="/../images/image-20250730155656485.png" alt="下内存写入断点"></p>
+</li>
+<li><p>shift+F9运行，回到“CPU”模块，会发现下方不远处就有一个大跳（隔得有点远截不到eip和大跳的同框图），在大跳前下断点，F9运行到断点处，然后步进就可以到达OEP了</p>
+</li>
+</ul>
+</li>
+<li><p>但是有一点奇怪的地方：结合upx的解析原理，upx好像是从upx1段加载数据解析到upx0段的（AI说的，不确定对不对），所以按道理，在upx1处下内存读取断点不是也有类似的监控效果吗？但是实测这样子会跑飞🤔有过一个想法就是，因为在upx1段下了读取断点，壳程序解析前中断了，然后又在upx0段下写入断点，然后按道理应该停在解析然后写入这一步，就是解析了还没写入，或者说刚刚写入一次，那这样也不至于直接调试终止吧🤔</p>
+</li>
+</ul>
+<h3 id="一次断点法（二次断点法plus"><a href="#一次断点法（二次断点法plus" class="headerlink" title="一次断点法（二次断点法plus)"></a>一次断点法（二次断点法plus)</h3><ul>
+<li><p>这个方法是基于二次断点法和upx实测出来的，因为根据壳程序解析的原理，最终都会发生向内存写入解析完的数据的操作，所以直接在写入的地方下内存写入断点，这样调试器中断的地方就离OEP不远了（接近壳程序解析的尾声，但还是远到截不到eip和大跳的同框图）</p>
+</li>
+<li><p>示例</p>
+<ul>
+<li><p>首先，同样要先去掉预设断点</p>
+<p><img src="/../images/image-20250730163429021.png" alt="去掉预设断点"></p>
+</li>
+<li><p>然后在“内存映射”模块给upx0下一次性内存写入断点&#x2F;给upx1下一次性内存读取断点</p>
+<p><img src="/../images/image-20250730164034182.png" alt="下内存写入断点"></p>
+</li>
+<li><p>shift+F9运行，中断的地方就差不多是壳程序解析写入&#x2F;开始解析的地方了，在下方大跳前F2断点+F9运行一步到位，然后就可以跳转到OEP了</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="特征查找法"><a href="#特征查找法" class="headerlink" title="特征查找法"></a>特征查找法</h3><ul>
+<li><p>借助特征指令popad，在程序区域搜索指令，然后下断点运行至此，再接着运行到OEP处</p>
+</li>
+<li><p>示例：</p>
+<ul>
+<li><p>F9运行到程序区域，此时断在pushad</p>
+<p><img src="/../images/image-20250730165414432.png" alt="F9运行"></p>
+</li>
+<li><p>右键在当前区域搜索命令popad</p>
+<p><img src="/../images/image-20250730165457171.png" alt="搜索"></p>
+</li>
+<li><p>双击搜索结果跳转，下方不远处就是到OEP的大跳了。直接在jmp前一条指令下断点，F9到此，然后步进</p>
+<p><img src="/../images/image-20250730165636809.png" alt="搜索结果"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Dll手动脱壳"><a href="#Dll手动脱壳" class="headerlink" title="Dll手动脱壳"></a>Dll手动脱壳</h2><ul>
+<li><p>若出现Dll程序加壳的情况，可以先把Dll程序转化成exe程序，然后使用和exe手动脱壳一样的步骤即可</p>
+</li>
+<li><p>示例：</p>
+<ul>
+<li><p>用DIE打开Dll程序，可以看到显示加了upx壳</p>
+<p><img src="/../images/image-20250730224157270.png" alt="DIE查看"></p>
+</li>
+<li><p>点击“区块”下方的“&gt;”，打开文件结构界面</p>
+<p><img src="/../images/image-20250730224231764.png" alt="文件结构页面"></p>
+</li>
+<li><p>取消勾选右上角”只读“，然后点击IMAGE_FILE_HEADER，取消勾选”标志“中的”Dll“（图中未取消）</p>
+<p><img src="/../images/image-20250730224435928.png" alt="取消勾选Dll"></p>
+<p>此时可以发现，Characteristics的值变了</p>
+</li>
+<li><p>然后把dll后缀改成exe就可以按照exe手动脱壳的步骤进行脱壳了</p>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="article-licensing box"><div class="licensing-title"><p>Day10:壳与脱壳（二）</p><p><a href="https://sydzi.github.io/2025/07/30/Day10-壳与脱壳（二）/">https://sydzi.github.io/2025/07/30/Day10-壳与脱壳（二）/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>SydzI</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2025-07-30</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-10-29</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/CTF/">CTF</a><a class="link-muted mr-2" rel="tag" href="/tags/Reverse/">Reverse</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=68b654c479868da1c7122aa1&amp;product=inline-share-buttons" defer></script><nav class="post-navigation mt-4 mb-2 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">Day11:花指令</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2025/07/29/Day9-%E5%A3%B3%E4%B8%8E%E8%84%B1%E5%A3%B3%EF%BC%88%E4%B8%80%EF%BC%89/"><span class="level-item">Day9:壳与脱壳（一）</span><i class="level-item fas fa-chevron-right"></i></a></div></nav></article></div><!--!--><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">评论</h3><script src="https://utteranc.es/client.js" repo="sydzi/sydzi.github.io" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-3-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.jpg" alt="SydzI"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">SydzI</p><p class="is-size-6 is-block">Action over inaction</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Nanjing, China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">31</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">6</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">10</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/SydzI" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://github.com/SydzI"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#寻找OEP的方法（二）"><span class="level-left"><span class="level-item">1</span><span class="level-item">寻找OEP的方法（二）</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#二次断点法"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">二次断点法</span></span></a></li><li><a class="level is-mobile" href="#一次断点法（二次断点法plus"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">一次断点法（二次断点法plus)</span></span></a></li><li><a class="level is-mobile" href="#特征查找法"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">特征查找法</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Dll手动脱壳"><span class="level-left"><span class="level-item">2</span><span class="level-item">Dll手动脱壳</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">SydzI&#039;s Blog</a><p class="is-size-7"><span>&copy; 2025 SydzI</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            },
+            services: {
+                firebase: {"enable":true,"collection":"articles","apiKey":"AIzaSyCL4X3DgCuPZ09mSUIYiIzwCrbKdVcf_jY","projectId":"sydzi-s-blog-counter"}
+            }
+        };</script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><script data-pjax src="/js/firebase_counter.js" defer></script><script src="/js/night.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"css":false});</script></body></html>
