@@ -6,7 +6,7 @@
   <link href="https://sydzi.github.io/atom.xml" rel="self"/>
   
   <link href="https://sydzi.github.io/"/>
-  <updated>2026-02-01T14:54:23.249Z</updated>
+  <updated>2026-02-08T15:31:14.782Z</updated>
   <id>https://sydzi.github.io/</id>
   
   <author>
@@ -17,11 +17,32 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>week49-week52</title>
+    <link href="https://sydzi.github.io/2026/02/08/week49-week52/"/>
+    <id>https://sydzi.github.io/2026/02/08/week49-week52/</id>
+    <published>2026-02-08T15:26:28.000Z</published>
+    <updated>2026-02-08T15:31:14.782Z</updated>
+    
+    <content type="html"><![CDATA[<p>2026年2月篇</p><span id="more"></span><h2 id="week49-2026-2-2-2026-2-8"><a href="#week49-2026-2-2-2026-2-8" class="headerlink" title="week49 (2026.2.2-2026.2.8)"></a>week49 (2026.2.2-2026.2.8)</h2><ul><li>这周，折腾了一点爬虫(～￣▽￣)～有点小摆(～￣▽￣)～</li></ul>]]></content>
+    
+    
+    <summary type="html">2026年2月4篇周记</summary>
+    
+    
+    
+    <category term="周记" scheme="https://sydzi.github.io/categories/%E5%91%A8%E8%AE%B0/"/>
+    
+    
+    <category term="周记" scheme="https://sydzi.github.io/tags/%E5%91%A8%E8%AE%B0/"/>
+    
+  </entry>
+  
+  <entry>
     <title>week45-week48</title>
     <link href="https://sydzi.github.io/2026/01/11/week45-week48/"/>
     <id>https://sydzi.github.io/2026/01/11/week45-week48/</id>
     <published>2026-01-11T14:28:26.000Z</published>
-    <updated>2026-02-01T14:54:23.249Z</updated>
+    <updated>2026-02-08T15:27:37.926Z</updated>
     
     <content type="html"><![CDATA[<p>2026年1月篇</p><span id="more"></span><h2 id="week45-2026-1-5-2025-1-11"><a href="#week45-2026-1-5-2025-1-11" class="headerlink" title="week45 (2026.1.5-2025.1.11)"></a>week45 (2026.1.5-2025.1.11)</h2><ul><li>期末周，复习到要似力X﹏X</li></ul><h2 id="week46-2026-1-12-2026-1-18"><a href="#week46-2026-1-12-2026-1-18" class="headerlink" title="week46 (2026.1.12-2026.1.18)"></a>week46 (2026.1.12-2026.1.18)</h2><ul><li>期末周断更…</li></ul><h2 id="week47-2026-1-19-2026-1-25"><a href="#week47-2026-1-19-2026-1-25" class="headerlink" title="week47 (2026.1.19-2026.1.25)"></a>week47 (2026.1.19-2026.1.25)</h2><ul><li>考完试回家力，偷懒两天:p</li></ul><h2 id="week48-2026-1-26-2026-2-1"><a href="#week48-2026-1-26-2026-2-1" class="headerlink" title="week48 (2026.1.26-2026.2.1)"></a>week48 (2026.1.26-2026.2.1)</h2><ul><li>周末两天打阿里CTF，爆零了😭😭</li></ul>]]></content>
     
@@ -449,29 +470,6 @@
     
     
     <summary type="html">反调试基本原理、WINAPI检测、数据检测、进程检测</summary>
-    
-    
-    
-    <category term="Reverse学习笔记" scheme="https://sydzi.github.io/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="CTF" scheme="https://sydzi.github.io/tags/CTF/"/>
-    
-    <category term="Reverse" scheme="https://sydzi.github.io/tags/Reverse/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Day11:花指令</title>
-    <link href="https://sydzi.github.io/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/"/>
-    <id>https://sydzi.github.io/2025/07/31/Day11-%E8%8A%B1%E6%8C%87%E4%BB%A4/</id>
-    <published>2025-07-31T02:54:49.000Z</published>
-    <updated>2025-11-07T09:20:07.660Z</updated>
-    
-    <content type="html"><![CDATA[<p>花指令</p><span id="more"></span><h2 id="花指令"><a href="#花指令" class="headerlink" title="花指令"></a>花指令</h2><ul><li><p>又叫垃圾指令，不影响程序原始逻辑，但会干扰IDA反编译或者反汇编。</p></li><li><p>原理：</p><p>因为反编译器多是静态分析的，不会通过执行来分析逻辑，只会根据反汇编出来的指令分析，因此有空可乘：例如可以通过内联汇编不完整指令但是跳过不完整指令来模糊指令边界、内联汇编永跳永不跳分支来误导运行逻辑分析、内联汇编无意义指令误导主要逻辑</p></li><li><p>显著特征是出现红色行，而应对方法是选中花指令所在的区域改为“nop”（空指令）</p></li></ul><h3 id="恒跳型"><a href="#恒跳型" class="headerlink" title="恒跳型"></a>恒跳型</h3><ul><li><p>即通过预设ZF位为1，使jz恒执行。实测IDA9.0.241217不会报红，也就是混淆失效，所以就看看源码吧</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;windows.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>_asm&#123;<br>xor eax, eax;<br>jz s;<br>add esp, <span class="hljs-number">0x11</span>;<br>s:<br>&#125;;<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;hello\n&quot;</span>);<br>system(<span class="hljs-string">&quot;pause&quot;</span>);<br><span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li></ul><h3 id="call-ret相消型"><a href="#call-ret相消型" class="headerlink" title="call-ret相消型"></a>call-ret相消型</h3><ul><li><p>来看效果</p><p><img src="/../images/image-20250731203000820.png" alt="报红"></p></li><li><p>可以看到，在函数中间出现了sp-analysis failed，而上面一条就是retn，明显不对。</p><p>往前看，rep stosd初始化后，call了$+5，即当前位置+5&#x3D;0046308C，也就是下一条的add</p><p>然后给esp的值+7（call的时候push eip即push 0046308c了）</p><p>此时esp存放值为0046308c+7&#x3D;00463093，所以retn时会pop 00463093，程序跳到00463093</p><p>往下看，00463093正是没识别出来的三个数的最后一个，下面还有一个offset没有指令。</p><p>第三个数68h和offset结合刚好是push offset，对应上了下面的call（函数传参）</p></li><li><p>选中没识别的三个数，按“U”（undefine)，可以看到三个数分开了</p><p><img src="/../images/image-20250731203817109.png" alt="按U"></p></li><li><p>选中db 68h和dd offset aHello，按C转化为汇编指令，可以看到push offset恢复了</p><p><img src="/../images/image-20250731204815374.png" alt="恢复push"></p></li><li><p>选中call $+5到db 34h，右键选择”Fill with NOPs“（实测db 34h会nop不干净，要选中到db 34h下一行）</p><p><img src="/../images/image-20250731204858702.png" alt="NOP"></p></li><li><p>可以看到函数变成这样，这是因为插入了retn导致函数范围分析错误，需要纠正</p><p><img src="/../images/image-20250731205500606.png" alt="NOP完"></p></li><li><p>点击函数名，然后右键edit fuction，把end address改成末尾那个真正的retn的地址就OK了</p><p><img src="/../images/image-20250731205807130.png" alt="纠正函数范围"></p></li></ul><h3 id="jz-操作数不全型"><a href="#jz-操作数不全型" class="headerlink" title="jz-操作数不全型"></a>jz-操作数不全型</h3><ul><li><p>这种情况下会出现和上一种一样的指令识别错误的问题，且看图：</p><p><img src="/../images/image-20250801002342967.png" alt="图"></p></li><li><p>这是按照MSVS C++初始化规则跳转后，在本来main函数的地方的截图。但是跳转过程中会发现，跳转到main函数的代码是jmp loc_xxxxxx而不是jmp sub_xxxxxx。但是目前还不影响，先分析报错的地方。</p></li><li><p>可以看到 xor ebp,[eax+50h] 处报红了，并且下面是一段没分析出来的数和字符串”pause”，下面进行分析</p></li><li><p>首先，rep stosd初始化后，进行了一个恒跳，跳转的地方是0046308E，在 xor ebp,[eax+50h] 这条指令里，所以这里红了</p></li><li><p>把 xor ebp,[eax+50h] 这条指令undefine一下</p><p><img src="/../images/image-20250801002409823.png" alt="undefine一下"></p></li><li><p>根据逻辑，程序是肯定会跳到0046308E的，所以前面的代码冗余，直接nop掉。选中 xor eax,eax 到0046308E（根据上一种类型的经验，要多覆盖一位才能刚好nop掉目标代码）</p><p><img src="/../images/image-20250801002510740.png" alt="NOP"></p></li><li><p>nop完成后（如果有db 90h就按”C“转成code）就会发现下面没分析的数立刻分析出指令了</p><p><img src="/../images/image-20250801002536258.png" alt="去混淆成功"></p></li><li><p>但是还没完，此时按F5是无法反编译的，因为报错的地方是loc_xxxxxx范围里的，不是一个函数，也就是前面说的jmp loc_xxxxxx而不是jmp sub_xxxxxx的问题了。这里可以看出，IDA这类混淆会导致IDA把函数识别成一个引用而不是函数。</p></li><li><p>到最开始push ebp开辟栈帧的引用loc_463070处，把它undefine一下，再按“P”重新分析一下，就可以得到main函数了</p><p><img src="/../images/image-20250801002703125.png" alt="修复的main函数"></p></li><li><p>这类有一个特征就是jz loc_xxxxxx+1，据此可以快速找到加了混淆的地方</p></li></ul><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>上述三种（实际上有混淆效果的只有两种）是比较基础的花指令。识别花指令的要点主要是看红色错误，也可以结合一些特征来识别。解决方法就是nop掉混淆代码。</li><li>在实际设计题目时，笔者意外发现了一些更强力的混淆，单单是在上述三种类型的基础上加一点其他指令，就会导致一个函数完全无法被识别（被放在rdata段而不是text段的那种），但是程序还能正常执行，而报错的地方在无法识别的函数的上级函数里（跳转到这个函数的那个函数），可能要结合AI才能实现快捷的分析。因此，花指令还是一个具有挑战性的混淆方式（当然也可能是笔者太菜了没石粒）</li></ul>]]></content>
-    
-    
-    <summary type="html">花指令</summary>
     
     
     
