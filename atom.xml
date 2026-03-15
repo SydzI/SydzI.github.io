@@ -6,7 +6,7 @@
   <link href="https://sydzi.github.io/atom.xml" rel="self"/>
   
   <link href="https://sydzi.github.io/"/>
-  <updated>2026-03-15T14:32:42.075Z</updated>
+  <updated>2026-03-15T14:32:42.104Z</updated>
   <id>https://sydzi.github.io/</id>
   
   <author>
@@ -15,25 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Day18-Java</title>
-    <link href="https://sydzi.github.io/2026/03/12/Day18-Java/"/>
-    <id>https://sydzi.github.io/2026/03/12/Day18-Java/</id>
-    <published>2026-03-12T13:01:00.000Z</published>
-    <updated>2026-03-15T14:32:42.075Z</updated>
-    
-    
-    
-    
-    <category term="Reverse学习笔记" scheme="https://sydzi.github.io/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="CTF" scheme="https://sydzi.github.io/tags/CTF/"/>
-    
-    <category term="Reverse" scheme="https://sydzi.github.io/tags/Reverse/"/>
-    
-  </entry>
   
   <entry>
     <title>week53-week56</title>
@@ -462,6 +443,29 @@
     
     
     <summary type="html">指令虚拟化、实现一个小型虚拟机程序、VM逆向实践</summary>
+    
+    
+    
+    <category term="Reverse学习笔记" scheme="https://sydzi.github.io/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="CTF" scheme="https://sydzi.github.io/tags/CTF/"/>
+    
+    <category term="Reverse" scheme="https://sydzi.github.io/tags/Reverse/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Day14:IDApython与SMC</title>
+    <link href="https://sydzi.github.io/2025/08/05/Day14-IDApython%E4%B8%8ESMC/"/>
+    <id>https://sydzi.github.io/2025/08/05/Day14-IDApython%E4%B8%8ESMC/</id>
+    <published>2025-08-05T01:53:56.000Z</published>
+    <updated>2026-02-15T15:23:13.833Z</updated>
+    
+    <content type="html"><![CDATA[<p>IDApythonAPI、SMC自修改代码</p><span id="more"></span><h2 id="IDApython"><a href="#IDApython" class="headerlink" title="IDApython"></a>IDApython</h2><ul><li>先贴上官方文档： <a href="https://python.docs.hex-rays.com/index.html">https://python.docs.hex-rays.com/index.html</a></li></ul><h3 id="基础API"><a href="#基础API" class="headerlink" title="基础API"></a>基础API</h3><ul><li>idc.here() &#x2F; idc.get_screen_ea()：返回光标所在处的地址</li><li>idc.get_inf_attr(INF_MIN_EA) &#x2F; idc.get_inf_attr(INF_MAX_EA)：返回最小&#x2F;最大地址（没有随机化地址情况下）</li><li>idc.generate_disasm_line(ea,0)：返回ea所在处的汇编指令</li><li>idc.prev_head(ea)&#x2F;next_head(ea)：返回ea处上一条&#x2F;下一条指令地址</li><li>idc.print_insn_mnem(ea)：打印ea处的助记符（即mov,add什么的）</li><li>idc.print_operand(ea,n)：打印ea处第n个操作数（n&#x3D;0或者1）</li></ul><h3 id="段相关API"><a href="#段相关API" class="headerlink" title="段相关API"></a>段相关API</h3><ul><li>idautils.Segments()：返回段起始地址列表</li><li>idc.get_segm_name(ea)：返回ea所在段的名字</li><li>idc.get_segm_start(ea)&#x2F;get_segm_end(ea)：返回ea所在段的起始地址&#x2F;结束地址</li><li>idc.get_next_seg(ea)：返回ea所在段的下一个段的起始地址</li></ul><h3 id="函数相关API"><a href="#函数相关API" class="headerlink" title="函数相关API"></a>函数相关API</h3><ul><li>idautils.Functions(start_addr,end_addr)：返回地址间的函数对象（不写参数就是所有函数对象）</li><li>idautils.FuncItems(ea)：返回ea所在函数所有指令的地址（相当于地址列表）</li><li>idaapi.get_func(ea)：获得ea所在函数的对象（含有如start_ea、end_ea、size等属性）</li><li>idc.get_func_name(ea)：返回ea所在函数的名字</li><li>idc.get_func_attr(ea,FUNCATTR_START) &#x2F; idc.get_func_attr(ea,FUNCATTR_END)：返回ea所在函数的起始地址&#x2F;结束地址</li><li>idc.get_next_func(ea) &#x2F; idc.get_prev_func(ea)：返回ea所在函数的上一个&#x2F;下一个函数的起始地址</li></ul><h3 id="指令相关API"><a href="#指令相关API" class="headerlink" title="指令相关API"></a>指令相关API</h3><ul><li>ida_ua.insn_t()，返回一个空的指令对象（或者说创建一个空的指令对象），包含函数的一些属性</li><li>idaapi.decode_insn(out,ea)，解析ea所在处的指令，把解析的结果给out（out必须是一个指令对象）<ul><li>out.ea：指令的起始地址</li><li>out.size：指令占用的字节数</li><li>out.get_cannon_mnemonic()：指令的助记符</li><li>out.itype：助记符的十进制码</li></ul></li></ul><h3 id="操作数相关API"><a href="#操作数相关API" class="headerlink" title="操作数相关API"></a>操作数相关API</h3><ul><li>idc.get_operand_value(ea,n)：返回ea处第n个操作数的值</li><li>idc.get_operand_type(ea,n)：返回ea处第n个操作数的类型</li></ul><h3 id="数据读写相关API"><a href="#数据读写相关API" class="headerlink" title="数据读写相关API"></a>数据读写相关API</h3><ul><li>idc.get_bytes(ea,size)：返回ea处size大小的bytes</li><li>idc.patch_byte(ea,content)：修改ea处的1字节为content</li><li>idc.patch_word(ea,content)：修改ea处的2字节为content</li><li>idc.patch_dword(ea,content)：修改ea处的4字节为content</li><li>idc.patch_qword(ea,content)：修改ea处的8字节为content</li></ul><h3 id="调试相关API"><a href="#调试相关API" class="headerlink" title="调试相关API"></a>调试相关API</h3><ul><li><p>ida_dbg.load_debugger(“local”,0)：启动调试器</p></li><li><p>ida_dbg.add_bpt(ea)：在ea处下断点</p></li><li><p>ida_dbg.del_bpt(ea)：删除ea处断点</p></li><li><p>ida_dbg.start_process(path,args,sdir)：启动调试进程，参数对应路径、命令行参数、工作目录</p></li><li><p>ida_dbg.step_into()：单步步入</p></li><li><p>ida_dbg.step_over()：单步步过</p></li><li><p>ida_dbg.step_until_ret()：运行到返回</p></li><li><p>idc.get_reg_value(regname)：获取regname寄存器的值</p></li><li><p>idc.set_reg_value(value,regname)：设置regname寄存器的值</p></li></ul><h3 id="其他操作相关API"><a href="#其他操作相关API" class="headerlink" title="其他操作相关API"></a>其他操作相关API</h3><ul><li><p>idautils.XrefsFrom(ea)：返回ea处引用的对象（有属性frm、to、type）</p></li><li><p>idautils.XrefsTo(ea)：返回所有引用ea处的对象（有属性frm、to、type）（Ctrl+X）</p><p>示例：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idaapi<br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsTo(here()):<br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#调用here()的函数地址</span><br><span class="hljs-keyword">for</span> xref <span class="hljs-keyword">in</span> idautils.XrefsFrom(here()):<br>    <span class="hljs-built_in">print</span>(xref.frm)<span class="hljs-comment">#here()</span><br>    <span class="hljs-built_in">print</span>(xref.to)<span class="hljs-comment">#here()引用的函数地址</span><br></code></pre></td></tr></table></figure></li><li><p>idautils.Strings()：返回包含所有字符串的对象（有属性ea、length、strtype）（shift+F12）</p></li><li><p>idc.get_strlit_contents(ea)：返回ea处的字符串</p><p>示例：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idc,idautils<br><span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> idautils.Strings():<br>    string=idc.get_strlit_contents(s.ea)<br>    <span class="hljs-built_in">print</span>(string)<br><span class="hljs-comment">#打印所有字符串</span><br></code></pre></td></tr></table></figure></li></ul><h2 id="自修改代码（SMC）"><a href="#自修改代码（SMC）" class="headerlink" title="自修改代码（SMC）"></a>自修改代码（SMC）</h2><ul><li><p>自修改代码（Self-Modifying-Code）指某部分代码以加密后的形式存在于程序中，程序执行到这部分代码的时候才会进行动态解密，和加壳有点异曲同工。常用来加密关键逻辑，使其不可直接静态分析</p></li><li><p>特征：</p><p>程序中存在对程序自身某部分的运算，一般还需要VirtualProtect() &#x2F; mprotect()来改变内存的属性以便将解密后的代码数据写入内存，或者使用VirtualAlloc把解密后的代码数据写入堆中执行（为了避免API暴露，还可能会新增一个有RWX属性的段来存放加密后的代码）。</p></li><li><p>应对方法有两种：一种是动态调试得到解密后的关键逻辑，另一种是使用脚本解密关键逻辑后再覆盖回去</p><ul><li><p>示例：2021-羊城杯-babysmc</p><p>PS：本来想要自己写一个简单程序试试手的，研究了半个下午没研究出来，程序修正到解密函数可以解密出正确代码了，但是调用关键逻辑check的时候莫名其妙跑飞了，在那个安全检查的位置，跳转后像是个畸形函数，不知道是不是改内存属性的时候影响到了，所以只能去找网上的题目了</p></li><li><p>这是优化后的主函数：</p><p><img src="/../images/image-20250805234429100.png" alt="主函数"></p><p>优化的来源就是，enc的位置是一团数字，而loc_7FF6BF081D00处开始是正常代码，加上对下面的decrypt函数的分析，可以确定enc就是被加密后的first_part</p></li><li><p>这是decrypt函数：</p><p><img src="/../images/image-20250805234728191.png" alt="decrypt函数"></p><p>非常明显地调用了VirtualProtect函数，解密逻辑很简单，就是ror后异或0x5a（ror查出来是循环右移，3就是右移的位数了，这点看汇编可能更清晰点）</p></li><li><p>下面就是今天的成果展示了（ror由DS协助实现），SMC解密脚本：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> idautils,idc,idaapi<br><br>enc=idc.get_bytes(<span class="hljs-number">0x00007FF6BF081085</span>,<span class="hljs-number">0x00007FF6BF081D00</span>-<span class="hljs-number">0x00007FF6BF081085</span>)<br>loc=<span class="hljs-number">0x00007FF6BF081085</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">ror</span>(<span class="hljs-params">value, shift, bits=<span class="hljs-number">8</span></span>):<br>    shift %= bits  <span class="hljs-comment"># 确保位移量在有效范围内</span><br>    <span class="hljs-keyword">return</span> (value &gt;&gt; shift) | ((value &lt;&lt; (bits - shift)) &amp; ((<span class="hljs-number">1</span> &lt;&lt; bits) - <span class="hljs-number">1</span>))<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> enc:<br>    idc.patch_byte(loc,(ror(i,<span class="hljs-number">3</span>)^<span class="hljs-number">0x5a</span>)&amp;<span class="hljs-number">0xff</span>)<br>    loc+=<span class="hljs-number">1</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;done&quot;</span>)<br></code></pre></td></tr></table></figure></li><li><p>本来是要写完的，但是first_part的函数解析完好几百行了，是我看不懂的加密🫠去找WP，发现是非常混淆的base64，还加了异或，但是我没看出逻辑，索性点到为止，改天把编码和密码的部分补上再说。</p></li><li><p>本来也尝试了动调解密，但是调着调着给我下起东西来了，虽然链接看着是微软的，但是还是有点怕，就舍弃这个方法了（下的是kernel.pdb好像，DS说是缺失符号文件🫠🫠）</p></li></ul></li></ul>]]></content>
+    
+    
+    <summary type="html">IDApythonAPI、SMC自修改代码</summary>
     
     
     
