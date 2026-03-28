@@ -2,27 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://sydzi.github.io/2026/03/12/week53-week56/</loc>
-    
-    <lastmod>2026-03-22</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://sydzi.github.io/2025/11/16/0xGame2025Week4ReverseWriteUp/</loc>
     
     <lastmod>2026-03-21</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2026/02/08/week49-week52/</loc>
-    
-    <lastmod>2026-03-15</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -65,61 +47,7 @@
   </url>
   
   <url>
-    <loc>https://sydzi.github.io/2025/06/02/%E5%91%A8%E8%AE%B0/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://sydzi.github.io/2026/02/13/%E4%B8%80%E4%B8%AA%E5%B0%86%E5%8D%9A%E5%AE%A2%E5%92%8C%E4%B8%AA%E4%BA%BA%E7%9F%A5%E8%AF%86%E5%BA%93%E7%BB%93%E5%90%88%E7%9A%84%E6%80%9D%E8%B7%AF/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2026/01/11/week45-week48/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2025/12/07/week40-week44/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2025/11/03/week35-week39/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2025/10/05/week31-week34/</loc>
-    
-    <lastmod>2026-02-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/2025/09/08/week27-week30/</loc>
     
     <lastmod>2026-02-15</lastmod>
     
@@ -364,7 +292,7 @@
 
   <url>
     <loc>https://sydzi.github.io/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -372,49 +300,42 @@
   
   <url>
     <loc>https://sydzi.github.io/tags/CTF/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/WriteUp/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/Reverse/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/%E5%A4%8D%E7%8E%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/blog/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/tags/%E6%9D%82%E8%AE%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/tags/%E5%91%A8%E8%AE%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -423,28 +344,21 @@
   
   <url>
     <loc>https://sydzi.github.io/categories/WriteUp-%E5%A4%8D%E7%8E%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/categories/Reverse%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://sydzi.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://sydzi.github.io/categories/%E5%91%A8%E8%AE%B0/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-03-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
